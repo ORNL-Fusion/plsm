@@ -18,6 +18,10 @@ namespace detail
 template <typename T>
 struct DifferenceTypeHelper
 {
+    static_assert(std::is_arithmetic<T>::value,
+        "Maybe you need a specialization "
+        "(see DifferenceTypeHelper<SpaceVector>)");
+
     using Type =
         std::conditional_t<std::is_integral<T>::value,
             std::make_signed_t<T>,

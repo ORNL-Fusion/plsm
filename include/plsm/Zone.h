@@ -8,15 +8,35 @@
 
 namespace plsm
 {
+/*!
+ * @brief Zone is used for recursively subdividing a lattice region
+ *
+ * Zone expects to be used in a Subpaving and have relationships with other
+ * Zones in a hierarchical subdivision by means of indices (for parent and
+ * children) and potentially an owning relationship with a Tile.
+ *
+ * @tparam TScalar Underlying integer type for lattice
+ * @tparam Dim Dimension of the lattice
+ *
+ * @test test_Zone.cpp
+ */
 template <typename TScalar, std::size_t Dim>
 struct Zone
 {
 public:
+    //! Alias for Region
     using RegionType = Region<TScalar, Dim>;
 
+    /*!
+     * @brief Default construct with empty Region, no parent, no children, and
+     * no Tile at level 0
+     */
     KOKKOS_INLINE_FUNCTION
     Zone() = default;
 
+    /*!
+     * @brief Construct with Region, subdivision level, and index or parent Zone
+     */
     KOKKOS_INLINE_FUNCTION
     Zone(const RegionType& region, std::size_t level,
             std::size_t parentId = invalid<std::size_t>)
@@ -27,6 +47,9 @@ public:
     {
     }
 
+    /*!
+     * @brief Check if Zone owns a Tile (has a valid Tile index)
+     */
     KOKKOS_INLINE_FUNCTION
     bool
     hasTile() const noexcept
@@ -34,6 +57,10 @@ public:
         return (_tileId != invalid<std::size_t>);
     }
 
+    //@{
+    /*!
+     * @brief Get/Set index of owned Tile
+     */
     KOKKOS_INLINE_FUNCTION
     std::size_t
     getTileIndex() const noexcept
@@ -47,7 +74,11 @@ public:
     {
         _tileId = tileId;
     }
+    //@}
 
+    /*!
+     * @brief Disown Tile (reset Tile index)
+     */
     KOKKOS_INLINE_FUNCTION
     void
     removeTile() noexcept
@@ -55,6 +86,9 @@ public:
         _tileId = invalid<std::size_t>;
     }
 
+    /*!
+     * @brief Get subdivision level
+     */
     KOKKOS_INLINE_FUNCTION
     std::size_t
     getLevel() const noexcept
@@ -62,6 +96,10 @@ public:
         return _level;
     }
 
+    //@{
+    /*!
+     * @brief Get/Set Interval of indices to subzones
+     */
     KOKKOS_INLINE_FUNCTION
     const Interval<std::size_t>&
     getSubZoneIndices() const noexcept
@@ -70,19 +108,26 @@ public:
     }
 
     KOKKOS_INLINE_FUNCTION
+    void
+    setSubZoneIndices(const Interval<std::size_t>& subZoneIds)
+    {
+        _subZoneIds = subZoneIds;
+    }
+    //@}
+
+    /*!
+     * @brief Get IntervalRange over subzone indices
+     */
+    KOKKOS_INLINE_FUNCTION
     IntervalRange<std::size_t>
     getSubZoneRange() const noexcept
     {
         return IntervalRange<std::size_t>{_subZoneIds};
     }
 
-    KOKKOS_INLINE_FUNCTION
-    void
-    setSubZoneIndices(const Interval<std::size_t>& subZoneIds)
-    {
-        _subZoneIds = subZoneIds;
-    }
-
+    /*!
+     * @brief Get the Zone's Region
+     */
     KOKKOS_INLINE_FUNCTION
     const RegionType&
     getRegion() const noexcept
@@ -90,6 +135,9 @@ public:
         return _region;
     }
 
+    /*!
+     * @brief Check if the Zone has a valid index to a parent Zone
+     */
     KOKKOS_INLINE_FUNCTION
     bool
     hasParent() const noexcept
@@ -97,6 +145,9 @@ public:
         return (_parentId != invalid<std::size_t>);
     }
 
+    /*!
+     * @brief Get the index to the parent Zone
+     */
     KOKKOS_INLINE_FUNCTION
     std::size_t
     getParentIndex() const noexcept
@@ -105,10 +156,15 @@ public:
     }
 
 private:
+    //! Referenced Region
     RegionType _region;
+    //! Subdivision level
     std::size_t _level{};
+    //! Index to parent Zone
     std::size_t _parentId{invalid<std::size_t>};
+    //! Interval of indices to subzones
     Interval<std::size_t> _subZoneIds;
+    //! Index to owned Tile
     std::size_t _tileId{invalid<std::size_t>};
 };
 }

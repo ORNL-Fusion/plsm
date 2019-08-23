@@ -44,7 +44,6 @@ Region<TScalar, Dim>::intersects(const FlatType& a, const FlatType& b) const
         ret = true;
     }
     else {
-        // Segment<FlatType> segment{a, b - a};
         Segment<FlatType> segment{a, b};
         for (std::size_t i = 0; i < a.size(); ++i) {
             if (intersectsFace<RangeElem::first>(i, segment) ||

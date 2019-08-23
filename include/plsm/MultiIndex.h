@@ -6,16 +6,31 @@
 
 namespace plsm
 {
+/*!
+ * @brief MultiIndex represents an N-dimensional set of indices
+ *
+ * This might be used to represent a position within a lattice region
+ *
+ * @tparam Dim Dimension of the space to be indexed
+ *
+ * @test test_MultiIndex.cpp
+ */
 template <std::size_t Dim>
 class MultiIndex :
     public detail::SpaceVectorBase<std::size_t, Dim, MultiIndex<Dim>>
 {
 public:
+    //! Alias to parent class type
     using Superclass =
         detail::SpaceVectorBase<std::size_t, Dim, MultiIndex<Dim>>;
 
     using Superclass::Superclass;
 
+    /*!
+     * @brief Get product of all indices
+     *
+     * This is helpful for getting the linear size from a multi-index size
+     */
     KOKKOS_INLINE_FUNCTION
     std::size_t
     getProduct() const
@@ -27,14 +42,4 @@ public:
         return ret;
     }
 };
-
-
-namespace detail
-{
-template <std::size_t Dim>
-struct DifferenceTypeHelper<MultiIndex<Dim>>
-{
-    // using Type =
-};
-}
 }
