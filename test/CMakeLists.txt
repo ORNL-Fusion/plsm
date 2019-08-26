@@ -1,3 +1,8 @@
+include(CTest)
+if(NOT ${BUILD_TESTING})
+    return()
+endif()
+
 set(TESTING_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(TESTING_SRC_DIR ${CMAKE_CURRENT_LIST_DIR})
 
