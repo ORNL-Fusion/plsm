@@ -36,10 +36,14 @@ set(PLSM_HEADERS
 )
 
 add_library(plsm INTERFACE)
-target_sources(plsm INTERFACE ${PLSM_HEADERS})
-target_include_directories(plsm INTERFACE "${PLSM_INCLUDE_DIR}")
-target_link_libraries(plsm INTERFACE Kokkos)
-target_compile_definitions(plsm INTERFACE TEST_SELECTOR)
+target_sources(plsm INTERFACE
+    $<BUILD_INTERFACE:${PLSM_HEADERS}>)
+target_include_directories(plsm INTERFACE
+    $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:Kokkos>)
+target_compile_definitions(plsm INTERFACE $<BUILD_INTERFACE:TEST_SELECTOR>)
 
 option(PLSM_ENABLE_VTK "Use VTK to render 3D cases" OFF)
 if(${PLSM_ENABLE_VTK})
@@ -50,8 +54,9 @@ if(${PLSM_ENABLE_VTK})
         NO_MODULE
     )
     # include(${VTK_USE_FILE})
-    target_link_libraries(plsm INTERFACE ${VTK_LIBRARIES})
-    target_include_directories(plsm SYSTEM INTERFACE ${VTK_INCLUDE_DIRS})
+    target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:${VTK_LIBRARIES}>)
+    target_include_directories(plsm SYSTEM INTERFACE
+        $<BUILD_INTERFACE:${VTK_INCLUDE_DIRS}>)
     target_compile_definitions(plsm INTERFACE
         ${VTK_DEFINITIONS}
         PLSM_ENABLE_VTK
@@ -62,3 +67,8 @@ include(CTest)
 add_subdirectory(test)
 
 add_subdirectory(doc)
+
+install(DIRECTORY include DESTINATION .)
+install(TARGETS plsm EXPORT plsm)
+install(FILES CMake/plsm-config.cmake DESTINATION lib/plsm)
+install(EXPORT plsm DESTINATION lib/plsm)
