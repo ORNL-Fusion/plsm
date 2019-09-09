@@ -1,4 +1,3 @@
-include(CTest)
 if(NOT ${BUILD_TESTING})
     return()
 endif()

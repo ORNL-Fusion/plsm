@@ -104,12 +104,6 @@ public:
     template <typename TRefinementDetector>
     void
     refine(TRefinementDetector&& detector);
-    // void
-    // refine(const RefinementSpec& refinementSpec);
-
-    // template <typename TSelector>
-    // void
-    // refine(const RefinementSpec& refinementSpec, TSelector selector);
 
     TilesView
     getTilesView()

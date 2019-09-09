@@ -58,5 +58,7 @@ if(${PLSM_ENABLE_VTK})
     )
 endif()
 
-add_subdirectory(doc)
+include(CTest)
 add_subdirectory(test)
+
+add_subdirectory(doc)
