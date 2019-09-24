@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,7 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Basic", "[Zone][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Zone Basic", "[Zone][template]", test::IntTypes)
 {
     using ZoneType = Zone<TestType, 2>;
     ZoneType zone;

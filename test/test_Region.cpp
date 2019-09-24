@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,8 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Construction", "[Region][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Region Construction", "[Region][template]",
+    test::IntTypes)
 {
     Region<TestType, 3> r0;
     REQUIRE(r0.empty());
@@ -26,7 +26,8 @@ TEMPLATE_LIST_TEST_CASE("Construction", "[Region][template]", test::IntTypes)
     REQUIRE(r2[2] == Ival{4, 6});
 }
 
-TEMPLATE_LIST_TEST_CASE("Contains point", "[Region][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Region Contains point", "[Region][template]",
+    test::IntTypes)
 {
     SpaceVector<TestType, 3> p{};
 
@@ -46,7 +47,8 @@ TEMPLATE_LIST_TEST_CASE("Contains point", "[Region][template]", test::IntTypes)
     REQUIRE(!r2.contains(p));
 }
 
-TEMPLATE_LIST_TEST_CASE("Intersection", "[Region][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Region Intersection", "[Region][template]",
+    test::IntTypes)
 {
     using Ival = Interval<TestType>;
     constexpr auto wc = wildcard<TestType>;

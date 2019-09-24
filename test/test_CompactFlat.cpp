@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,8 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("2D", "[CompactFlat][template]", test::ScalarTypes)
+TEMPLATE_LIST_TEST_CASE("CompactFlat 2D", "[CompactFlat][template]",
+    test::ScalarTypes)
 {
     SpaceVector<TestType, 2> o{};
     SpaceVector<TestType, 2> x{8, wildcard<TestType>};
@@ -31,7 +31,8 @@ TEMPLATE_LIST_TEST_CASE("2D", "[CompactFlat][template]", test::ScalarTypes)
     REQUIRE(y5[0] == 5);
 }
 
-TEMPLATE_LIST_TEST_CASE("3D", "[CompactFlat][template]", test::ScalarTypes)
+TEMPLATE_LIST_TEST_CASE("CompactFlat 3D", "[CompactFlat][template]",
+    test::ScalarTypes)
 {
     SpaceVector<TestType, 3> o{};
 

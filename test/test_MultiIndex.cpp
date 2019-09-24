@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,7 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEST_CASE("2D")
+TEST_CASE("MultiIndex 2D")
 {
     MultiIndex<2> i2{};
     MultiIndex<2> j2{2, 3};
@@ -31,7 +30,7 @@ TEST_CASE("2D")
     REQUIRE(ij[1] == 2);
 }
 
-TEST_CASE("3D")
+TEST_CASE("MultiIndex 3D")
 {
     MultiIndex<3> i3{};
     MultiIndex<3> j3{2, 3, 4};

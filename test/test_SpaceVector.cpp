@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,8 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("2D", "[SpaceVector][template]", test::ScalarTypes)
+TEMPLATE_LIST_TEST_CASE("SpaceVector 2D", "[SpaceVector][template]",
+    test::ScalarTypes)
 {
     SpaceVector<TestType, 2> a{3, 3};
     SpaceVector<TestType, 2> b{5, 4};
@@ -54,7 +54,8 @@ TEMPLATE_LIST_TEST_CASE("2D", "[SpaceVector][template]", test::ScalarTypes)
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("3D", "[SpaceVector][template]", test::ScalarTypes)
+TEMPLATE_LIST_TEST_CASE("SpaceVector 3D", "[SpaceVector][template]",
+    test::ScalarTypes)
 {
     SpaceVector<TestType, 3> a{3, 3, 3};
     SpaceVector<TestType, 3> b{5, 4, 3};
@@ -111,7 +112,7 @@ TEMPLATE_LIST_TEST_CASE("3D", "[SpaceVector][template]", test::ScalarTypes)
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("Filled", "[SpaceVector][template]",
+TEMPLATE_LIST_TEST_CASE("SpaceVector Filled", "[SpaceVector][template]",
     test::ScalarTypes)
 {
     auto v1 = SpaceVector<TestType, 1>::filled(8);

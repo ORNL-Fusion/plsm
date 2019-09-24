@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -7,7 +6,7 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Basic", "[Segment][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Segment Basic", "[Segment][template]", test::IntTypes)
 {
     SpaceVector<TestType, 3> a{};
     SpaceVector<TestType, 3> b{1, 1, 1};

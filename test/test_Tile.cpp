@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //plsm
@@ -6,7 +5,7 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Basic", "[Tile][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Tile Basic", "[Tile][template]", test::IntTypes)
 {
     using TileType = Tile<TestType, 2>;
     TileType t;

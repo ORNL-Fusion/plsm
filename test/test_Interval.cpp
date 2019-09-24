@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //std
@@ -10,7 +9,8 @@
 using namespace plsm;
 
 
-TEMPLATE_LIST_TEST_CASE("Interval", "[Interval][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Interval Basic", "[Interval][template]",
+    test::IntTypes)
 {
     Interval<TestType> x;
     REQUIRE(x.begin() == 0);
@@ -82,7 +82,8 @@ TEMPLATE_LIST_TEST_CASE("Interval", "[Interval][template]", test::IntTypes)
 }
 
 
-TEMPLATE_LIST_TEST_CASE("constexpr", "[Interval][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Interval constexpr", "[Interval][template]",
+    test::IntTypes)
 {
     constexpr Interval<TestType> x;
     static_assert(x.begin() == 0, "");

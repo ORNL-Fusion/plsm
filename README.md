@@ -13,10 +13,6 @@ At this point, Kokkos must be built separately. It should be installed (with
 Perhaps this should be done as part of the build project so that configuration
 options would be controlled through CMake for plsm.
 
-#### Boost.Timer
-This is only required for testing. If you turn off the `BUILD_TESTING` CMake
-variable, this is not required.
-
 #### Catch2
 Catch2 is used as the testing framework. It is included automatically since it
 is header-only, and therefore nothing needs to be done by the user.

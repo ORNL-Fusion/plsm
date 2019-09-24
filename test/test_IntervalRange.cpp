@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
 //std
@@ -8,7 +7,7 @@
 #include <plsm/TestingCommon.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Basic", "[IntervalRange][template]",
+TEMPLATE_LIST_TEST_CASE("IntervalRange Basic", "[IntervalRange][template]",
     test::IntTypes)
 {
     IntervalRange<TestType> ir0;
@@ -44,7 +43,7 @@ TEMPLATE_LIST_TEST_CASE("Basic", "[IntervalRange][template]",
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("Range-for", "[IntervalRange][template]",
+TEMPLATE_LIST_TEST_CASE("IntervalRange Range-for", "[IntervalRange][template]",
     test::IntTypes)
 {
     std::vector<TestType> v;
@@ -75,7 +74,7 @@ TEMPLATE_LIST_TEST_CASE("Range-for", "[IntervalRange][template]",
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("constexpr", "[IntervalRange][template]",
+TEMPLATE_LIST_TEST_CASE("IntervalRange constexpr", "[IntervalRange][template]",
     test::IntTypes)
 {
     constexpr IntervalRange<TestType> ir0;

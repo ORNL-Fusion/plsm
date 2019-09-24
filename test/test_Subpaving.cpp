@@ -1,28 +1,18 @@
-#define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 
 //std
 #include <exception>
 #include <iostream>
-//boost
-#include <boost/timer/timer.hpp>
 //plsm
 #include <plsm/Subpaving.h>
 #include <plsm/TestingCommon.h>
-#include <plsm/KokkosContext.h>
 #include <plsm/refine/BallDetector.h>
 #include <plsm/refine/PolylineDetector.h>
 #include <plsm/refine/RegionDetector.h>
 using namespace plsm;
 
-int
-main(int argc, char* argv[])
-{
-    test::KokkosContext context;
-    return Catch::Session().run(argc, argv);
-}
-
-TEMPLATE_LIST_TEST_CASE("Subpaving", "[Subpaving][template]", test::IntTypes)
+TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
+    test::IntTypes)
 {
     using Ival = Interval<TestType>;
     Region<TestType, 3> r{{Ival{0, 4}, Ival{0, 4}, Ival{0, 4}}};
@@ -30,7 +20,7 @@ TEMPLATE_LIST_TEST_CASE("Subpaving", "[Subpaving][template]", test::IntTypes)
     s.refine(refine::PolylineDetector<TestType, 3>{0});
 }
 
-TEST_CASE("Plot", "[Subpaving]")
+TEST_CASE("Subpaving 3D", "[Subpaving]")
 {
     using Ival = Interval<int>;
     Region<int, 3> r{{Ival{0, 512}, Ival{0, 512}, Ival{0, 512}}};
@@ -39,10 +29,9 @@ TEST_CASE("Plot", "[Subpaving]")
 
     SECTION("ball")
     {
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::BallDetector<int, 3>{{256,256,256}, 128});
-        }
+        BENCHMARK("refine: ball") {
+            s.refine(refine::BallDetector<int, 3>{{256,256,256}, 128});
+        };
         // s.render();
     }
 
@@ -52,12 +41,12 @@ TEST_CASE("Plot", "[Subpaving]")
         rspecPoints.push_back({{256, 128, wildcard<int>}});
         rspecPoints.push_back({{384, 256, wildcard<int>}});
         rspecPoints.push_back({{512, 512, wildcard<int>}});
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
-        Interval<int> ival{0, 56};
-        s.refine(refine::RegionDetector<int, 3, Select>{{ival, ival, ival}});
-        }
+
+        BENCHMARK("refine: z-aligned polyline plus box") {
+            s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
+            Interval<int> ival{0, 56};
+            s.refine(refine::RegionDetector<int, 3, Select>{{ival, ival, ival}});
+        };
         // s.render();
     }
 
@@ -67,15 +56,15 @@ TEST_CASE("Plot", "[Subpaving]")
         rspecPoints.push_back({{wildcard<int>, 256, 128}});
         rspecPoints.push_back({{wildcard<int>, 384, 256}});
         rspecPoints.push_back({{wildcard<int>, 512, 512}});
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
-        }
+
+        BENCHMARK("refine: x-aligned") {
+            s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
+        };
         // s.render();
     }
 }
 
-TEST_CASE("Plot (2D-ish)", "[Subpaving]")
+TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
 {
     using Ival = Interval<int>;
     Region<int, 3> r{{Ival{0, 512}, Ival{0, 512}, Ival{256, 257}}};
@@ -84,10 +73,9 @@ TEST_CASE("Plot (2D-ish)", "[Subpaving]")
 
     SECTION("ball")
     {
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::BallDetector<int, 3, SelectAll>{{256,256,256}, 128});
-        }
+        BENCHMARK("refine: ball 2D-ish") {
+            s.refine(refine::BallDetector<int, 3, SelectAll>{{256,256,256}, 128});
+        };
         // s.render();
     }
 
@@ -97,12 +85,13 @@ TEST_CASE("Plot (2D-ish)", "[Subpaving]")
         rspecPoints.push_back({{256, 128, wildcard<int>}});
         rspecPoints.push_back({{384, 256, wildcard<int>}});
         rspecPoints.push_back({{512, 512, wildcard<int>}});
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
-        Interval<int> ival{0, 56};
-        s.refine(refine::RegionDetector<int, 3, Select>{{ival, ival, Interval<int>{0, 512}}});
-        }
+
+        BENCHMARK("refine: z-aligned plus region 2D-ish") {
+            s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
+            Interval<int> ival{0, 56};
+            s.refine(refine::RegionDetector<int, 3, Select>{
+                {ival, ival, Interval<int>{0, 512}}});
+        };
         // s.render();
     }
 
@@ -112,15 +101,15 @@ TEST_CASE("Plot (2D-ish)", "[Subpaving]")
         rspecPoints.push_back({{wildcard<int>, 256, 128}});
         rspecPoints.push_back({{wildcard<int>, 384, 256}});
         rspecPoints.push_back({{wildcard<int>, 512, 512}});
-        {
-        boost::timer::auto_cpu_timer timer;
-        s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
-        }
+
+        BENCHMARK("refine: x-aligned 2D-ish") {
+            s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
+        };
         // s.render();
     }
 }
 
-TEST_CASE("XRN Defaults", "[Subpaving]")
+TEST_CASE("Subpaving with XRN Defaults", "[Subpaving]")
 {
     using Ival = Interval<int>;
     Region<int, 3> r{{Ival{0, 5120}, Ival{0, 4096}, Ival{0, 12}}};
