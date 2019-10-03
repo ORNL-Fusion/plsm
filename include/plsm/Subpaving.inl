@@ -19,8 +19,13 @@ Subpaving<TScalar, Dim, TItemData>::Subpaving(const RegionType& region,
     :
     _zones("zones", 1),
     _tiles("tiles", 1),
-    _rootRegion(region),
-    _subdivisionInfos("Subdivision Infos")
+    _rootRegion(region)
+    // ,
+    //FIXME:
+    //      Cuda runtime error if left "empty".
+    //      KOKKOS_INVALID_INDEX is used by default which is a huge number.
+    //      This should be reported once we get back to kokkos master branch.
+    // _subdivisionInfos("Subdivision Infos", 1)
 {
     processSubdivisionRatios(subdivisionRatios);
 

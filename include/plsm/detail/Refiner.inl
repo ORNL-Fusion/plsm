@@ -139,10 +139,13 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::Refiner(
     _subdivisionInfos(subpaving._subdivisionInfos),
     _detector(detector),
     _numTiles(_tiles.extent(0)),
-    _numZones(_zones.extent(0)),
-    _newZoneCounts("New Zone Counts"),
-    _subZoneStarts("SubZone Start Indices"),
-    _newTileStarts("Tile Start Indices")
+    _numZones(_zones.extent(0))
+    // FIXME: These should start empty, default construction seems to work
+    // ,
+    // _selectedSubZones("Selected Sub-Zones", 1),
+    // _newZoneCounts("New Zone Counts", 1),
+    // _subZoneStarts("SubZone Start Indices", 1),
+    // _newTileStarts("Tile Start Indices", 1)
 {
 }
 
