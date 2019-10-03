@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(PLSM CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(ENV{KOKKOS_CMAKE_CXX_STANDARD} ${CMAKE_CXX_STANDARD})
+project(PLSM CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
+list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
 find_package(Kokkos REQUIRED)
 
 set(PLSM_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
@@ -42,26 +44,12 @@ target_include_directories(plsm INTERFACE
     $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:Kokkos>)
-target_compile_definitions(plsm INTERFACE $<BUILD_INTERFACE:TEST_SELECTOR>)
-
-option(PLSM_ENABLE_VTK "Use VTK to render 3D cases" OFF)
-if(${PLSM_ENABLE_VTK})
-    find_package(VTK REQUIRED
-        COMPONENTS
-        vtkRenderingOpenGL2
-        vtkInteractionStyle
-        NO_MODULE
-    )
-    # include(${VTK_USE_FILE})
-    target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:${VTK_LIBRARIES}>)
-    target_include_directories(plsm SYSTEM INTERFACE
-        $<BUILD_INTERFACE:${VTK_INCLUDE_DIRS}>)
-    target_compile_definitions(plsm INTERFACE
-        ${VTK_DEFINITIONS}
-        PLSM_ENABLE_VTK
-    )
-endif()
+target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:Kokkos::kokkos>)
+###
+###
+target_compile_definitions(plsm INTERFACE TEST_SELECTOR)
+###
+###
 
 include(CTest)
 add_subdirectory(test)

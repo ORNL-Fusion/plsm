@@ -105,7 +105,7 @@ public:
     void
     refine(TRefinementDetector&& detector);
 
-    TilesView
+    TilesDualView
     getTilesView()
     {
         return _tiles;
@@ -113,11 +113,6 @@ public:
 
     void
     plot();
-
-#ifdef PLSM_ENABLE_VTK
-    void
-    render();
-#endif
 
 private:
     void

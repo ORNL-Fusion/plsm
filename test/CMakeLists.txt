@@ -46,6 +46,16 @@ file(DOWNLOAD
 #     add_test(NAME ${_test_name} COMMAND ${_test_name})
 # endfunction(create_test)
 
+option(PLSM_ENABLE_VTK "Use VTK to render 3D cases" OFF)
+if(${PLSM_ENABLE_VTK})
+    find_package(VTK REQUIRED
+        COMPONENTS
+        vtkRenderingOpenGL2
+        vtkInteractionStyle
+        NO_MODULE
+    )
+endif()
+
 function(create_test _name _sources_list)
     add_executable(${_name} ${${_sources_list}} test_main.cpp)
     target_link_libraries(${_name} PUBLIC plsm)
@@ -75,6 +85,16 @@ function(create_test _name _sources_list)
         -Wlogical-op
         ,>
     )
+
+    if(${PLSM_ENABLE_VTK})
+        target_link_libraries(${_name} PUBLIC ${VTK_LIBRARIES})
+        target_include_directories(${_name} SYSTEM PUBLIC ${VTK_INCLUDE_DIRS})
+        target_compile_definitions(${_name} PUBLIC
+            ${VTK_DEFINITIONS}
+            PLSM_ENABLE_VTK
+        )
+    endif()
+
     add_test(NAME ${_name} COMMAND ${_name})
 endfunction(create_test)
 
