@@ -82,9 +82,9 @@ class Subpaving
 
 public:
     using ScalarType = TScalar;
-    using RegionType =
-        detail::EnumIndexed<Region<ScalarType, Dim>, TEnumIndex>;
-    using PointType = typename RegionType::VectorType;
+    using RegionType = detail::EnumIndexed<Region<ScalarType, Dim>, TEnumIndex>;
+    using PointType =
+        detail::EnumIndexed<SpaceVector<ScalarType, Dim>, TEnumIndex>;
     using IntervalType = typename RegionType::IntervalType;
     using ZoneType = Zone<RegionType>;
     using ZonesDualView = Kokkos::DualView<ZoneType*>;

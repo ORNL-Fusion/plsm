@@ -18,18 +18,9 @@ Catch2 is used as the testing framework. It is included automatically since it
 is header-only, and therefore nothing needs to be done by the user.
 
 ### CMake Instructions
-For serial mode:
 ```
 cmake -DCMAKE_BUILD_TYPE=Release \
-    -DKOKKOS_DIR=</path/to/kokkos/install> \
-    /path/to/plsm
-```
-
-For CUDA mode:
-```
-cmake -DCMAKE_CXX_COMPILER=<path/to/kokkos/install>/bin/nvcc_wrapper \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DKOKKOS_DIR=</path/to/kokkos/install> \
+    -DKokkos_DIR=</path/to/kokkos/install> \
     /path/to/plsm
 ```
 
