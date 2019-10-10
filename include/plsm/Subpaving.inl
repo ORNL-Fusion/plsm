@@ -97,7 +97,9 @@ Subpaving<TScalar, Dim, TItemData>::processSubdivisionRatios(
         }
     }
 
-    Kokkos::resize(_subdivisionInfos.h_view, subdivisionRatios.size());
+    _subdivisionInfos = Kokkos::DualView<SubdivisionInfoType*>{
+        "Subdivision Infos", subdivisionRatios.size()};
+    // Kokkos::resize(_subdivisionInfos.h_view, subdivisionRatios.size());
     std::copy(begin(subdivisionRatios), end(subdivisionRatios),
         _subdivisionInfos.h_view.data());
     _subdivisionInfos.modify_host();
@@ -116,16 +118,79 @@ Subpaving<TScalar, Dim, TItemData>::refine(TRefinementDetector&& detector)
 
 
 template <typename TScalar, std::size_t Dim, typename TItemData>
-void
-Subpaving<TScalar, Dim, TItemData>::plot()
+typename Subpaving<TScalar, Dim, TItemData>::TilesHostView
+Subpaving<TScalar, Dim, TItemData>::getTilesOnHost()
 {
     _tiles.modify_device();
     Kokkos::resize(_tiles.h_view, _tiles.d_view.extent(0));
     _tiles.sync_host();
+    return _tiles.h_view;
+}
 
+
+template <typename TScalar, std::size_t Dim, typename TItemData>
+typename Subpaving<TScalar, Dim, TItemData>::ZonesHostView
+Subpaving<TScalar, Dim, TItemData>::getZonesOnHost()
+{
+    _zones.modify_device();
+    Kokkos::resize(_zones.h_view, _zones.d_view.extent(0));
+    _zones.sync_host();
+    return _zones.h_view;
+}
+
+
+template <typename TScalar, std::size_t Dim, typename TItemData>
+std::size_t
+Subpaving<TScalar, Dim, TItemData>::getTileId(const PointType& point)
+{
+    auto zones = getZonesOnHost();
+    return getTileId(point, zones(0));
+}
+
+
+template <typename TScalar, std::size_t Dim, typename TItemData>
+std::size_t
+Subpaving<TScalar, Dim, TItemData>::getTileId(const PointType& point,
+    const ZoneType& zone) const
+{
+    //
+    //TODO: Abstract this process so it can be performed on device or host
+    //
+    //
+    //  getZones<Device>() -> _zones.d_view
+    //  getZones<Host>() -> _zones.h_view
+    //
+    //  template <Context>
+    //  getTileId()
+    //  {
+    //      auto zones = getZones<Context>();
+    //      ...
+    //  }
+    //
+
+    if (zone.getRegion().contains(point)) {
+        if (zone.hasTile()) {
+            return zone.getTileIndex();
+        }
+        for (auto subZoneId : zone.getSubZoneRange()) {
+            auto tileId = getTileId(point, _zones.h_view(subZoneId));
+            if (tileId != invalid<std::size_t>) {
+                return tileId;
+            }
+        }
+    }
+    return invalid<std::size_t>;
+}
+
+
+template <typename TScalar, std::size_t Dim, typename TItemData>
+void
+Subpaving<TScalar, Dim, TItemData>::plot()
+{
+    auto tiles = getTilesOnHost();
     std::ofstream ofs("gp.txt");
-    for (auto i : makeIntervalRange(_tiles.h_view.extent(0))) {
-        const auto& region = _tiles.h_view(i).getRegion();
+    for (auto i : makeIntervalRange(tiles.extent(0))) {
+        const auto& region = tiles(i).getRegion();
         ofs << "\n";
         ofs << region[0].begin() << " " << region[1].begin() << "\n";
         ofs << region[0].end() << " " << region[1].begin() << "\n";

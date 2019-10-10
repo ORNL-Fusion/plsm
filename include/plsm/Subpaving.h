@@ -81,11 +81,12 @@ class Subpaving
 public:
     using ScalarType = TScalar;
     using RegionType = Region<ScalarType, Dim>;
+    using PointType = typename RegionType::VectorType;
     using IntervalType = typename RegionType::IntervalType;
     using ZoneType = Zone<TScalar, Dim>;
     using ZonesDualView = Kokkos::DualView<ZoneType*>;
     using ZonesView = typename ZonesDualView::t_dev;
-    using ZonesHostMirror = typename ZonesDualView::t_host;
+    using ZonesHostView = typename ZonesDualView::t_host;
     using SubdivisionRatioType = SubdivisionRatio<Dim>;
     using SubdivisionInfoType = SubdivisionInfo<Dim>;
     using ItemDataType = TItemData;
@@ -101,9 +102,18 @@ public:
 
     Subpaving(const Subpaving&) = delete;
 
+    Subpaving(Subpaving&&) = default;
+    Subpaving& operator=(Subpaving&&) = default;
+
     template <typename TRefinementDetector>
     void
     refine(TRefinementDetector&& detector);
+
+    const RegionType&
+    getLatticeRegion() const noexcept
+    {
+        return _rootRegion;
+    }
 
     TilesDualView
     getTilesView()
@@ -111,12 +121,30 @@ public:
         return _tiles;
     }
 
+    std::size_t
+    getNumberOfTiles()
+    {
+        return getTilesOnHost().extent(0);
+    }
+
+    TilesHostView
+    getTilesOnHost();
+
+    ZonesHostView
+    getZonesOnHost();
+
+    std::size_t
+    getTileId(const PointType& point);
+
     void
     plot();
 
 private:
     void
     processSubdivisionRatios(const std::vector<SubdivisionRatioType>&);
+
+    std::size_t
+    getTileId(const PointType& point, const ZoneType& zone) const;
 
 private:
     ZonesDualView _zones;

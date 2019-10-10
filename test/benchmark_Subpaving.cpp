@@ -123,8 +123,8 @@ TEST_CASE("Subpaving with XRN Defaults", "[Subpaving]")
     Subpaving<int, 3> s(r, {{{10, 8, 3}}, {{8, 8, 4}}});
     std::vector<SpaceVector<int, 3>> rspecPoints;
     rspecPoints.push_back({{wildcard<int>, wildcard<int>, 3}});
-    BENCHMARK("refine: XRN Default")
-    {
-        s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
-    };
+    // BENCHMARK("refine: XRN Default")
+    // {
+    //     s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
+    // };
 }
