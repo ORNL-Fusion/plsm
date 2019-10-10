@@ -83,7 +83,7 @@ class Subpaving
 public:
     using ScalarType = TScalar;
     using RegionType =
-        detail::EnumIndexed<Region, ScalarType, Dim, TEnumIndex>;
+        detail::EnumIndexed<Region<ScalarType, Dim>, TEnumIndex>;
     using PointType = typename RegionType::VectorType;
     using IntervalType = typename RegionType::IntervalType;
     using ZoneType = Zone<RegionType>;
