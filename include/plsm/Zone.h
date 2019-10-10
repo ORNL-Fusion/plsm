@@ -15,17 +15,16 @@ namespace plsm
  * Zones in a hierarchical subdivision by means of indices (for parent and
  * children) and potentially an owning relationship with a Tile.
  *
- * @tparam TScalar Underlying integer type for lattice
- * @tparam Dim Dimension of the lattice
+ * @tparam TRegion Type used for lattice region
  *
  * @test test_Zone.cpp
  */
-template <typename TScalar, std::size_t Dim>
+template <typename TRegion>
 struct Zone
 {
 public:
     //! Alias for Region
-    using RegionType = Region<TScalar, Dim>;
+    using RegionType = TRegion;
 
     /*!
      * @brief Default construct with empty Region, no parent, no children, and

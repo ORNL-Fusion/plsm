@@ -7,6 +7,7 @@
 #include <Kokkos_Core.hpp>
 #include <Kokkos_DualView.hpp>
 //plsm
+#include <plsm/detail/EnumIndexed.h>
 #include <plsm/detail/Refiner.h>
 #include <plsm/MultiIndex.h>
 #include <plsm/Zone.h>
@@ -72,7 +73,8 @@ private:
 };
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData = std::size_t>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex = void,
+    typename TItemData = std::size_t>
 class Subpaving
 {
     template <typename TSubpaving, typename TSelector>
@@ -80,17 +82,18 @@ class Subpaving
 
 public:
     using ScalarType = TScalar;
-    using RegionType = Region<ScalarType, Dim>;
+    using RegionType =
+        detail::EnumIndexed<Region, ScalarType, Dim, TEnumIndex>;
     using PointType = typename RegionType::VectorType;
     using IntervalType = typename RegionType::IntervalType;
-    using ZoneType = Zone<TScalar, Dim>;
+    using ZoneType = Zone<RegionType>;
     using ZonesDualView = Kokkos::DualView<ZoneType*>;
     using ZonesView = typename ZonesDualView::t_dev;
     using ZonesHostView = typename ZonesDualView::t_host;
     using SubdivisionRatioType = SubdivisionRatio<Dim>;
     using SubdivisionInfoType = SubdivisionInfo<Dim>;
     using ItemDataType = TItemData;
-    using TileType = Tile<TScalar, Dim, ItemDataType>;
+    using TileType = Tile<RegionType, ItemDataType>;
     using TilesDualView = Kokkos::DualView<TileType*>;
     using TilesView = typename TilesDualView::t_dev;
     using TilesHostView = typename TilesDualView::t_host;

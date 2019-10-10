@@ -13,8 +13,8 @@
 
 namespace plsm
 {
-template <typename TScalar, std::size_t Dim, typename TItemData>
-Subpaving<TScalar, Dim, TItemData>::Subpaving(const RegionType& region,
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
         const std::vector<SubdivisionRatioType>& subdivisionRatios)
     :
     _zones("zones", 1),
@@ -42,9 +42,9 @@ Subpaving<TScalar, Dim, TItemData>::Subpaving(const RegionType& region,
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 void
-Subpaving<TScalar, Dim, TItemData>::processSubdivisionRatios(
+Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
     const std::vector<SubdivisionRatioType>& subdivRatios)
 {
     auto subdivisionRatios = subdivRatios;
@@ -108,18 +108,19 @@ Subpaving<TScalar, Dim, TItemData>::processSubdivisionRatios(
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 template <typename TRefinementDetector>
 void
-Subpaving<TScalar, Dim, TItemData>::refine(TRefinementDetector&& detector)
+Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
+    TRefinementDetector&& detector)
 {
     detail::makeRefiner(*this, std::forward<TRefinementDetector>(detector))();
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
-typename Subpaving<TScalar, Dim, TItemData>::TilesHostView
-Subpaving<TScalar, Dim, TItemData>::getTilesOnHost()
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+typename Subpaving<TScalar, Dim, TEnum, TItemData>::TilesHostView
+Subpaving<TScalar, Dim, TEnum, TItemData>::getTilesOnHost()
 {
     _tiles.modify_device();
     Kokkos::resize(_tiles.h_view, _tiles.d_view.extent(0));
@@ -128,9 +129,9 @@ Subpaving<TScalar, Dim, TItemData>::getTilesOnHost()
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
-typename Subpaving<TScalar, Dim, TItemData>::ZonesHostView
-Subpaving<TScalar, Dim, TItemData>::getZonesOnHost()
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+typename Subpaving<TScalar, Dim, TEnum, TItemData>::ZonesHostView
+Subpaving<TScalar, Dim, TEnum, TItemData>::getZonesOnHost()
 {
     _zones.modify_device();
     Kokkos::resize(_zones.h_view, _zones.d_view.extent(0));
@@ -139,18 +140,18 @@ Subpaving<TScalar, Dim, TItemData>::getZonesOnHost()
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 std::size_t
-Subpaving<TScalar, Dim, TItemData>::getTileId(const PointType& point)
+Subpaving<TScalar, Dim, TEnum, TItemData>::getTileId(const PointType& point)
 {
     auto zones = getZonesOnHost();
     return getTileId(point, zones(0));
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 std::size_t
-Subpaving<TScalar, Dim, TItemData>::getTileId(const PointType& point,
+Subpaving<TScalar, Dim, TEnum, TItemData>::getTileId(const PointType& point,
     const ZoneType& zone) const
 {
     //
@@ -183,9 +184,9 @@ Subpaving<TScalar, Dim, TItemData>::getTileId(const PointType& point,
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 void
-Subpaving<TScalar, Dim, TItemData>::plot()
+Subpaving<TScalar, Dim, TEnum, TItemData>::plot()
 {
     auto tiles = getTilesOnHost();
     std::ofstream ofs("gp.txt");

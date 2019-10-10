@@ -7,13 +7,13 @@ using namespace plsm;
 
 TEMPLATE_LIST_TEST_CASE("Tile Basic", "[Tile][template]", test::IntTypes)
 {
-    using TileType = Tile<TestType, 2>;
+    using RegionType = Region<TestType, 2>;
+    using TileType = Tile<RegionType>;
     TileType t;
     REQUIRE(!t.hasOwningZone());
     REQUIRE(!t.hasData());
     REQUIRE(t.getRegion().empty());
 
-    using RegionType = typename TileType::RegionType;
     using Ival = typename RegionType::IntervalType;
     RegionType r1{Ival{12}, Ival{8}};
     TileType t1{r1, 0};

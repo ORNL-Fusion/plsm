@@ -128,10 +128,10 @@ public:
 };
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::Refiner(
-        SubpavingType& subpaving, TDetector detector)
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
+::Refiner(SubpavingType& subpaving, TDetector detector)
     :
     _subpaving(subpaving),
     _zones(subpaving._zones.d_view),
@@ -150,9 +150,10 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::Refiner(
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::~Refiner()
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
+::~Refiner()
 {
     _subpaving._zones.d_view = _zones;
     _subpaving._zones.modify_device();
@@ -161,10 +162,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::~Refiner()
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::operator()()
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
+::operator()()
 {
     _targetDepth = (_detector.depth() == _detector.fullDepth) ?
         this->_subdivisionInfos.h_view.extent(0) : _detector.depth();
@@ -183,11 +185,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::operator()()
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 KOKKOS_INLINE_FUNCTION
 std::size_t
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::countSelectSubZones(std::size_t index, const ZoneType& zone) const
 {
     const auto& info = _subdivisionInfos.d_view(zone.getLevel());
@@ -205,11 +207,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::countSelectNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
     const
 {
@@ -232,11 +234,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::countNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals) const
 {
     const auto& tile = _tiles(index);
@@ -256,10 +258,10 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::countNewZonesAndTiles()
 {
     Kokkos::resize(_newZoneCounts, _numTiles);
@@ -273,10 +275,10 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::findNewItemIndices()
 {
     Kokkos::resize(_subZoneStarts, _numTiles);
@@ -289,12 +291,13 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 KOKKOS_INLINE_FUNCTION
 typename
-    Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::RegionType
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+    Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
+        ::RegionType
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId) const
 {
     using IntervalType = typename RegionType::IntervalType;
@@ -315,12 +318,12 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::refineTile(
-    std::size_t index) const
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
+::refineTile(std::size_t index) const
 {
     auto newZones = _newZoneCounts(index);
     if (newZones == 0) {
@@ -357,10 +360,10 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>::refineTile(
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::assignNewZonesAndTiles()
 {
     Kokkos::resize(_zones, _zones.extent(0) + _newItemTotals.zones);

@@ -7,6 +7,8 @@
 
 namespace plsm
 {
+namespace detail
+{
 /*!
  * @brief EnumIndexed allows any 'std::array-like' class to be indexed with an
  * enum type
@@ -45,5 +47,7 @@ template <template <typename, std::size_t> class TArrayTpl,
     typename TData, std::size_t N>
 struct EnumIndexed<TArrayTpl, TData, N, void> : TArrayTpl<TData, N>
 {
+    using TArrayTpl<TData, N>::TArrayTpl;
 };
+}
 }

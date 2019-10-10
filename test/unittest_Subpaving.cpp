@@ -15,9 +15,11 @@ using namespace plsm;
 TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
     test::IntTypes)
 {
-    using Ival = Interval<TestType>;
-    Region<TestType, 3> r{{Ival{0, 4}, Ival{0, 4}, Ival{0, 4}}};
-    Subpaving<TestType, 3> s(r, {{{2, 2, 2}}});
+    using SubpavingType = Subpaving<TestType, 3>;
+    using RegionType = typename SubpavingType::RegionType;
+    using Ival = typename RegionType::IntervalType;
+    RegionType r{{Ival{0, 4}, Ival{0, 4}, Ival{0, 4}}};
+    SubpavingType s(r, {{{2, 2, 2}}});
     SECTION("Uniform Refinement")
     {
         s.refine(

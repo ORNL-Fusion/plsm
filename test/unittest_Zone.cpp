@@ -7,14 +7,14 @@ using namespace plsm;
 
 TEMPLATE_LIST_TEST_CASE("Zone Basic", "[Zone][template]", test::IntTypes)
 {
-    using ZoneType = Zone<TestType, 2>;
+    using RegionType = Region<TestType, 2>;
+    using ZoneType = Zone<RegionType>;
     ZoneType zone;
     REQUIRE(!zone.hasTile());
     REQUIRE(!zone.hasParent());
     REQUIRE(zone.getRegion().empty());
     REQUIRE(zone.getSubZoneIndices().empty());
 
-    using RegionType = typename ZoneType::RegionType;
     using Ival = typename RegionType::IntervalType;
     RegionType r1{Ival{12}, Ival{8}};
     ZoneType zone1{r1, 0};

@@ -12,7 +12,7 @@
 
 namespace plsm
 {
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename, std::size_t, typename, typename>
 class Subpaving;
 
 
@@ -24,12 +24,13 @@ class Refiner
 };
 
 
-template <typename TScalar, std::size_t Dim, typename TItemData,
-    typename TDetector>
-class Refiner<::plsm::Subpaving<TScalar, Dim, TItemData>, TDetector>
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData, typename TDetector>
+class Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 {
 public:
-    using SubpavingType = ::plsm::Subpaving<TScalar, Dim, TItemData>;
+    using SubpavingType =
+        ::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>;
     using ScalarType = typename SubpavingType::ScalarType;
     using ZoneType = typename SubpavingType::ZoneType;
     using TileType = typename SubpavingType::TileType;

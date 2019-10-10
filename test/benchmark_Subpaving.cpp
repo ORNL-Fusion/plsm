@@ -12,19 +12,11 @@
 #include <plsm/refine/RegionDetector.h>
 using namespace plsm;
 
-TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
-    test::IntTypes)
-{
-    using Ival = Interval<TestType>;
-    Region<TestType, 3> r{{Ival{0, 4}, Ival{0, 4}, Ival{0, 4}}};
-    Subpaving<TestType, 3> s(r, {{{2, 2, 2}}});
-    // s.refine(refine::PolylineDetector<TestType, 3>{0});
-}
-
 TEST_CASE("Subpaving 3D", "[Subpaving]")
 {
+    using RegionType = typename Subpaving<int, 3>::RegionType;
     using Ival = Interval<int>;
-    Region<int, 3> r{{Ival{0, 512}, Ival{0, 512}, Ival{0, 512}}};
+    RegionType r{{Ival{0, 512}, Ival{0, 512}, Ival{0, 512}}};
     Subpaving<int, 3> s(r, {{{2, 2, 2}}});
     std::vector<SpaceVector<int, 3>> rspecPoints;
 
@@ -70,8 +62,9 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
 
 TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
 {
+    using RegionType = typename Subpaving<int, 3>::RegionType;
     using Ival = Interval<int>;
-    Region<int, 3> r{{Ival{0, 512}, Ival{0, 512}, Ival{256, 257}}};
+    RegionType r{{Ival{0, 512}, Ival{0, 512}, Ival{256, 257}}};
     Subpaving<int, 3> s(r, {{{2, 2, 1}}});
     std::vector<SpaceVector<int, 3>> rspecPoints;
 
@@ -118,8 +111,9 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
 
 TEST_CASE("Subpaving with XRN Defaults", "[Subpaving]")
 {
+    using RegionType = typename Subpaving<int, 3>::RegionType;
     using Ival = Interval<int>;
-    Region<int, 3> r{{Ival{0, 5120}, Ival{0, 4096}, Ival{0, 12}}};
+    RegionType r{{Ival{0, 5120}, Ival{0, 4096}, Ival{0, 12}}};
     Subpaving<int, 3> s(r, {{{10, 8, 3}}, {{8, 8, 4}}});
     std::vector<SpaceVector<int, 3>> rspecPoints;
     rspecPoints.push_back({{wildcard<int>, wildcard<int>, 3}});

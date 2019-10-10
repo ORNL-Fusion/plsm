@@ -15,18 +15,17 @@ namespace plsm
  * Tile expects to be used in a Subpaving and to "owned" by an existing Zone in
  * that Subpaving.
  *
- * @tparam TScalar Underlying integer type for lattice
- * @tparam Dim Dimension of the lattice
+ * @tparam TRegion Type used for lattice region
  * @tparam TItemData User data type to be mapped from Tile
  *
  * @test test_Tile.cpp
  */
-template <typename TScalar, std::size_t Dim, typename TItemData = std::size_t>
+template <typename TRegion, typename TItemData = std::size_t>
 class Tile
 {
 public:
     //! Alias for Region
-    using RegionType = Region<TScalar, Dim>;
+    using RegionType = TRegion;
     //! User data type to be mapped from Tile
     using ItemDataType = TItemData;
 

@@ -9,6 +9,7 @@
 enum class Axis { x, y, z };
 
 using namespace plsm;
+using namespace detail;
 
 TEMPLATE_LIST_TEST_CASE("Enum-Indexed SpaceVector", "[EnumIndexed][template]",
     test::IntTypes)
