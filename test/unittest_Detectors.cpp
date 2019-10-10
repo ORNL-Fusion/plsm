@@ -13,7 +13,7 @@ using namespace plsm;
 TEMPLATE_LIST_TEST_CASE("PolylineDetector - 3D", "[Detectors][template]",
     test::IntTypes)
 {
-    using Ival = Interval<TestType>;
+    // using Ival = Interval<TestType>;
     // refine::PolylineDetector<TestType, 3> pd3;
     // TODO
 }
@@ -27,8 +27,8 @@ TEMPLATE_LIST_TEST_CASE("RegionDetector - 2D", "[Detectors][template]",
     SECTION("Intersect Mode")
     {
         using DetectorType = refine::RegionDetector<TestType, 2>;
-        using RefineTag = typename DetectorType::RefineTag;
-        using SelectTag = typename DetectorType::SelectTag;
+        // using RefineTag = typename DetectorType::RefineTag;
+        // using SelectTag = typename DetectorType::SelectTag;
         DetectorType rd2{{Ival{32, 96}, Ival{32, 96}}};
 
         REQUIRE(rd2.intersect(r));

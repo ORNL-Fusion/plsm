@@ -57,6 +57,11 @@ struct RefineTraits<::plsm::SelectAll>
 
 namespace refine
 {
+/*!
+ * @brief Detector
+ *
+ * @todo Need to support 'overlap' (see BallDetector)
+ */
 template <typename TDerived, typename TRefineTag = ::plsm::Intersect>
 class Detector
 {

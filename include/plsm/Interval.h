@@ -3,11 +3,12 @@
 /** @file */
 
 //std
-#include <cassert>
 #include <iostream>
 #include <type_traits>
 //Kokkos
 #include <Kokkos_Macros.hpp>
+//plsm
+#include <plsm/Utility.h>
 
 /*!
  * @brief plsm
@@ -67,7 +68,7 @@ public:
         :
         _end{end}
     {
-        assert(end >= LimitType{});
+        assertNonNegative(end);
     }
 
     /*!

@@ -1,7 +1,11 @@
 #pragma once
 
 //std
+#include <cassert>
 #include <limits>
+#include <type_traits>
+//Kokkos
+#include <Kokkos_Macros.hpp>
 
 namespace plsm
 {
@@ -34,4 +38,21 @@ struct DifferenceTypeHelper
 
 template <typename T>
 using DifferenceType = typename detail::DifferenceTypeHelper<T>::Type;
+
+
+template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+KOKKOS_INLINE_FUNCTION
+constexpr void
+assertNonNegative(T value)
+{
+    assert(value >= T{});
+}
+
+
+template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
+KOKKOS_INLINE_FUNCTION
+constexpr void
+assertNonNegative(T)
+{
+}
 }

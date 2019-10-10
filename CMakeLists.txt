@@ -3,13 +3,19 @@ cmake_minimum_required(VERSION 3.9)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
+set(Kokkos_ROOT ${Kokkos_DIR})
+find_package(Kokkos REQUIRED)
+if (${Kokkos_ENABLE_CUDA})
+    set(CMAKE_CXX_COMPILER "${Kokkos_ROOT}/bin/nvcc_wrapper")
+endif()
 set(ENV{KOKKOS_CMAKE_CXX_STANDARD} ${CMAKE_CXX_STANDARD})
+
 project(PLSM CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
-list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
-find_package(Kokkos REQUIRED)
 
 set(PLSM_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
 set(PLSM_HEADER_DIR "${PLSM_INCLUDE_DIR}/plsm")
