@@ -63,7 +63,7 @@ add_subdirectory(test)
 
 add_subdirectory(doc)
 
-install(DIRECTORY include DESTINATION .)
+install(DIRECTORY include/plsm DESTINATION include)
 install(TARGETS plsm EXPORT plsm)
 install(FILES CMake/plsm-config.cmake DESTINATION lib/plsm)
 install(EXPORT plsm DESTINATION lib/plsm)
