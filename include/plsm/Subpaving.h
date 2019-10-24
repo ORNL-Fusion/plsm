@@ -9,6 +9,7 @@
 //plsm
 #include <plsm/detail/EnumIndexed.h>
 #include <plsm/detail/Refiner.h>
+#include <plsm/ContextUtility.h>
 #include <plsm/MultiIndex.h>
 #include <plsm/Zone.h>
 
@@ -86,17 +87,21 @@ public:
     using PointType =
         detail::EnumIndexed<SpaceVector<ScalarType, Dim>, TEnumIndex>;
     using IntervalType = typename RegionType::IntervalType;
-    using ZoneType = Zone<RegionType>;
-    using ZonesDualView = Kokkos::DualView<ZoneType*>;
-    using ZonesView = typename ZonesDualView::t_dev;
-    using ZonesHostView = typename ZonesDualView::t_host;
     using SubdivisionRatioType = SubdivisionRatio<Dim>;
     using SubdivisionInfoType = SubdivisionInfo<Dim>;
     using ItemDataType = TItemData;
+
+    using ZoneType = Zone<RegionType>;
+    using ZonesDualView = Kokkos::DualView<ZoneType*>;
+
+    template <typename TContext>
+    using ZonesView = detail::ContextualViewType<ZonesDualView, TContext>;
+
     using TileType = Tile<RegionType, ItemDataType>;
     using TilesDualView = Kokkos::DualView<TileType*>;
-    using TilesView = typename TilesDualView::t_dev;
-    using TilesHostView = typename TilesDualView::t_host;
+
+    template <typename TContext>
+    using TilesView = detail::ContextualViewType<TilesDualView, TContext>;
 
     Subpaving() = delete;
 
@@ -124,20 +129,52 @@ public:
         return _tiles;
     }
 
+    template <typename TContext = OnHost>
     std::size_t
-    getNumberOfTiles()
+    getNumberOfTiles(TContext context = onHost)
     {
-        return getTilesOnHost().extent(0);
+        return getTiles(context).extent(0);
     }
 
-    TilesHostView
-    getTilesOnHost();
+    template <typename TContext = OnHost>
+    void
+    syncTiles(TContext context = onHost)
+    {
+        detail::syncUpdate(_tiles, context);
+    }
 
-    ZonesHostView
-    getZonesOnHost();
+    template <typename TContext = OnHost>
+    void
+    syncZones(TContext context = onHost)
+    {
+        detail::syncUpdate(_zones, context);
+    }
 
+    template <typename TContext = OnHost>
+    void
+    syncAll(TContext context = onHost)
+    {
+        syncTiles(context);
+        syncZones(context);
+    }
+
+    template <typename TContext = OnHost>
+    TilesView<TContext>&
+    getTiles(TContext context = onHost)
+    {
+        return detail::getContextualView(_tiles, context);
+    }
+
+    template <typename TContext = OnHost>
+    ZonesView<TContext>&
+    getZones(TContext context = onHost)
+    {
+        return detail::getContextualView(_zones, context);
+    }
+
+    template <typename TContext = OnHost>
     std::size_t
-    getTileId(const PointType& point);
+    findTileId(const PointType& point, TContext context = onHost);
 
     void
     plot();
@@ -146,8 +183,9 @@ private:
     void
     processSubdivisionRatios(const std::vector<SubdivisionRatioType>&);
 
+    template <typename TContext>
     std::size_t
-    getTileId(const PointType& point, const ZoneType& zone) const;
+    findTileId(const PointType& point, const ZoneType& zone, TContext context);
 
 private:
     ZonesDualView _zones;

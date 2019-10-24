@@ -24,7 +24,11 @@ TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
     {
         s.refine(
             refine::RegionDetector<TestType, 3, Select>{s.getLatticeRegion()});
-        REQUIRE(s.getNumberOfTiles() == 64);
-        REQUIRE(s.getTileId({3, 3, 3}) == 63);
+        REQUIRE(s.getTiles(onDevice).extent(0) == 64);
+        s.syncTiles(onHost);
+        REQUIRE(s.getTiles().extent(0) == 64);
+        REQUIRE(s.findTileId({3, 3, 3}) == invalid<std::size_t>);
+        s.syncAll(onHost);
+        REQUIRE(s.findTileId({3, 3, 3}) == 63);
     }
 }

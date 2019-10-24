@@ -6,6 +6,7 @@
 //Kokkos
 #include <Kokkos_Vector.hpp>
 //plsm
+#include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>
 #include <plsm/Utility.h>
@@ -106,9 +107,9 @@ public:
 
 protected:
     SubpavingType& _subpaving;
-    using ZonesView = typename SubpavingType::ZonesView;
+    using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
     ZonesView _zones;
-    using TilesView = typename SubpavingType::TilesView;
+    using TilesView = typename SubpavingType::template TilesView<OnDevice>;
     TilesView _tiles;
     using SubdivisionInfoType = typename SubpavingType::SubdivisionInfoType;
     Kokkos::DualView<SubdivisionInfoType*> _subdivisionInfos;
