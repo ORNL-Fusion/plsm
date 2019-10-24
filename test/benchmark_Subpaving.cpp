@@ -26,7 +26,7 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
         {
             s.refine(refine::BallDetector<int, 3>{{256,256,256}, 128});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 
     SECTION("z-aligned")
@@ -42,7 +42,7 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
             Interval<int> ival{0, 56};
             s.refine(refine::RegionDetector<int, 3, Select>{{ival, ival, ival}});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 
     SECTION("x-aligned")
@@ -56,7 +56,7 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
         {
             s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
         {
             s.refine(refine::BallDetector<int, 3, SelectAll>{{256,256,256}, 128});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 
     SECTION("z-aligned")
@@ -91,7 +91,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
             s.refine(refine::RegionDetector<int, 3, Select>{
                 {ival, ival, Interval<int>{0, 512}}});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 
     SECTION("x-aligned")
@@ -105,7 +105,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
         {
             s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
         };
-        // renderSubpaving(s);
+        // test::renderSubpaving(s);
     }
 }
 

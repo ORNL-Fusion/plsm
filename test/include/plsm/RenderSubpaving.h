@@ -12,21 +12,21 @@
 
 namespace plsm
 {
+namespace test
+{
 template <typename TScalar, std::size_t Dim, typename TItemData>
 void
 renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
 {
-    auto tiles = subpaving.getTilesView();
-    tiles.modify_device();
-    Kokkos::resize(tiles.h_view, tiles.d_view.extent(0));
-    tiles.sync_host();
+    subpaving.syncTiles(onHost);
+    auto tiles = subpaving.getTiles();
 
-    auto numTiles = tiles.h_view.extent(0);
+    auto numTiles = tiles.extent(0);
     auto points = vtkSmartPointer<vtkPoints>::New();
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType pId = 0;
     for (std::size_t i = 0; i < numTiles; ++i) {
-        const auto& region = tiles.h_view(i).getRegion();
+        const auto& region = tiles(i).getRegion();
 
         points->InsertNextPoint(region[0].begin(), region[1].begin(), region[2].begin());
         points->InsertNextPoint(region[0].end(), region[1].begin(), region[2].begin());
@@ -96,6 +96,7 @@ renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
     interactor->SetRenderWindow(window);
     window->Render();
     interactor->Start();
+}
 }
 }
 #endif
