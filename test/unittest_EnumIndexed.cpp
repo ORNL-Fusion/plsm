@@ -2,7 +2,7 @@
 
 //std
 //plsm
-#include <plsm/detail/EnumIndexed.h>
+#include <plsm/EnumIndexed.h>
 #include <plsm/MultiIndex.h>
 #include <plsm/Region.h>
 #include <plsm/TestingCommon.h>
@@ -10,12 +10,12 @@
 enum class Axis { x, y, z };
 
 using namespace plsm;
-using namespace detail;
 
 TEMPLATE_LIST_TEST_CASE("Enum-Indexed SpaceVector", "[EnumIndexed][template]",
     test::IntTypes)
 {
-    EnumIndexed<SpaceVector<TestType, 3>, Axis> a{5, 4, 3};
+    using Vector = EnumIndexed<SpaceVector<TestType, 3>, Axis>;
+    Vector a{5, 4, 3};
     REQUIRE(a[Axis::x] == 5);
     REQUIRE(a[Axis::y] == 4);
     REQUIRE(a[Axis::z] == 3);

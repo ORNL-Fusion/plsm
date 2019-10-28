@@ -93,6 +93,24 @@ public:
     }
 
     /*!
+     * @brief Check if Region is of length exactly one in each dimension, that
+     * is, it comprises just a single point
+     */
+    KOKKOS_INLINE_FUNCTION
+    bool
+    isSimplex() const noexcept
+    {
+        bool ret = true;
+        for (auto ival : *this) {
+            if (ival.length() != 1) {
+                ret = false;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /*!
      * @brief Check if the given point is inside the Region
      */
     KOKKOS_INLINE_FUNCTION

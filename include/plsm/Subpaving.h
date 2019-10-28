@@ -7,7 +7,7 @@
 #include <Kokkos_Core.hpp>
 #include <Kokkos_DualView.hpp>
 //plsm
-#include <plsm/detail/EnumIndexed.h>
+#include <plsm/EnumIndexed.h>
 #include <plsm/detail/Refiner.h>
 #include <plsm/ContextUtility.h>
 #include <plsm/MultiIndex.h>
@@ -83,9 +83,8 @@ class Subpaving
 
 public:
     using ScalarType = TScalar;
-    using RegionType = detail::EnumIndexed<Region<ScalarType, Dim>, TEnumIndex>;
-    using PointType =
-        detail::EnumIndexed<SpaceVector<ScalarType, Dim>, TEnumIndex>;
+    using RegionType = EnumIndexed<Region<ScalarType, Dim>, TEnumIndex>;
+    using PointType = EnumIndexed<SpaceVector<ScalarType, Dim>, TEnumIndex>;
     using IntervalType = typename RegionType::IntervalType;
     using SubdivisionRatioType = SubdivisionRatio<Dim>;
     using SubdivisionInfoType = SubdivisionInfo<Dim>;
@@ -102,6 +101,9 @@ public:
 
     template <typename TContext>
     using TilesView = detail::ContextualViewType<TilesDualView, TContext>;
+
+    template <typename T>
+    using Array = Kokkos::Array<T, Dim>;
 
     Subpaving() = delete;
 
