@@ -1,6 +1,5 @@
 #pragma once
 
-//plsm
 #include <plsm/detail/SpaceVectorBase.h>
 #include <plsm/IntervalRange.h>
 

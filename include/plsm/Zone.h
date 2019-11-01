@@ -1,6 +1,5 @@
 #pragma once
 
-//plsm
 #include <plsm/IntervalRange.h>
 #include <plsm/Region.h>
 #include <plsm/Tile.h>

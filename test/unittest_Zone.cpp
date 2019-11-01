@@ -1,6 +1,5 @@
 #include <catch.hpp>
 
-//plsm
 #include <plsm/Zone.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;

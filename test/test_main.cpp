@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
-//plsm
+
 #include <plsm/KokkosContext.h>
 
 int

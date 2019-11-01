@@ -1,10 +1,9 @@
 #pragma once
 
-//std
 #include <vector>
-//Kokkos
+
 #include <Kokkos_Core.hpp>
-//plsm
+
 #include <plsm/Region.h>
 #include <plsm/refine/Detector.h>
 

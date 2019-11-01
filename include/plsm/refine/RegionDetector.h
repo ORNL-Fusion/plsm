@@ -1,6 +1,5 @@
 #pragma once
 
-//plsm
 #include <plsm/Region.h>
 #include <plsm/refine/Detector.h>
 

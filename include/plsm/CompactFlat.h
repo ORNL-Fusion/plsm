@@ -1,10 +1,9 @@
 #pragma once
 
-//std
 #include <algorithm>
 #include <cassert>
 #include <limits>
-//plsm
+
 #include <plsm/SpaceVector.h>
 #include <plsm/Utility.h>
 

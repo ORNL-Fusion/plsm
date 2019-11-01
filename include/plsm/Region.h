@@ -1,14 +1,13 @@
 #pragma once
 
-//std
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <vector>
-//Kokkos
+
 #include <Kokkos_Array.hpp>
 #include <Kokkos_Core.hpp>
-//plsm
+
 #include <plsm/CompactFlat.h>
 #include <plsm/Interval.h>
 #include <plsm/Segment.h>

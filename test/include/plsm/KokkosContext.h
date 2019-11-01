@@ -1,6 +1,5 @@
 #pragma once
 
-//Kokkos
 #include <Kokkos_Core.hpp>
 
 namespace plsm

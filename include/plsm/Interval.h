@@ -2,12 +2,11 @@
 
 /** @file */
 
-//std
 #include <iostream>
 #include <type_traits>
-//Kokkos
+
 #include <Kokkos_Macros.hpp>
-//plsm
+
 #include <plsm/Utility.h>
 
 /*!

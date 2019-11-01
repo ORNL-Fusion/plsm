@@ -1,6 +1,5 @@
 #include <catch.hpp>
 
-//plsm
 #include <plsm/SpaceVector.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;

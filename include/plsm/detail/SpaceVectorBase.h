@@ -1,12 +1,11 @@
 #pragma once
 
-//std
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
-//Kokkos
+
 #include <Kokkos_Array.hpp>
-//plsm
+
 #include <plsm/Utility.h>
 #include <plsm/detail/KokkosExtension.h>
 

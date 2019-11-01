@@ -1,8 +1,7 @@
 #pragma once
 
-//Kokkos
 #include <Kokkos_Macros.hpp>
-//plsm
+
 #include <plsm/Utility.h>
 
 namespace plsm

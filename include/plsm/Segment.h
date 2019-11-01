@@ -1,8 +1,7 @@
 #pragma once
 
-//std
 #include <cassert>
-//plsm
+
 #include <plsm/detail/SpaceVectorBase.h>
 
 namespace plsm

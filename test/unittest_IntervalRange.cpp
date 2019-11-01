@@ -1,8 +1,7 @@
 #include <catch.hpp>
 
-//std
 #include <vector>
-//plsm
+
 #include <plsm/IntervalRange.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;

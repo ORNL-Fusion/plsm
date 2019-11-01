@@ -1,6 +1,5 @@
 #pragma once
 
-//plsm
 #include <plsm/MultiIndex.h>
 #include <plsm/Utility.h>
 #include <plsm/refine/Detector.h>

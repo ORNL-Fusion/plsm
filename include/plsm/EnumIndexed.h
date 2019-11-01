@@ -1,8 +1,7 @@
 #pragma once
 
-//std
 #include <type_traits>
-//Kokkos
+
 #include <Kokkos_Macros.hpp>
 
 namespace plsm

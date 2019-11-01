@@ -1,10 +1,9 @@
 #pragma once
 
-//std
 #include <cassert>
 #include <limits>
 #include <type_traits>
-//Kokkos
+
 #include <Kokkos_Macros.hpp>
 
 namespace plsm

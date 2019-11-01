@@ -1,8 +1,7 @@
 #pragma once
 
-//std
 #include <type_traits>
-//plsm
+
 #include <plsm/detail/SpaceVectorBase.h>
 
 namespace plsm

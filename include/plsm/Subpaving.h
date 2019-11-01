@@ -1,12 +1,11 @@
 #pragma once
 
-//std
 #include <vector>
 #include <type_traits>
-//Kokkos
+
 #include <Kokkos_Core.hpp>
 #include <Kokkos_DualView.hpp>
-//plsm
+
 #include <plsm/EnumIndexed.h>
 #include <plsm/detail/Refiner.h>
 #include <plsm/ContextUtility.h>

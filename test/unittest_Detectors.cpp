@@ -1,8 +1,7 @@
 #include <catch.hpp>
 
-//std
 #include <type_traits>
-//plsm
+
 #include <plsm/Region.h>
 #include <plsm/refine/BallDetector.h>
 #include <plsm/refine/PolylineDetector.h>

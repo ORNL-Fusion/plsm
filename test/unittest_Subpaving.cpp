@@ -1,9 +1,8 @@
 #include <catch.hpp>
 
-//std
 #include <exception>
 #include <iostream>
-//plsm
+
 #include <plsm/Subpaving.h>
 #include <plsm/TestingCommon.h>
 #include <plsm/RenderSubpaving.h>

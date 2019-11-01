@@ -1,7 +1,5 @@
 #include <catch.hpp>
 
-//std
-//plsm
 #include <plsm/EnumIndexed.h>
 #include <plsm/MultiIndex.h>
 #include <plsm/Region.h>

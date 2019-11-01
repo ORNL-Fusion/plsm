@@ -1,9 +1,8 @@
 #include <catch.hpp>
 
-//std
 #include <iostream>
 #include <sstream>
-//plsm
+
 #include <plsm/Interval.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;

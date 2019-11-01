@@ -1,13 +1,12 @@
 #pragma once
 
-//std
 #include <algorithm>
 #include <array>
 #include <fstream>
 #include <numeric>
 #include <stdexcept>
 #include <utility>
-//plsm
+
 #include <plsm/IntervalRange.h>
 #include <plsm/detail/Refiner.h>
 

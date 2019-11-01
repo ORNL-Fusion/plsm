@@ -1,9 +1,8 @@
 #pragma once
 
-//std
 #include <algorithm>
 #include <cmath>
-//plsm
+
 #include <plsm/Region.h>
 #include <plsm/refine/Detector.h>
 

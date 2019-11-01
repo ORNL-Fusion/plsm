@@ -1,8 +1,7 @@
 #pragma once
 
-//std
 #include <iterator>
-//plsm
+
 #include <plsm/Interval.h>
 
 namespace plsm

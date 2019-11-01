@@ -1,11 +1,10 @@
 #pragma once
 
-//std
 #include <vector>
 #include <utility>
-//Kokkos
+
 #include <Kokkos_Vector.hpp>
-//plsm
+
 #include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>

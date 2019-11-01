@@ -1,8 +1,7 @@
 #pragma once
 
-//std
 #include <cstddef>
-//Kokkos
+
 #include <Kokkos_Array.hpp>
 
 namespace Kokkos
