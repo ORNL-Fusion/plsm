@@ -49,12 +49,12 @@ public:
         }
     }
 
+    // template <typename T, std::enable_if_t<std::is_integral<T>::value, int> = 0>
     KOKKOS_INLINE_FUNCTION
     bool
+    // isOnAxis(T axis) const noexcept
     isOnAxis(std::size_t axis) const noexcept
     {
-        static_assert(std::is_integral<ScalarType>::value, "");
-
         constexpr auto zero = static_cast<ScalarType>(0);
         if ((*this)[axis] == zero) {
             return false;
@@ -70,6 +70,14 @@ public:
             }
         }
         return ret;
+    }
+
+    template <typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    KOKKOS_INLINE_FUNCTION
+    bool
+    isOnAxis(T axis) const noexcept
+    {
+        return isOnAxis(static_cast<std::size_t>(axis));
     }
 
     static

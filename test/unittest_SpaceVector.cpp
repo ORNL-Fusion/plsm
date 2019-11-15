@@ -3,6 +3,7 @@
 #include <plsm/SpaceVector.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;
+using test::Axis;
 
 TEMPLATE_LIST_TEST_CASE("SpaceVector 2D", "[SpaceVector][template]",
     test::ScalarTypes)
@@ -162,6 +163,7 @@ TEMPLATE_LIST_TEST_CASE("SpaceVector Axis", "[SpaceVector][template]",
         SpaceVector<TestType, 3> e{2, 2, 2};
         SpaceVector<TestType, 3> f{2, 0, 2};
         REQUIRE(a.isOnAxis(1));
+        REQUIRE(a.isOnAxis(Axis::y));
         REQUIRE(!a.isOnAxis(0));
         REQUIRE(!a.isOnAxis(2));
         REQUIRE(b.isOnAxis(0));

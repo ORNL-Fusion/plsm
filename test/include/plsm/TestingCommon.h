@@ -21,5 +21,7 @@ using UIntTypes = std::tuple<
 using OtherScalars = std::tuple<double, float>;
 
 using ScalarTypes = decltype(std::tuple_cat(IntTypes{}, OtherScalars{}));
+
+enum class Axis { x, y, z };
 }
 }

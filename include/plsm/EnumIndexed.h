@@ -44,8 +44,6 @@ struct EnumIndexed : TArray
     {
         return TArray::operator[](i);
     }
-
-    // using TArray::operator[];
 };
 
 
