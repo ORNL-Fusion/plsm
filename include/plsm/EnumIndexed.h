@@ -17,6 +17,12 @@ struct EnumIndexed : TArray
 
     using TArray::TArray;
 
+    EnumIndexed(const TArray& a)
+        :
+        TArray(a)
+    {
+    }
+
     KOKKOS_INLINE_FUNCTION
     decltype(auto)
     operator[](EnumIndex enumVal)
