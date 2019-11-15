@@ -49,6 +49,29 @@ public:
         }
     }
 
+    KOKKOS_INLINE_FUNCTION
+    bool
+    isOnAxis(std::size_t axis) const noexcept
+    {
+        static_assert(std::is_integral<ScalarType>::value, "");
+
+        constexpr auto zero = static_cast<ScalarType>(0);
+        if ((*this)[axis] == zero) {
+            return false;
+        }
+        bool ret = true;
+        for (std::size_t i = 0; i < Dim; ++i) {
+            if (i == axis) {
+                continue;
+            }
+            if ((*this)[i] != zero) {
+                ret = false;
+                break;
+            }
+        }
+        return ret;
+    }
+
     static
     KOKKOS_INLINE_FUNCTION
     Derived

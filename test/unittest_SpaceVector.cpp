@@ -133,3 +133,51 @@ TEMPLATE_LIST_TEST_CASE("SpaceVector Filled", "[SpaceVector][template]",
         REQUIRE(v16[i] == 8);
     }
 }
+
+TEMPLATE_LIST_TEST_CASE("SpaceVector Axis", "[SpaceVector][template]",
+    test::IntTypes)
+{
+    SECTION("2D")
+    {
+        SpaceVector<TestType, 2> a{0, 2};
+        SpaceVector<TestType, 2> b{2, 0};
+        SpaceVector<TestType, 2> c{0, 0};
+        SpaceVector<TestType, 2> d{2, 2};
+        REQUIRE(a.isOnAxis(1));
+        REQUIRE(!a.isOnAxis(0));
+        REQUIRE(b.isOnAxis(0));
+        REQUIRE(!b.isOnAxis(1));
+        REQUIRE(!c.isOnAxis(0));
+        REQUIRE(!c.isOnAxis(1));
+        REQUIRE(!d.isOnAxis(0));
+        REQUIRE(!d.isOnAxis(1));
+    }
+
+    SECTION("3D")
+    {
+        SpaceVector<TestType, 3> a{0, 2, 0};
+        SpaceVector<TestType, 3> b{2, 0, 0};
+        SpaceVector<TestType, 3> c{0, 0, 2};
+        SpaceVector<TestType, 3> d{0, 0, 0};
+        SpaceVector<TestType, 3> e{2, 2, 2};
+        SpaceVector<TestType, 3> f{2, 0, 2};
+        REQUIRE(a.isOnAxis(1));
+        REQUIRE(!a.isOnAxis(0));
+        REQUIRE(!a.isOnAxis(2));
+        REQUIRE(b.isOnAxis(0));
+        REQUIRE(!b.isOnAxis(1));
+        REQUIRE(!b.isOnAxis(2));
+        REQUIRE(!c.isOnAxis(0));
+        REQUIRE(!c.isOnAxis(1));
+        REQUIRE(c.isOnAxis(2));
+        REQUIRE(!d.isOnAxis(0));
+        REQUIRE(!d.isOnAxis(1));
+        REQUIRE(!d.isOnAxis(2));
+        REQUIRE(!e.isOnAxis(0));
+        REQUIRE(!e.isOnAxis(1));
+        REQUIRE(!e.isOnAxis(2));
+        REQUIRE(!f.isOnAxis(0));
+        REQUIRE(!f.isOnAxis(1));
+        REQUIRE(!f.isOnAxis(2));
+    }
+}

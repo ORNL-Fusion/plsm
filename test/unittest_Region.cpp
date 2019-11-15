@@ -20,6 +20,7 @@ TEMPLATE_LIST_TEST_CASE("Region Construction", "[Region][template]",
     REQUIRE(r[2] == Ival{0, 1});
     REQUIRE(r.isSimplex());
     REQUIRE(r.volume() == 1);
+    REQUIRE(r.getOrigin() == SpaceVector<TestType, 3>{0, 0, 0});
 
     Region<TestType, 3> r2({Ival{0, 2}, Ival{2, 4}, Ival{4, 6}});
     REQUIRE(r2[0] == Ival{0, 2});
@@ -27,6 +28,7 @@ TEMPLATE_LIST_TEST_CASE("Region Construction", "[Region][template]",
     REQUIRE(r2[2] == Ival{4, 6});
     REQUIRE(!r2.isSimplex());
     REQUIRE(r2.volume() == 8);
+    REQUIRE(r2.getOrigin() == SpaceVector<TestType, 3>{0, 2, 4});
 }
 
 TEMPLATE_LIST_TEST_CASE("Region Contains point", "[Region][template]",

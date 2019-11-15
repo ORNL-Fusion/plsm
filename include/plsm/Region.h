@@ -74,6 +74,9 @@ public:
         return Dim;
     }
 
+    /*!
+     * @brief Compute volume, that is, the number of lattice points contained
+     */
     KOKKOS_INLINE_FUNCTION
     typename IntervalType::SizeType
     volume() const noexcept
@@ -116,6 +119,20 @@ public:
                 ret = false;
                 break;
             }
+        }
+        return ret;
+    }
+
+    /*!
+     * @brief Construct the point at the lower limit
+     */
+    KOKKOS_INLINE_FUNCTION
+    VectorType
+    getOrigin() const noexcept
+    {
+        VectorType ret;
+        for (std::size_t i = 0; i < Dim; ++i) {
+            ret[i] = (*this)[i].begin();
         }
         return ret;
     }
