@@ -74,6 +74,17 @@ public:
         return Dim;
     }
 
+    KOKKOS_INLINE_FUNCTION
+    typename IntervalType::SizeType
+    volume() const noexcept
+    {
+        typename IntervalType::SizeType ret{1};
+        for (auto ival : *this) {
+            ret *= ival.length();
+        }
+        return ret;
+    }
+
     /*!
      * @brief Check if Region is empty (at least one Interval is empty)
      */

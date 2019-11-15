@@ -19,12 +19,14 @@ TEMPLATE_LIST_TEST_CASE("Region Construction", "[Region][template]",
     REQUIRE(r[1] == Ival{0, 1});
     REQUIRE(r[2] == Ival{0, 1});
     REQUIRE(r.isSimplex());
+    REQUIRE(r.volume() == 1);
 
     Region<TestType, 3> r2({Ival{0, 2}, Ival{2, 4}, Ival{4, 6}});
     REQUIRE(r2[0] == Ival{0, 2});
     REQUIRE(r2[1] == Ival{2, 4});
     REQUIRE(r2[2] == Ival{4, 6});
     REQUIRE(!r2.isSimplex());
+    REQUIRE(r2.volume() == 8);
 }
 
 TEMPLATE_LIST_TEST_CASE("Region Contains point", "[Region][template]",
