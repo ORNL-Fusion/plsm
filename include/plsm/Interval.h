@@ -180,7 +180,7 @@ private:
 /*!
  * @relates Interval
  * @brief Check equality of two Intervals, potentially using different
- * underlying types
+ * limit types
  */
 template <typename T, typename U>
 KOKKOS_INLINE_FUNCTION

@@ -64,6 +64,18 @@ public:
     }
 
     /*!
+     * @brief Construct single point region at the given point
+     */
+    explicit
+    KOKKOS_INLINE_FUNCTION
+    Region(const VectorType& point) noexcept
+    {
+        for (std::size_t i = 0; i < Dim; ++i) {
+            (*this)[i] = IntervalType{point[i], point[i]+1};
+        }
+    }
+
+    /*!
      * @brief Dimension of lattice
      */
     static
@@ -192,6 +204,37 @@ public:
     intersectsFace(std::size_t spaceCoord, const Segment<FlatType>& segment)
         const;
 };
+
+/*!
+ * @relates Region
+ * @brief Check equality of two Regions, potentially using different limit types
+ */
+template <typename T, typename U, std::size_t N>
+KOKKOS_INLINE_FUNCTION
+bool
+operator==(const Region<T, N>& a, const Region<U, N>& b) noexcept
+{
+    bool ret = true;
+    for (std::size_t i = 0; i < N; ++i) {
+        if (a[i] != b[i]) {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}
+
+/*!
+ * @relates Region
+ * @brief Two Regions are not equal
+ */
+template <typename T, typename U, std::size_t N>
+KOKKOS_INLINE_FUNCTION
+bool
+operator!=(const Region<T, N>& a, const Region<U, N>& b) noexcept
+{
+    return !(a == b);
+}
 } /* namespace plsm */
 
 #include <plsm/Region.inl>

@@ -29,6 +29,19 @@ TEMPLATE_LIST_TEST_CASE("Region Construction", "[Region][template]",
     REQUIRE(!r2.isSimplex());
     REQUIRE(r2.volume() == 8);
     REQUIRE(r2.getOrigin() == SpaceVector<TestType, 3>{0, 2, 4});
+
+    Region<TestType, 3> r3(SpaceVector<TestType, 3>{});
+    REQUIRE(r3 == r);
+    REQUIRE(r3[0] == Ival{0, 1});
+    REQUIRE(r3[1] == Ival{0, 1});
+    REQUIRE(r3[2] == Ival{0, 1});
+    REQUIRE(r3.getOrigin() == SpaceVector<TestType, 3>{0, 0, 0});
+
+    Region<TestType, 3> r4(SpaceVector<TestType, 3>{3, 4, 5});
+    REQUIRE(r4[0] == Ival{3, 4});
+    REQUIRE(r4[1] == Ival{4, 5});
+    REQUIRE(r4[2] == Ival{5, 6});
+    REQUIRE(r4.getOrigin() == SpaceVector<TestType, 3>{3, 4, 5});
 }
 
 TEMPLATE_LIST_TEST_CASE("Region Contains point", "[Region][template]",
