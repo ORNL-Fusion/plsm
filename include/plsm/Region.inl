@@ -1,7 +1,32 @@
 #pragma once
 
+#include <plsm/IntervalRange.h>
+
 namespace plsm
 {
+template <typename TScalar, std::size_t Dim>
+KOKKOS_INLINE_FUNCTION
+SpaceVector<double, Dim>
+Region<TScalar, Dim>::dispersion() const noexcept
+{
+    SpaceVector<double, Dim> disp{};
+    auto vol = static_cast<double>(volume());
+    auto volInv = 1.0 / vol;
+
+    for (std::size_t axis = 0; axis < Dim; ++axis) {
+        double nSqSum {};
+        auto ival = (*this)[axis];
+        for (auto n : makeIntervalRange(ival)) {
+            nSqSum += static_cast<double>(n*n);
+        }
+        auto nAvg = midpoint(axis);
+        disp[axis] = volInv*(nSqSum - vol*nAvg*nAvg);
+    }
+
+    return disp;
+}
+
+
 template <typename TScalar, std::size_t Dim>
 KOKKOS_INLINE_FUNCTION
 bool

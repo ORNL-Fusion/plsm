@@ -120,3 +120,28 @@ TEMPLATE_LIST_TEST_CASE("Region Intersection", "[Region][template]",
     REQUIRE(r6.intersects(r4));
     REQUIRE(r4.intersects(r6));
 }
+
+TEMPLATE_LIST_TEST_CASE("Region Geometry", "[Region][template]", test::IntTypes)
+{
+    Region<TestType, 3> r0;
+    REQUIRE(r0.empty());
+
+    using Ival = Interval<TestType>;
+    using Vecd = SpaceVector<double, 3>;
+
+    Region<TestType, 3> r({Ival{0, 1}, Ival{0, 1}, Ival{0, 1}});
+    REQUIRE(r.midpoint(0) == 0.0);
+    REQUIRE(r.midpoint(1) == 0.0);
+    REQUIRE(r.midpoint(2) == 0.0);
+    REQUIRE(r.dispersion() == Vecd{0.0, 0.0, 0.0});
+
+    Region<TestType, 3> r2({Ival{0, 2}, Ival{2, 4}, Ival{4, 6}});
+    REQUIRE(r2.midpoint(0) == 0.5);
+    REQUIRE(r2.midpoint(1) == 2.5);
+    REQUIRE(r2.midpoint(2) == 4.5);
+
+    Region<TestType, 3> r4(SpaceVector<TestType, 3>{3, 4, 5});
+    REQUIRE(r4.midpoint(0) == 3.0);
+    REQUIRE(r4.midpoint(1) == 4.0);
+    REQUIRE(r4.midpoint(2) == 5.0);
+}

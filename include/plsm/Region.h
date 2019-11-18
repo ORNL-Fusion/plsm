@@ -101,6 +101,32 @@ public:
     }
 
     /*!
+     * @brief Compute dispersion (sigma^2)
+     * @todo Figure out what this means :)
+     */
+    KOKKOS_INLINE_FUNCTION
+    SpaceVector<double, Dim>
+    dispersion() const noexcept;
+
+    KOKKOS_INLINE_FUNCTION
+    double
+    midpoint(std::size_t axis) const noexcept
+    {
+        assert(!empty());
+        auto a = static_cast<double>((*this)[axis].begin());
+        auto b = static_cast<double>((*this)[axis].end() - 1);
+        return 0.5*(a + b);
+    }
+
+    template <typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    KOKKOS_INLINE_FUNCTION
+    double
+    midpoint(T axis) const noexcept
+    {
+        return midpoint(static_cast<std::size_t>(axis));
+    }
+
+    /*!
      * @brief Check if Region is empty (at least one Interval is empty)
      */
     KOKKOS_INLINE_FUNCTION
@@ -145,6 +171,20 @@ public:
         VectorType ret;
         for (std::size_t i = 0; i < Dim; ++i) {
             ret[i] = (*this)[i].begin();
+        }
+        return ret;
+    }
+
+    /*!
+     * @brief Construct the point at the upper limit
+     */
+    KOKKOS_INLINE_FUNCTION
+    VectorType
+    getUpperLimitPoint() const noexcept
+    {
+        VectorType ret;
+        for (std::size_t i = 0; i < Dim; ++i) {
+            ret[i] = (*this)[i].end();
         }
         return ret;
     }
