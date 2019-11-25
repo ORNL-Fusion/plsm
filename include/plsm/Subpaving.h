@@ -109,7 +109,8 @@ public:
     Subpaving(const RegionType& region,
         const std::vector<SubdivisionRatioType>& subdivisionRatios);
 
-    Subpaving(const Subpaving&) = delete;
+    Subpaving(const Subpaving&) = default;
+    Subpaving& operator=(const Subpaving&) = default;
 
     Subpaving(Subpaving&&) = default;
     Subpaving& operator=(Subpaving&&) = default;
@@ -128,13 +129,6 @@ public:
     getTilesView()
     {
         return _tiles;
-    }
-
-    template <typename TContext = OnHost>
-    std::size_t
-    getNumberOfTiles(TContext context = onHost)
-    {
-        return getTiles(context).extent(0);
     }
 
     template <typename TContext = OnHost>
@@ -157,6 +151,13 @@ public:
     {
         syncTiles(context);
         syncZones(context);
+    }
+
+    template <typename TContext = OnHost>
+    std::size_t
+    getNumberOfTiles(TContext context = onHost)
+    {
+        return getTiles(context).extent(0);
     }
 
     template <typename TContext = OnHost>
