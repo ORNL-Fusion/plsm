@@ -73,6 +73,8 @@ public:
 
     static constexpr std::size_t fullDepth = wildcard<std::size_t>;
 
+    Detector() = default;
+
     Detector(std::size_t refineDepth)
         :
         _depth{refineDepth}
