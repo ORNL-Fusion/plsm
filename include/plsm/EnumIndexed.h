@@ -17,6 +17,11 @@ struct EnumIndexed : TArray
 
     using TArray::TArray;
 
+    KOKKOS_INLINE_FUNCTION
+    EnumIndexed() noexcept(noexcept(TArray()))
+        = default;
+
+    KOKKOS_INLINE_FUNCTION
     EnumIndexed(const TArray& a)
         :
         TArray(a)

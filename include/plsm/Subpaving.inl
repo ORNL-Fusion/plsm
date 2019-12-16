@@ -118,6 +118,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
 
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 template <typename TContext>
+KOKKOS_INLINE_FUNCTION
 std::size_t
 Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
     const PointType& point,
@@ -130,6 +131,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
 
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 template <typename TContext>
+KOKKOS_INLINE_FUNCTION
 std::size_t
 Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(const PointType& point,
     const ZoneType& zone, TContext context)

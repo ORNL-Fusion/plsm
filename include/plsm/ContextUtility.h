@@ -53,6 +53,7 @@ getContextualView(TDualView& dualView, ::plsm::OnHost)
 
 
 template <typename TDualView>
+KOKKOS_INLINE_FUNCTION
 ContextualViewType<TDualView, ::plsm::OnDevice>&
 getContextualView(TDualView& dualView, ::plsm::OnDevice)
 {
