@@ -36,13 +36,13 @@ public:
     //! Alias for Interval
     using IntervalType = Interval<ScalarType>;
     //! Alias for parent class type
-    using Superclass = Kokkos::Array<IntervalType, Dim>;
+    using ArrayType = Kokkos::Array<IntervalType, Dim>;
     //! Alias for SpaceVector
     using VectorType = SpaceVector<ScalarType, Dim>;
     //! Alias for CompactFlat
     using FlatType = CompactFlat<ScalarType, Dim>;
 
-    using Superclass::Superclass;
+    using ArrayType::ArrayType;
 
     /*!
      * @brief Default construct empty Region
@@ -61,6 +61,16 @@ public:
         for (std::size_t i = 0; i < Dim; ++i) {
             (*this)[i] = ilist.begin()[i];
         }
+    }
+
+    /*!
+     * @brief Construct from parent array type
+     */
+    KOKKOS_INLINE_FUNCTION
+    Region(const ArrayType& arr) noexcept
+        :
+        ArrayType(arr)
+    {
     }
 
     /*!
