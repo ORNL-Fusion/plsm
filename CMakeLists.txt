@@ -52,7 +52,6 @@ target_include_directories(plsm INTERFACE
     $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
 )
-# target_link_libraries(plsm INTERFACE $<BUILD_INTERFACE:Kokkos::kokkos>)
 target_link_libraries(plsm INTERFACE Kokkos::kokkos)
 ###
 ###

@@ -94,7 +94,7 @@ public:
                 d_max += static_cast<ScalarType>(e_lo*e_lo);
             }
             else {
-                auto r = static_cast<ScalarType>(std::max(e_lo, std::abs(e_hi)));
+                auto r = static_cast<ScalarType>(plsm::max(e_lo, plsm::abs(e_hi)));
                 d_max += r*r;
             }
         }

@@ -54,4 +54,50 @@ constexpr void
 assertNonNegative(T)
 {
 }
+
+
+//@{
+/**
+ * Duplicate of the generic std::min and std::max to be used in device kernels
+ */
+template <typename T>
+KOKKOS_INLINE_FUNCTION
+const T&
+min(const T& a, const T& b)
+{
+    if (b < a) {
+        return b;
+    }
+    return a;
+}
+
+template <typename T>
+KOKKOS_INLINE_FUNCTION
+const T&
+max(const T& a, const T& b)
+{
+    if (a < b) {
+        return b;
+    }
+    return a;
+}
+//@}
+
+
+template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+KOKKOS_INLINE_FUNCTION
+T
+abs(T a)
+{
+    return max(-a, a);
+}
+
+
+template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
+KOKKOS_INLINE_FUNCTION
+T
+abs(T a)
+{
+    return a;
+}
 }

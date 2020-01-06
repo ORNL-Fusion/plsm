@@ -19,12 +19,6 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
     _zones("zones", 1),
     _tiles("tiles", 1),
     _rootRegion(region)
-    // ,
-    //FIXME:
-    //      Cuda runtime error if left "empty".
-    //      KOKKOS_INVALID_INDEX is used by default which is a huge number.
-    //      This should be reported once we get back to kokkos master branch.
-    // _subdivisionInfos("Subdivision Infos", 1)
 {
     processSubdivisionRatios(subdivisionRatios);
 
@@ -101,7 +95,6 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
     std::copy(begin(subdivisionRatios), end(subdivisionRatios),
         _subdivisionInfos.h_view.data());
     _subdivisionInfos.modify_host();
-    Kokkos::resize(_subdivisionInfos.d_view, subdivisionRatios.size());
     _subdivisionInfos.sync_device();
 }
 
@@ -120,8 +113,7 @@ template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 template <typename TContext>
 KOKKOS_INLINE_FUNCTION
 std::size_t
-Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
-    const PointType& point,
+Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(const PointType& point,
     TContext context)
 {
     auto zones = getZones(context);

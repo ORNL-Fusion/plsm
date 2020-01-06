@@ -263,13 +263,15 @@ void
 Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::countNewZonesAndTiles()
 {
-    Kokkos::resize(_newZoneCounts, _numTiles);
+    _newZoneCounts = Kokkos::View<std::size_t*>("New Zone Counts", _numTiles);
     auto numSubZones = _subdivisionInfos.h_view(_currLevel).getRatio().getProduct();
-    Kokkos::resize(_selectedSubZones, _numTiles, numSubZones);
+    _selectedSubZones = Kokkos::View<std::size_t**>("Selected Sub-Zones",
+        _numTiles, numSubZones);
     NewItemTotals counts{};
     Kokkos::parallel_reduce(_numTiles,
         CountNewItemsFromTile<Refiner>{*this},
         counts);
+    Kokkos::fence();
     _newItemTotals = counts;
 }
 
@@ -280,13 +282,16 @@ void
 Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 ::findNewItemIndices()
 {
-    Kokkos::resize(_subZoneStarts, _numTiles);
+    _subZoneStarts = Kokkos::View<std::size_t*>("SubZone Start Indices",
+        _numTiles);
     Kokkos::parallel_for(_numTiles, InitZoneStarts<Refiner>{*this});
     Kokkos::parallel_scan(_numTiles, ExclusiveScanFunctor{_subZoneStarts});
 
-    Kokkos::resize(_newTileStarts, _numTiles);
+    _newTileStarts = Kokkos::View<std::size_t*>("Tile Start Indices",
+        _numTiles);
     Kokkos::parallel_for(_numTiles, InitTileStarts<Refiner>{*this});
     Kokkos::parallel_scan(_numTiles, ExclusiveScanFunctor{_newTileStarts});
+    Kokkos::fence();
 }
 
 
@@ -369,6 +374,7 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
     Kokkos::resize(_tiles, _tiles.extent(0) + _newItemTotals.tiles);
 
     Kokkos::parallel_for(_numTiles, RefineTile<Refiner>{*this});
+    Kokkos::fence();
 
     _numTiles = _tiles.extent(0);
     _numZones = _zones.extent(0);

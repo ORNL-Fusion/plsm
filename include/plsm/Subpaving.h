@@ -112,9 +112,6 @@ public:
     Subpaving(const Subpaving&) = default;
     Subpaving& operator=(const Subpaving&) = default;
 
-    Subpaving(Subpaving&&) = default;
-    Subpaving& operator=(Subpaving&&) = default;
-
     template <typename TRefinementDetector>
     void
     refine(TRefinementDetector&& detector);
