@@ -46,8 +46,8 @@ using ContextualViewType = typename ContextualView<TDualView, TContext>::Type;
 
 template <typename TDualView>
 KOKKOS_INLINE_FUNCTION
-ContextualViewType<TDualView, ::plsm::OnHost>&
-getContextualView(TDualView& dualView, ::plsm::OnHost)
+const ContextualViewType<TDualView, ::plsm::OnHost>&
+getContextualView(const TDualView& dualView, ::plsm::OnHost)
 {
     return dualView.h_view;
 }
@@ -55,8 +55,8 @@ getContextualView(TDualView& dualView, ::plsm::OnHost)
 
 template <typename TDualView>
 KOKKOS_INLINE_FUNCTION
-ContextualViewType<TDualView, ::plsm::OnDevice>&
-getContextualView(TDualView& dualView, ::plsm::OnDevice)
+const ContextualViewType<TDualView, ::plsm::OnDevice>&
+getContextualView(const TDualView& dualView, ::plsm::OnDevice)
 {
     return dualView.d_view;
 }

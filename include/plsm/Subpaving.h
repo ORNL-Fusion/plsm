@@ -159,16 +159,16 @@ public:
 
     template <typename TContext = OnHost>
     KOKKOS_INLINE_FUNCTION
-    TilesView<TContext>&
-    getTiles(TContext context = onHost)
+    const TilesView<TContext>&
+    getTiles(TContext context = onHost) const
     {
         return detail::getContextualView(_tiles, context);
     }
 
     template <typename TContext = OnHost>
     KOKKOS_INLINE_FUNCTION
-    ZonesView<TContext>&
-    getZones(TContext context = onHost)
+    const ZonesView<TContext>&
+    getZones(TContext context = onHost) const
     {
         return detail::getContextualView(_zones, context);
     }
@@ -176,7 +176,7 @@ public:
     template <typename TContext = OnHost>
     KOKKOS_INLINE_FUNCTION
     std::size_t
-    findTileId(const PointType& point, TContext context = onHost);
+    findTileId(const PointType& point, TContext context = onHost) const;
 
     void
     plot();
@@ -184,11 +184,6 @@ public:
 private:
     void
     processSubdivisionRatios(const std::vector<SubdivisionRatioType>&);
-
-    template <typename TContext>
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    findTileId(const PointType& point, const ZoneType& zone, TContext context);
 
 private:
     ZonesDualView _zones;

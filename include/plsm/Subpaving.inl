@@ -114,33 +114,34 @@ template <typename TContext>
 KOKKOS_INLINE_FUNCTION
 std::size_t
 Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(const PointType& point,
-    TContext context)
+    TContext context) const
 {
     auto zones = getZones(context);
-    return findTileId(point, zones(0), context);
-}
-
-
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
-template <typename TContext>
-KOKKOS_INLINE_FUNCTION
-std::size_t
-Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(const PointType& point,
-    const ZoneType& zone, TContext context)
-{
-    auto zones = getZones(context);
-    if (zone.getRegion().contains(point)) {
+    std::size_t zoneId = 0;
+    auto zone = zones(zoneId);
+    auto tileId = invalid<std::size_t>;
+    if (!zone.getRegion().contains(point)) {
+        return tileId;
+    }
+    for (;;) {
         if (zone.hasTile()) {
-            return zone.getTileIndex();
+            tileId = zone.getTileIndex();
+            break;
         }
+        auto newZoneId = zoneId;
         for (auto subZoneId : zone.getSubZoneRange()) {
-            auto tileId = findTileId(point, zones(subZoneId), context);
-            if (tileId != invalid<std::size_t>) {
-                return tileId;
+            if (zones(subZoneId).getRegion().contains(point)) {
+                newZoneId = subZoneId;
+                break;
             }
         }
+        if (newZoneId == zoneId) {
+            break;
+        }
+        zoneId = newZoneId;
+        zone = zones(zoneId);
     }
-    return invalid<std::size_t>;
+    return tileId;
 }
 
 

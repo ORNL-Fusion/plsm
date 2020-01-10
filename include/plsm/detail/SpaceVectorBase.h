@@ -89,6 +89,14 @@ public:
         }
         return ret;
     }
+
+    static
+    KOKKOS_INLINE_FUNCTION
+    Derived
+    zero()
+    {
+        return filled(static_cast<TScalar>(0));
+    }
 };
 
 
@@ -122,6 +130,16 @@ operator==(const SpaceVectorBase<T, N, Derived>& a,
         }
     }
     return ret;
+}
+
+
+template <typename T, std::size_t N, typename Derived>
+KOKKOS_INLINE_FUNCTION
+bool
+operator!=(const SpaceVectorBase<T, N, Derived>& a,
+    const SpaceVectorBase<T, N, Derived>& b)
+{
+    return !(a == b);
 }
 
 
