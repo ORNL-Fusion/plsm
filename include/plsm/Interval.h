@@ -52,7 +52,6 @@ public:
     /*!
      * @brief Default construct empty interval [0, 0)
      */
-    KOKKOS_INLINE_FUNCTION
     constexpr
     Interval() noexcept
         = default;
@@ -86,7 +85,6 @@ public:
     /*!
      * @brief Defaulted copy operations
      */
-    KOKKOS_INLINE_FUNCTION
     constexpr
     Interval(const Interval&) noexcept
         = default;
@@ -94,7 +92,6 @@ public:
     /*!
      * @brief Defaulted copy operations
      */
-    KOKKOS_INLINE_FUNCTION
     Interval&
     operator=(const Interval&) noexcept
         = default;

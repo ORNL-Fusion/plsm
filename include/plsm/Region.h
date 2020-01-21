@@ -47,7 +47,6 @@ public:
     /*!
      * @brief Default construct empty Region
      */
-    KOKKOS_INLINE_FUNCTION
     Region() noexcept
         = default;
 

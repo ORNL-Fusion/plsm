@@ -29,7 +29,6 @@ public:
      * @brief Default construct with empty Region, no parent, no children, and
      * no Tile at level 0
      */
-    KOKKOS_INLINE_FUNCTION
     Zone() = default;
 
     /*!

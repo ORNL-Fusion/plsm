@@ -31,7 +31,6 @@ public:
     /*!
      * @brief Default construct with empty region, no owner, and no data item
      */
-    KOKKOS_INLINE_FUNCTION
     Tile() = default;
 
     /*!

@@ -22,7 +22,6 @@ template <std::size_t Dim>
 class SubdivisionInfo
 {
 public:
-    KOKKOS_INLINE_FUNCTION
     SubdivisionInfo() noexcept
         = default;
 
