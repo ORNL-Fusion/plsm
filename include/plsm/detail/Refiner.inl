@@ -32,11 +32,7 @@ public:
     void
     operator()(std::size_t index, NewItemTotals& running) const
     {
-#ifdef TEST_SELECTOR
         this->countSelectNewItemsFromTile(index, running);
-#else
-        this->countNewItemsFromTile(index, running);
-#endif
     }
 };
 
@@ -67,23 +63,7 @@ Refiner<TSubpaving, TDetector>::Refiner(SubpavingType& subpaving,
     _detector(detector),
     _numTiles(_tiles.extent(0)),
     _numZones(_zones.extent(0))
-    // FIXME: These should start empty, default construction seems to work
-    // ,
-    // _selectedSubZones("Selected Sub-Zones", 1),
-    // _newZoneCounts("New Zone Counts", 1),
-    // _subZoneStarts("SubZone Start Indices", 1),
-    // _newTileStarts("Tile Start Indices", 1)
 {
-}
-
-
-template <typename TSubpaving, typename TDetector>
-Refiner<TSubpaving, TDetector>::~Refiner()
-{
-    _subpaving._zones.d_view = _zones;
-    _subpaving._zones.modify_device();
-    _subpaving._tiles.d_view = _tiles;
-    _subpaving._tiles.modify_device();
 }
 
 
@@ -105,6 +85,11 @@ Refiner<TSubpaving, TDetector>::operator()()
 
         assignNewZonesAndTiles();
     }
+
+    _subpaving._zones.d_view = _zones;
+    _subpaving._zones.modify_device();
+    _subpaving._tiles.d_view = _tiles;
+    _subpaving._tiles.modify_device();
 }
 
 
@@ -140,7 +125,6 @@ Refiner<TSubpaving, TDetector>::countSelectNewItemsFromTile(std::size_t index,
     std::size_t count = 0;
     auto& zone = _zones(zoneId);
     auto level = zone.getLevel();
-    // if (level == _currLevel) {
     if (level < _targetDepth) {
         if (_detector(DetectorType::refineTag, tile.getRegion())) {
             count = countSelectSubZones(index, zone);
@@ -155,39 +139,18 @@ Refiner<TSubpaving, TDetector>::countSelectNewItemsFromTile(std::size_t index,
 
 
 template <typename TSubpaving, typename TDetector>
-KOKKOS_FUNCTION
-void
-Refiner<TSubpaving, TDetector>::countNewItemsFromTile(std::size_t index,
-    NewItemTotals& runningTotals) const
-{
-    const auto& tile = _tiles(index);
-    auto zoneId = tile.getOwningZoneIndex();
-    std::size_t count = 0;
-    auto level = _zones(zoneId).getLevel();
-    if (level == _currLevel) {
-        if (_detector(DetectorType::refineTag, tile.getRegion())) {
-            count = _subdivisionInfos.d_view(level).getRatio().getProduct();
-        }
-    }
-    _newZoneCounts(index) = count;
-    if (count > 0) {
-        runningTotals.zones += count;
-        runningTotals.tiles += count - 1;
-    }
-}
-
-
-template <typename TSubpaving, typename TDetector>
 void
 Refiner<TSubpaving, TDetector>::countNewZonesAndTiles()
 {
-    _newZoneCounts = Kokkos::View<std::size_t*>("New Zone Counts", _numTiles);
-    auto numSubZones = _subdivisionInfos.h_view(_currLevel).getRatio().getProduct();
-    _selectedSubZones = Kokkos::View<std::size_t**>("Selected Sub-Zones",
+    _newZoneCounts = Kokkos::View<std::size_t*>(
+        Kokkos::ViewAllocateWithoutInitializing{"New Zone Counts"}, _numTiles);
+    auto numSubZones =
+        _subdivisionInfos.h_view(_currLevel).getRatio().getProduct();
+    _selectedSubZones = Kokkos::View<std::size_t**>(
+        Kokkos::ViewAllocateWithoutInitializing{"Selected Sub-Zones"},
         _numTiles, numSubZones);
     NewItemTotals counts{};
-    Kokkos::parallel_reduce(_numTiles,
-        CountNewItemsFromTile<Refiner>{*this},
+    Kokkos::parallel_reduce(_numTiles, CountNewItemsFromTile<Refiner>{*this},
         counts);
     Kokkos::fence();
     _newItemTotals = counts;
@@ -198,8 +161,11 @@ template <typename TSubpaving, typename TDetector>
 void
 Refiner<TSubpaving, TDetector>::findNewItemIndices()
 {
-    Kokkos::View<std::size_t*> subZoneStarts("SubZone Start Ids", _numTiles);
-    Kokkos::View<std::size_t*> newTileStarts("Tile Start Ids", _numTiles);
+    auto subZoneStarts = Kokkos::View<std::size_t*>(
+        Kokkos::ViewAllocateWithoutInitializing{"SubZone Start Ids"},
+        _numTiles);
+    auto newTileStarts = Kokkos::View<std::size_t*>(
+        Kokkos::ViewAllocateWithoutInitializing{"Tile Start Ids"}, _numTiles);
     auto newZoneCounts = _newZoneCounts;
 
     //Initialize starts

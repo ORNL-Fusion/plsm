@@ -27,10 +27,6 @@ public:
     using RegionType = typename SubpavingType::RegionType;
     using DetectorType = TDetector;
 
-    Refiner(SubpavingType& subpaving, DetectorType detector);
-
-    ~Refiner();
-
     void
     operator()();
 
@@ -95,6 +91,12 @@ public:
     }
 
 protected:
+    template <typename, std::size_t, typename, typename>
+    friend class ::plsm::Subpaving;
+
+    Refiner(SubpavingType& subpaving, DetectorType detector);
+
+protected:
     SubpavingType& _subpaving;
     using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
     ZonesView _zones;
@@ -117,15 +119,6 @@ protected:
     Kokkos::View<std::size_t*> _subZoneStarts;
     Kokkos::View<std::size_t*> _newTileStarts;
 };
-
-
-template <typename TSubpaving, typename TDetector>
-Refiner<TSubpaving, TDetector>
-makeRefiner(TSubpaving& subpaving, TDetector&& detector)
-{
-    return Refiner<TSubpaving, TDetector>{subpaving,
-        std::forward<TDetector>(detector)};
-}
 }
 }
 

@@ -105,7 +105,9 @@ void
 Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
     TRefinementDetector&& detector)
 {
-    detail::makeRefiner(*this, std::forward<TRefinementDetector>(detector))();
+    using Refiner = detail::Refiner<Subpaving, TRefinementDetector>;
+    auto refiner = Refiner{*this, std::forward<TRefinementDetector>(detector)};
+    refiner();
 }
 
 
