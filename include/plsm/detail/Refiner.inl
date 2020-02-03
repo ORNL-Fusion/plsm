@@ -244,8 +244,8 @@ Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
     //Create first new zone, replace current tile and associate
     auto subZoneBeginId = _numZones + _subZoneStarts(index);
     _zones(subZoneBeginId) =
-        ZoneType{getSubZoneRegion(ownerZone, getSubZoneId(index, 0)), level,
-            ownerZoneId};
+        ZoneType{getSubZoneRegion(ownerZone, _selectedSubZones(index, 0)),
+            level, ownerZoneId};
     _zones(subZoneBeginId).setTileIndex(index);
     tile = TileType{_zones(subZoneBeginId).getRegion(), subZoneBeginId};
 
@@ -255,8 +255,8 @@ Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
         auto zoneId = subZoneBeginId + i;
         auto tileId = tileBeginId + i - 1;
         _zones(zoneId) =
-            ZoneType{getSubZoneRegion(ownerZone, getSubZoneId(index, i)), level,
-                ownerZoneId};
+            ZoneType{getSubZoneRegion(ownerZone, _selectedSubZones(index, i)),
+                level, ownerZoneId};
         _zones(zoneId).setTileIndex(tileId);
         _tiles(tileId) = TileType{_zones(zoneId).getRegion(), zoneId};
     }

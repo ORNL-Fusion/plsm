@@ -54,11 +54,6 @@ target_include_directories(plsm INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(plsm INTERFACE Kokkos::kokkos)
-###
-###
-target_compile_definitions(plsm INTERFACE TEST_SELECTOR)
-###
-###
 
 include(CTest)
 add_subdirectory(test)

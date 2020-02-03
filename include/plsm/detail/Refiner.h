@@ -79,17 +79,6 @@ public:
     RegionType
     getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId) const;
 
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    getSubZoneId(std::size_t tileId, std::size_t subZoneLocalId) const
-    {
-#ifdef TEST_SELECTOR
-        return _selectedSubZones(tileId, subZoneLocalId);
-#else
-        return subZoneLocalId;
-#endif
-    }
-
 protected:
     template <typename, std::size_t, typename, typename>
     friend class ::plsm::Subpaving;
