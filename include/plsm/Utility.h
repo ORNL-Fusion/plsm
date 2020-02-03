@@ -16,8 +16,26 @@ template <typename T>
 constexpr T wildcard = std::numeric_limits<T>::max();
 
 
+template <typename, std::size_t, typename, typename>
+class Subpaving;
+
+
 namespace detail
 {
+template <typename T>
+struct IsSubpaving : std::false_type
+{
+};
+
+
+template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+    typename TItemData>
+struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
+    std::true_type
+{
+};
+
+
 template <typename T>
 struct DifferenceTypeHelper
 {

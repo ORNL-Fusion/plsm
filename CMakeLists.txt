@@ -24,6 +24,7 @@ set(PLSM_HEADERS
     ${PLSM_HEADER_DIR}/detail/Refiner.h
     ${PLSM_HEADER_DIR}/detail/Refiner.inl
     ${PLSM_HEADER_DIR}/detail/SpaceVectorBase.h
+    ${PLSM_HEADER_DIR}/detail/SubdivisionInfo.h
     ${PLSM_HEADER_DIR}/refine/BallDetector.h
     ${PLSM_HEADER_DIR}/refine/Detector.h
     ${PLSM_HEADER_DIR}/refine/PolylineDetector.h

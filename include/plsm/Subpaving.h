@@ -6,72 +6,14 @@
 #include <Kokkos_Core.hpp>
 #include <Kokkos_DualView.hpp>
 
-#include <plsm/EnumIndexed.h>
-#include <plsm/detail/Refiner.h>
 #include <plsm/ContextUtility.h>
-#include <plsm/MultiIndex.h>
+#include <plsm/EnumIndexed.h>
 #include <plsm/Zone.h>
+#include <plsm/detail/Refiner.h>
+#include <plsm/detail/SubdivisionInfo.h>
 
 namespace plsm
 {
-template <std::size_t Dim>
-using SubdivisionRatio = MultiIndex<Dim>;
-
-
-template <std::size_t Dim>
-class SubdivisionInfo
-{
-public:
-    SubdivisionInfo() noexcept
-        = default;
-
-    KOKKOS_INLINE_FUNCTION
-    SubdivisionInfo(const SubdivisionRatio<Dim>& ratio)
-        :
-        _ratio{ratio}
-    {
-        _sliceSize[Dim-1] = 1;
-        for (auto i : makeIntervalRange(Dim - 1)) {
-            _sliceSize[Dim-2-i] = _sliceSize[Dim-1-i]*_ratio[Dim-1-i];
-        }
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    const SubdivisionRatio<Dim>&
-    getRatio() const noexcept
-    {
-        return _ratio;
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    getLinearIndex(const MultiIndex<Dim>& mId) const
-    {
-        std::size_t ret = 0;
-        for (auto i : makeIntervalRange(Dim)) {
-            ret += mId[i]*_sliceSize[i];
-        }
-        return ret;
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    MultiIndex<Dim>
-    getMultiIndex(std::size_t linearIndex) const
-    {
-        MultiIndex<Dim> ret;
-        for (auto i : makeIntervalRange(Dim)) {
-            ret[i] = linearIndex / _sliceSize[i];
-            linearIndex = linearIndex % _sliceSize[i];
-        }
-        return ret;
-    }
-
-private:
-    SubdivisionRatio<Dim> _ratio;
-    MultiIndex<Dim> _sliceSize;
-};
-
-
 template <typename TScalar, std::size_t Dim, typename TEnumIndex = void,
     typename TItemData = std::size_t>
 class Subpaving
@@ -85,7 +27,6 @@ public:
     using PointType = EnumIndexed<SpaceVector<ScalarType, Dim>, TEnumIndex>;
     using IntervalType = typename RegionType::IntervalType;
     using SubdivisionRatioType = SubdivisionRatio<Dim>;
-    using SubdivisionInfoType = SubdivisionInfo<Dim>;
     using ItemDataType = TItemData;
 
     using ZoneType = Zone<RegionType>;
@@ -110,6 +51,14 @@ public:
 
     Subpaving(const Subpaving&) = default;
     Subpaving& operator=(const Subpaving&) = default;
+
+    static
+    KOKKOS_INLINE_FUNCTION
+    constexpr std::size_t
+    dimension() noexcept
+    {
+        return Dim;
+    }
 
     template <typename TRefinementDetector>
     void
@@ -188,7 +137,7 @@ private:
     ZonesDualView _zones;
     TilesDualView _tiles;
     RegionType _rootRegion;
-    Kokkos::DualView<SubdivisionInfoType*> _subdivisionInfos;
+    Kokkos::DualView<detail::SubdivisionInfo<Dim>*> _subdivisionInfos;
     std::size_t _refinementDepth{};
 };
 }

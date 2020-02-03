@@ -9,28 +9,18 @@
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>
 #include <plsm/Utility.h>
+#include <plsm/detail/SubdivisionInfo.h>
 
 namespace plsm
 {
-template <typename, std::size_t, typename, typename>
-class Subpaving;
-
-
 namespace detail
 {
 template <typename TSubpaving, typename TDetector>
 class Refiner
 {
-};
-
-
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
-class Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-{
 public:
-    using SubpavingType =
-        ::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>;
+    static_assert(IsSubpaving<TSubpaving>::value, "");
+    using SubpavingType = TSubpaving;
     using ScalarType = typename SubpavingType::ScalarType;
     using ZoneType = typename SubpavingType::ZoneType;
     using TileType = typename SubpavingType::TileType;
@@ -110,7 +100,7 @@ protected:
     ZonesView _zones;
     using TilesView = typename SubpavingType::template TilesView<OnDevice>;
     TilesView _tiles;
-    using SubdivisionInfoType = typename SubpavingType::SubdivisionInfoType;
+    using SubdivisionInfoType = SubdivisionInfo<SubpavingType::dimension()>;
     Kokkos::DualView<SubdivisionInfoType*> _subdivisionInfos;
 
     std::size_t _currLevel;

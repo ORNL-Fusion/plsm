@@ -8,46 +8,6 @@ namespace plsm
 {
 namespace detail
 {
-class ExclusiveScanFunctor
-{
-public:
-    ExclusiveScanFunctor(Kokkos::View<std::size_t*> data)
-        :
-        _data(data)
-    {
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    operator()(std::size_t index, std::size_t& update, const bool finalPass)
-        const
-    {
-        const auto temp = _data(index);
-        if (finalPass) {
-            _data(index) = update;
-        }
-        update += temp;
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    init(std::size_t& update) const
-    {
-      update = 0;
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    join(volatile std::size_t& update, std::size_t input) const
-    {
-      update += input;
-    }
-
-private:
-    Kokkos::View<std::size_t*> _data;
-};
-
-
 template <typename TRefiner>
 class RefinerFunctor : public TRefiner
 {
@@ -82,37 +42,6 @@ public:
 
 
 template <typename TRefiner>
-class InitZoneStarts : public RefinerFunctor<TRefiner>
-{
-public:
-    using RefinerFunctor<TRefiner>::RefinerFunctor;
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    operator()(std::size_t index) const
-    {
-        this->_subZoneStarts(index) = this->_newZoneCounts(index);
-    }
-};
-
-
-template <typename TRefiner>
-class InitTileStarts : public RefinerFunctor<TRefiner>
-{
-public:
-    using RefinerFunctor<TRefiner>::RefinerFunctor;
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    operator()(std::size_t index) const
-    {
-        this->_newTileStarts(index) = (this->_newZoneCounts(index) == 0) ? 0 :
-            this->_newZoneCounts(index) - 1;
-    }
-};
-
-
-template <typename TRefiner>
 class RefineTile : public RefinerFunctor<TRefiner>
 {
 public:
@@ -127,10 +56,9 @@ public:
 };
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::Refiner(SubpavingType& subpaving, TDetector detector)
+template <typename TSubpaving, typename TDetector>
+Refiner<TSubpaving, TDetector>::Refiner(SubpavingType& subpaving,
+        TDetector detector)
     :
     _subpaving(subpaving),
     _zones(subpaving._zones.d_view),
@@ -149,10 +77,8 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::~Refiner()
+template <typename TSubpaving, typename TDetector>
+Refiner<TSubpaving, TDetector>::~Refiner()
 {
     _subpaving._zones.d_view = _zones;
     _subpaving._zones.modify_device();
@@ -161,11 +87,9 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::operator()()
+Refiner<TSubpaving, TDetector>::operator()()
 {
     _targetDepth = (_detector.depth() == _detector.fullDepth) ?
         this->_subdivisionInfos.h_view.extent(0) : _detector.depth();
@@ -184,12 +108,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 KOKKOS_INLINE_FUNCTION
 std::size_t
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::countSelectSubZones(std::size_t index, const ZoneType& zone) const
+Refiner<TSubpaving, TDetector>::countSelectSubZones(std::size_t index,
+    const ZoneType& zone) const
 {
     const auto& info = _subdivisionInfos.d_view(zone.getLevel());
     auto numSubRegions = info.getRatio().getProduct();
@@ -206,13 +129,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::countSelectNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
-    const
+Refiner<TSubpaving, TDetector>::countSelectNewItemsFromTile(std::size_t index,
+    NewItemTotals& runningTotals) const
 {
     const auto& tile = _tiles(index);
     auto zoneId = tile.getOwningZoneIndex();
@@ -233,12 +154,11 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::countNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals) const
+Refiner<TSubpaving, TDetector>::countNewItemsFromTile(std::size_t index,
+    NewItemTotals& runningTotals) const
 {
     const auto& tile = _tiles(index);
     auto zoneId = tile.getOwningZoneIndex();
@@ -257,11 +177,9 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::countNewZonesAndTiles()
+Refiner<TSubpaving, TDetector>::countNewZonesAndTiles()
 {
     _newZoneCounts = Kokkos::View<std::size_t*>("New Zone Counts", _numTiles);
     auto numSubZones = _subdivisionInfos.h_view(_currLevel).getRatio().getProduct();
@@ -276,42 +194,62 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::findNewItemIndices()
+Refiner<TSubpaving, TDetector>::findNewItemIndices()
 {
-    _subZoneStarts = Kokkos::View<std::size_t*>("SubZone Start Indices",
-        _numTiles);
-    Kokkos::parallel_for(_numTiles, InitZoneStarts<Refiner>{*this});
-    Kokkos::parallel_scan(_numTiles, ExclusiveScanFunctor{_subZoneStarts});
+    Kokkos::View<std::size_t*> subZoneStarts("SubZone Start Ids", _numTiles);
+    Kokkos::View<std::size_t*> newTileStarts("Tile Start Ids", _numTiles);
+    auto newZoneCounts = _newZoneCounts;
 
-    _newTileStarts = Kokkos::View<std::size_t*>("Tile Start Indices",
-        _numTiles);
-    Kokkos::parallel_for(_numTiles, InitTileStarts<Refiner>{*this});
-    Kokkos::parallel_scan(_numTiles, ExclusiveScanFunctor{_newTileStarts});
+    //Initialize starts
+    Kokkos::parallel_for(_numTiles, KOKKOS_LAMBDA (std::size_t i) {
+        auto newZoneCount = newZoneCounts(i);
+        subZoneStarts(i) = newZoneCount;
+        newTileStarts(i) = (newZoneCount == 0) ? 0 : newZoneCount - 1;
+    });
+
+    //Scan zone starts
+    Kokkos::parallel_scan(_numTiles, KOKKOS_LAMBDA (std::size_t i,
+            std::size_t& update, const bool finalPass) {
+        const auto tmp = subZoneStarts(i);
+        if (finalPass) {
+            subZoneStarts(i) = update;
+        }
+        update += tmp;
+    });
+
+    //Scan tile starts
+    Kokkos::parallel_scan(_numTiles, KOKKOS_LAMBDA (std::size_t i,
+            std::size_t& update, const bool finalPass) {
+        const auto tmp = newTileStarts(i);
+        if (finalPass) {
+            newTileStarts(i) = update;
+        }
+        update += tmp;
+    });
+
     Kokkos::fence();
+    _subZoneStarts = subZoneStarts;
+    _newTileStarts = newTileStarts;
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 KOKKOS_INLINE_FUNCTION
-typename
-    Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-        ::RegionType
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId) const
+typename Refiner<TSubpaving, TDetector>::RegionType
+Refiner<TSubpaving, TDetector>::getSubZoneRegion(const ZoneType& zone,
+    std::size_t subZoneLocalId) const
 {
     using IntervalType = typename RegionType::IntervalType;
 
+    constexpr auto dim = SubpavingType::dimension();
     const auto& info = _subdivisionInfos.d_view(zone.getLevel());
-    MultiIndex<Dim> mId = info.getMultiIndex(subZoneLocalId);
+    MultiIndex<dim> mId = info.getMultiIndex(subZoneLocalId);
 
     const auto& zoneRegion = zone.getRegion();
     RegionType ret;
-    for (auto i : makeIntervalRange(Dim)) {
+    for (auto i : makeIntervalRange(dim)) {
         const auto& ival = zoneRegion[i];
         auto delta = ival.length() / info.getRatio()[i];
         ret[i] = IntervalType{
@@ -322,12 +260,10 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 KOKKOS_FUNCTION
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::refineTile(std::size_t index) const
+Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
 {
     auto newZones = _newZoneCounts(index);
     if (newZones == 0) {
@@ -364,11 +300,9 @@ Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
 }
 
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData, typename TDetector>
+template <typename TSubpaving, typename TDetector>
 void
-Refiner<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>, TDetector>
-::assignNewZonesAndTiles()
+Refiner<TSubpaving, TDetector>::assignNewZonesAndTiles()
 {
     Kokkos::resize(_zones, _zones.extent(0) + _newItemTotals.zones);
     Kokkos::resize(_tiles, _tiles.extent(0) + _newItemTotals.tiles);

@@ -90,7 +90,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
         }
     }
 
-    _subdivisionInfos = Kokkos::DualView<SubdivisionInfoType*>{
+    _subdivisionInfos = Kokkos::DualView<detail::SubdivisionInfo<Dim>*>{
         "Subdivision Infos", subdivisionRatios.size()};
     std::copy(begin(subdivisionRatios), end(subdivisionRatios),
         _subdivisionInfos.h_view.data());
