@@ -5,7 +5,6 @@
 
 #include <plsm/Subpaving.h>
 #include <plsm/TestingCommon.h>
-#include <plsm/RenderSubpaving.h>
 #include <plsm/refine/BallDetector.h>
 #include <plsm/refine/PolylineDetector.h>
 #include <plsm/refine/RegionDetector.h>

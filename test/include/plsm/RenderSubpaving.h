@@ -6,6 +6,7 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -28,15 +29,31 @@ renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
     for (std::size_t i = 0; i < numTiles; ++i) {
         const auto& region = tiles(i).getRegion();
 
-        points->InsertNextPoint(region[0].begin(), region[1].begin(), region[2].begin());
-        points->InsertNextPoint(region[0].end(), region[1].begin(), region[2].begin());
-        points->InsertNextPoint(region[0].end(), region[1].end(), region[2].begin());
-        points->InsertNextPoint(region[0].begin(), region[1].end(), region[2].begin());
+        if (Dim == 3) {
+            points->InsertNextPoint(region[0].begin(), region[1].begin(), region[2].begin());
+            points->InsertNextPoint(region[0].end(), region[1].begin(), region[2].begin());
+            points->InsertNextPoint(region[0].end(), region[1].end(), region[2].begin());
+            points->InsertNextPoint(region[0].begin(), region[1].end(), region[2].begin());
 
-        points->InsertNextPoint(region[0].begin(), region[1].begin(), region[2].end());
-        points->InsertNextPoint(region[0].end(), region[1].begin(), region[2].end());
-        points->InsertNextPoint(region[0].end(), region[1].end(), region[2].end());
-        points->InsertNextPoint(region[0].begin(), region[1].end(), region[2].end());
+            points->InsertNextPoint(region[0].begin(), region[1].begin(), region[2].end());
+            points->InsertNextPoint(region[0].end(), region[1].begin(), region[2].end());
+            points->InsertNextPoint(region[0].end(), region[1].end(), region[2].end());
+            points->InsertNextPoint(region[0].begin(), region[1].end(), region[2].end());
+        }
+        else if (Dim == 2) {
+            points->InsertNextPoint(region[0].begin(), region[1].begin(), 0.0);
+            points->InsertNextPoint(region[0].end(), region[1].begin(), 0.0);
+            points->InsertNextPoint(region[0].end(), region[1].end(), 0.0);
+            points->InsertNextPoint(region[0].begin(), region[1].end(), 0.0);
+
+            points->InsertNextPoint(region[0].begin(), region[1].begin(), 0.0);
+            points->InsertNextPoint(region[0].end(), region[1].begin(), 0.0);
+            points->InsertNextPoint(region[0].end(), region[1].end(), 0.0);
+            points->InsertNextPoint(region[0].begin(), region[1].end(), 0.0);
+        }
+        else {
+            throw std::runtime_error("Unsupported dimensionality");
+        }
 
         cells->InsertNextCell(2);
         cells->InsertCellPoint(pId);
@@ -88,8 +105,10 @@ renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
     mapper->SetInputData(pd);
     auto actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
+    actor->GetProperty()->SetColor(0, 0, 0);
     auto renderer = vtkSmartPointer<vtkRenderer>::New();
     renderer->AddActor(actor);
+    renderer->SetBackground(1, 1, 1);
     auto window = vtkSmartPointer<vtkRenderWindow>::New();
     window->AddRenderer(renderer);
     auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
