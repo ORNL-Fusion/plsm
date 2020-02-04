@@ -4,11 +4,23 @@
 
 namespace plsm
 {
+/*!
+ * @brief Set of ratios specifying how many subdivisions to make in each
+ * dimension
+ */
 template <std::size_t Dim>
 using SubdivisionRatio = MultiIndex<Dim>;
 
 namespace detail
 {
+/*!
+ * @brief A tool to handle arbitrary subdivision ratios at each refinement level
+ *
+ * This class represents subdivision information for a single refinement level.
+ * It stores the subdivision ratio in each direction and performs conversion
+ * between linear and multi-indices within the grid defined according to those
+ * ratios.
+ */
 template <std::size_t Dim>
 class SubdivisionInfo
 {
@@ -16,6 +28,9 @@ public:
     SubdivisionInfo() noexcept
         = default;
 
+    /*!
+     * @brief Construct from subdivision ratio
+     */
     KOKKOS_INLINE_FUNCTION
     SubdivisionInfo(const SubdivisionRatio<Dim>& ratio)
         :
@@ -27,6 +42,9 @@ public:
         }
     }
 
+    /*!
+     * @brief Get the subdivision ratio
+     */
     KOKKOS_INLINE_FUNCTION
     const SubdivisionRatio<Dim>&
     getRatio() const noexcept
@@ -34,6 +52,10 @@ public:
         return _ratio;
     }
 
+    /*!
+     * @brief Convert a multi-index to a linear index for the grid defined by
+     * the subdivision ratio
+     */
     KOKKOS_INLINE_FUNCTION
     std::size_t
     getLinearIndex(const MultiIndex<Dim>& mId) const
@@ -45,6 +67,10 @@ public:
         return ret;
     }
 
+    /*!
+     * @brief Convert a linear index to its corresponding multi-index within the
+     * grid defined by the subdivision ratio
+     */
     KOKKOS_INLINE_FUNCTION
     MultiIndex<Dim>
     getMultiIndex(std::size_t linearIndex) const
@@ -58,7 +84,9 @@ public:
     }
 
 private:
+    //! The subdivision (multi-)ratio fot the current refinement level
     SubdivisionRatio<Dim> _ratio;
+    //! Set of strides to ease conversion between linear and multi-indices
     MultiIndex<Dim> _sliceSize;
 };
 }

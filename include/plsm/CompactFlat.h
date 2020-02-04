@@ -24,7 +24,7 @@ namespace plsm
  *
  * The representation is compact in that the specified coordinate values are
  * held in the first entries of the member array. So a CompactFlat constructed
- * from the vector {wildcard, 1, 2} would be represented as {1, 2, <garbage>},
+ * from the vector {wildcard, 1, 2} would be represented as {1, 2, 'garbage'},
  * and the indexing operator returns values according to this ordering.
  * Therefore CompactFlat indices do not relate directly to the indices for the
  * parent space. But an index may be mapped to the parent space using

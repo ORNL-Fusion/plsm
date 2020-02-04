@@ -14,7 +14,7 @@ namespace plsm
 {
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
-        const std::vector<SubdivisionRatioType>& subdivisionRatios)
+        const std::vector<SubdivisionRatio<Dim>>& subdivisionRatios)
     :
     _zones("zones", 1),
     _tiles("tiles", 1),
@@ -38,14 +38,14 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
-    const std::vector<SubdivisionRatioType>& subdivRatios)
+    const std::vector<SubdivisionRatio<Dim>>& subdivRatios)
 {
     auto subdivisionRatios = subdivRatios;
 
     auto elementWiseProduct =
-        [](const SubdivisionRatioType& a, const SubdivisionRatioType& b)
+        [](const SubdivisionRatio<Dim>& a, const SubdivisionRatio<Dim>& b)
         {
-            SubdivisionRatioType ret;
+            SubdivisionRatio<Dim> ret;
             for (auto i : makeIntervalRange(Dim)) {
                 ret[i] = a[i] * b[i];
             }
@@ -64,7 +64,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
     //FIXME: infinite loop when ratios do not evenly divide extents
     for (;;) {
         bool needAnotherLevel = false;
-        auto newRatio = SubdivisionRatioType::filled(1);
+        auto newRatio = SubdivisionRatio<Dim>::filled(1);
         for (auto i : makeIntervalRange(Dim)) {
             if (ratioProduct[i] < extents[i]) {
                 newRatio[i] = subdivisionRatios.back()[i];

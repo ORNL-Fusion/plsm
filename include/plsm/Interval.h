@@ -137,6 +137,19 @@ public:
     }
 
     /*!
+     * @brief Compute midpoint of owned interval
+     */
+    KOKKOS_INLINE_FUNCTION
+    double
+    midpoint() const noexcept
+    {
+        assert(!empty());
+        auto a = static_cast<double>(begin());
+        auto b = static_cast<double>(end() - 1);
+        return 0.5*(a + b);
+    }
+
+    /*!
      * @brief Check if a scalar value resides within the Interval
      */
     KOKKOS_INLINE_FUNCTION

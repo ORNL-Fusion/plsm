@@ -19,7 +19,7 @@ Region<TScalar, Dim>::dispersion() const noexcept
         for (auto n : makeIntervalRange(ival)) {
             nSqSum += static_cast<double>(n*n);
         }
-        auto nAvg = midpoint(axis);
+        auto nAvg = ival.midpoint();
         disp[axis] = volInv*(nSqSum - vol*nAvg*nAvg);
     }
 

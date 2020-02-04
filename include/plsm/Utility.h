@@ -8,10 +8,12 @@
 
 namespace plsm
 {
+//! Convention chosen to represent an invalid value for the given type
 template <typename T>
 constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 
 
+//! Convention chosen to represent a wildcard value for the given type
 template <typename T>
 constexpr T wildcard = std::numeric_limits<T>::max();
 
@@ -22,6 +24,13 @@ class Subpaving;
 
 namespace detail
 {
+/*!
+ * @brief Checks whether T is an instantiation of Subpaving
+ */
+template <typename T>
+struct IsSubpaving;
+
+/*! @cond */
 template <typename T>
 struct IsSubpaving : std::false_type
 {
@@ -34,8 +43,12 @@ struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
     std::true_type
 {
 };
+/*! @endcond */
 
 
+/*!
+ * @brief Determine the type for the result of a subtraction
+ */
 template <typename T>
 struct DifferenceTypeHelper
 {
@@ -53,10 +66,17 @@ struct DifferenceTypeHelper
 }
 
 
+/*!
+ * @brief Determine the type for the result of a subtraction
+ */
 template <typename T>
 using DifferenceType = typename detail::DifferenceTypeHelper<T>::Type;
 
 
+//@{
+/*!
+ * @brief Specialized assert for requiring a value to be non-negative
+ */
 template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
 KOKKOS_INLINE_FUNCTION
 constexpr void
@@ -72,11 +92,13 @@ constexpr void
 assertNonNegative(T)
 {
 }
+//@}
 
 
 //@{
 /**
- * Duplicate of the generic std::min and std::max to be used in device kernels
+ * Duplicate of the generic std::min, std::max, and std::abs to be used in
+ * device kernels
  */
 template <typename T>
 KOKKOS_INLINE_FUNCTION
@@ -99,7 +121,6 @@ max(const T& a, const T& b)
     }
     return a;
 }
-//@}
 
 
 template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
@@ -118,4 +139,5 @@ abs(T a)
 {
     return a;
 }
+//@}
 }

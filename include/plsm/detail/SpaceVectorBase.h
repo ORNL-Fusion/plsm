@@ -13,14 +13,27 @@ namespace plsm
 {
 namespace detail
 {
-template <typename TScalar, std::size_t Dim, typename Derived>
+/*!
+ * @brief Generic representation and most basic functionality for a Euclidian
+ * vector
+ *
+ * @tparam TScalar Underlying scalar representation
+ * @tparam Dim Vector space dimension
+ * @tparam TDerived Implementation class
+ */
+template <typename TScalar, std::size_t Dim, typename TDerived>
 class SpaceVectorBase : public Kokkos::Array<TScalar, Dim>
 {
 public:
+    //! Underlying scalar type
     using ScalarType = TScalar;
 
     using Kokkos::Array<ScalarType, Dim>::Array;
 
+    //@{
+    /*!
+     * @brief Special copy constructors
+     */
     KOKKOS_INLINE_FUNCTION
     SpaceVectorBase(std::initializer_list<ScalarType> ilist)
     {
@@ -38,7 +51,11 @@ public:
             (*this)[i] = static_cast<ScalarType>(other[i]);
         }
     }
+    //@}
 
+    /*!
+     * @brief Assignment from initializer_list
+     */
     KOKKOS_INLINE_FUNCTION
     SpaceVectorBase&
     operator=(std::initializer_list<ScalarType> ilist)
@@ -49,6 +66,11 @@ public:
         }
     }
 
+    //@{
+    /*!
+     * @brief Check if this vector has a non-zero component for the given axis
+     * and zero components for every other axis
+     */
     KOKKOS_INLINE_FUNCTION
     bool
     isOnAxis(std::size_t axis) const noexcept
@@ -77,22 +99,29 @@ public:
     {
         return isOnAxis(static_cast<std::size_t>(axis));
     }
+    //@}
 
+    /*!
+     * @brief Construct a vector filled with the given value
+     */
     static
     KOKKOS_INLINE_FUNCTION
-    Derived
+    TDerived
     filled(TScalar value)
     {
-        Derived ret;
+        TDerived ret;
         for (std::size_t i = 0; i < Dim; ++i) {
             ret[i] = value;
         }
         return ret;
     }
 
+    /*!
+     * @brief Construct a zero vector
+     */
     static
     KOKKOS_INLINE_FUNCTION
-    Derived
+    TDerived
     zero()
     {
         return filled(static_cast<TScalar>(0));
@@ -100,9 +129,13 @@ public:
 };
 
 
-template <typename T, std::size_t N, typename Derived>
+/*!
+ * @relates SpaceVectorBase
+ * @brief Formatted vector output, for example: {x, y}
+ */
+template <typename T, std::size_t N, typename TDerived>
 std::ostream&
-operator<<(std::ostream& os, const SpaceVectorBase<T, N, Derived>& v)
+operator<<(std::ostream& os, const SpaceVectorBase<T, N, TDerived>& v)
 {
     os << "{";
     if (N > 0) {
@@ -116,11 +149,16 @@ operator<<(std::ostream& os, const SpaceVectorBase<T, N, Derived>& v)
 }
 
 
-template <typename T, std::size_t N, typename Derived>
+//@{
+/*!
+ * @relates SpaceVectorBase
+ * @brief Equality comparison
+ */
+template <typename T, std::size_t N, typename TDerived>
 KOKKOS_INLINE_FUNCTION
 bool
-operator==(const SpaceVectorBase<T, N, Derived>& a,
-    const SpaceVectorBase<T, N, Derived>& b)
+operator==(const SpaceVectorBase<T, N, TDerived>& a,
+    const SpaceVectorBase<T, N, TDerived>& b)
 {
     bool ret = true;
     for (std::size_t i = 0; i < N; ++i) {
@@ -133,23 +171,28 @@ operator==(const SpaceVectorBase<T, N, Derived>& a,
 }
 
 
-template <typename T, std::size_t N, typename Derived>
+template <typename T, std::size_t N, typename TDerived>
 KOKKOS_INLINE_FUNCTION
 bool
-operator!=(const SpaceVectorBase<T, N, Derived>& a,
-    const SpaceVectorBase<T, N, Derived>& b)
+operator!=(const SpaceVectorBase<T, N, TDerived>& a,
+    const SpaceVectorBase<T, N, TDerived>& b)
 {
     return !(a == b);
 }
+//@}
 
 
-template <typename T, std::size_t N, typename Derived>
+/*!
+ * @relates SpaceVectorBase
+ * @brief Compute the component-wise difference
+ */
+template <typename T, std::size_t N, typename TDerived>
 KOKKOS_INLINE_FUNCTION
-Derived
-operator-(const SpaceVectorBase<T, N, Derived>& b,
-    const SpaceVectorBase<T, N, Derived>& a)
+TDerived
+operator-(const SpaceVectorBase<T, N, TDerived>& b,
+    const SpaceVectorBase<T, N, TDerived>& a)
 {
-    Derived ret;
+    TDerived ret;
     for (std::size_t i = 0; i < N; ++i) {
         ret[i] = b[i] - a[i];
     }

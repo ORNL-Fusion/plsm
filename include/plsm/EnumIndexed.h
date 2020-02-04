@@ -13,6 +13,7 @@ namespace plsm
 template <typename TArray, typename TEnumIndex = void>
 struct EnumIndexed : TArray
 {
+    //! Type of enum index
     using EnumIndex = TEnumIndex;
 
     using TArray::TArray;
@@ -20,6 +21,9 @@ struct EnumIndexed : TArray
     EnumIndexed() noexcept(noexcept(TArray()))
         = default;
 
+    /*!
+     * @brief Pass-through copy constructor for underlying container
+     */
     KOKKOS_INLINE_FUNCTION
     EnumIndexed(const TArray& a)
         :
@@ -27,6 +31,11 @@ struct EnumIndexed : TArray
     {
     }
 
+    //@{
+    /*!
+     * @brief Indexing operators; separate size_t and enum versions because
+     * Kokkos::Array allows enums without handling scoped enums
+     */
     KOKKOS_INLINE_FUNCTION
     decltype(auto)
     operator[](EnumIndex enumVal)
@@ -54,9 +63,13 @@ struct EnumIndexed : TArray
     {
         return TArray::operator[](i);
     }
+    //@}
 };
 
 
+/*!
+ * @brief Specialization for when no enum type is provided
+ */
 template <typename TArray>
 struct EnumIndexed<TArray, void> : TArray
 {
