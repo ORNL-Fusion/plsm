@@ -6,7 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
 set(Kokkos_ROOT ${Kokkos_DIR})
-find_package(Kokkos REQUIRED)
+find_package(Kokkos 3 REQUIRED)
 if (${Kokkos_ENABLE_CUDA})
     set(CMAKE_CXX_COMPILER "${Kokkos_ROOT}/bin/nvcc_wrapper")
 endif()
