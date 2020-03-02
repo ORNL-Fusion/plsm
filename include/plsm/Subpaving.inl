@@ -100,6 +100,23 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
 
 
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+std::uint64_t
+Subpaving<TScalar, Dim, TEnum, TItemData>::getDeviceMemorySize() const noexcept
+{
+    std::uint64_t ret {};
+
+    ret += _tiles.d_view.required_allocation_size(_tiles.d_view.extent(0));
+    ret += _zones.d_view.required_allocation_size(_zones.d_view.extent(0));
+    ret += sizeof(_rootRegion);
+    ret += _subdivisionInfos.d_view.required_allocation_size(
+        _subdivisionInfos.d_view.extent(0));
+    ret += sizeof(_refinementDepth);
+
+    return ret;
+}
+
+
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 template <typename TRefinementDetector>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::refine(

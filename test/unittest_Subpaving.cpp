@@ -24,6 +24,8 @@ TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
         using refine::RegionDetector;
         sp.refine(RegionDetector<TestType, 3, Select>{sp.getLatticeRegion()});
         REQUIRE(sp.getTiles(onDevice).extent(0) == 64);
+        auto spMemSz = sp.getDeviceMemorySize();
+        std::cout << "Mem Size: " << spMemSz << '\n';
         sp.syncTiles(onHost);
         REQUIRE(sp.getTiles().extent(0) == 64);
         REQUIRE(sp.findTileId({3, 3, 3}) == invalid<std::size_t>);

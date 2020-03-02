@@ -101,6 +101,12 @@ public:
     }
 
     /*!
+     * @brief Get size (in bytes) of memory used on the device
+     */
+    std::uint64_t
+    getDeviceMemorySize() const noexcept;
+
+    /*!
      * @brief Get tiles DualView
      * @todo Rename this
      */
