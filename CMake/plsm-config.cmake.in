@@ -1,4 +1,5 @@
 # plsm-config.cmake - package configuration file
+@PACKAGE_INIT@
 
 get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 include("${SELF_DIR}/plsm.cmake")
@@ -6,3 +7,7 @@ include("${SELF_DIR}/plsm.cmake")
 include(CMakeFindDependencyMacro)
 list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
 find_dependency(Kokkos)
+set(PLSM_ENABLE_VTK @PLSM_ENABLE_VTK@)
+if(${PLSM_ENABLE_VTK})
+    find_dependency(VTK)
+endif()

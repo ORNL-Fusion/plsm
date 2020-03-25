@@ -1,3 +1,22 @@
+option(PLSM_ENABLE_VTK "Use VTK to render 3D cases" OFF)
+if(${PLSM_ENABLE_VTK})
+    find_package(VTK REQUIRED
+        COMPONENTS
+        vtkRenderingOpenGL2
+        vtkInteractionStyle
+        NO_MODULE
+    )
+    add_library(plsmVis INTERFACE)
+    target_link_libraries(plsmVis INTERFACE ${VTK_LIBRARIES} plsm)
+    target_include_directories(plsmVis SYSTEM INTERFACE ${VTK_INCLUDE_DIRS})
+    target_compile_definitions(plsmVis INTERFACE
+        ${VTK_DEFINITIONS}
+        PLSM_ENABLE_VTK
+    )
+    install(TARGETS plsmVis EXPORT plsm)
+    install(FILES include/plsm/RenderSubpaving.h DESTINATION include/plsm/test)
+endif()
+
 if(NOT ${BUILD_TESTING})
     return()
 endif()
@@ -10,16 +29,6 @@ file(DOWNLOAD
     https://raw.githubusercontent.com/catchorg/Catch2/master/single_include/catch2/catch.hpp
     "${TESTING_BIN_DIR}/catch.hpp"
 )
-
-option(PLSM_ENABLE_VTK "Use VTK to render 3D cases" OFF)
-if(${PLSM_ENABLE_VTK})
-    find_package(VTK REQUIRED
-        COMPONENTS
-        vtkRenderingOpenGL2
-        vtkInteractionStyle
-        NO_MODULE
-    )
-endif()
 
 macro(add_unittest_source _source_list _name)
     list(APPEND ${_source_list} unittest_${_name}.cpp)
@@ -60,14 +69,8 @@ function(create_test _name _sources_list)
     )
 
     if(${PLSM_ENABLE_VTK})
-        target_link_libraries(${_name} PUBLIC ${VTK_LIBRARIES})
-        target_include_directories(${_name} SYSTEM PUBLIC ${VTK_INCLUDE_DIRS})
-        target_compile_definitions(${_name} PUBLIC
-            ${VTK_DEFINITIONS}
-            PLSM_ENABLE_VTK
-        )
+        target_link_libraries(${_name} PUBLIC plsmVis)
     endif()
-
 endfunction(create_test)
 
 add_unittest_source(PLSM_UNIT_TESTS CompactFlat)
