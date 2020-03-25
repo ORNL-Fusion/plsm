@@ -133,7 +133,7 @@ TEMPLATE_LIST_TEST_CASE("Region Geometry", "[Region][template]", test::IntTypes)
     REQUIRE(r[0].midpoint() == 0.0);
     REQUIRE(r[1].midpoint() == 0.0);
     REQUIRE(r[2].midpoint() == 0.0);
-    REQUIRE(r.dispersion() == Vecd{0.0, 0.0, 0.0});
+    REQUIRE(r.dispersion() == Vecd{1.0, 1.0, 1.0});
 
     Region<TestType, 3> r2({Ival{0, 2}, Ival{2, 4}, Ival{4, 6}});
     REQUIRE(r2[0].midpoint() == 0.5);
