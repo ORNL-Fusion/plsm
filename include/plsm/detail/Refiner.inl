@@ -99,12 +99,12 @@ std::size_t
 Refiner<TSubpaving, TDetector>::countSelectSubZones(std::size_t index,
     const ZoneType& zone) const
 {
-    const auto& info = _subdivisionInfos.d_view(zone.getLevel());
+    SubdivisionInfoType info(getSubdivisionRatio(zone.getLevel(), index));
     auto numSubRegions = info.getRatio().getProduct();
     auto selected = Kokkos::subview(_selectedSubZones, index, Kokkos::ALL);
     std::size_t count = 0;
     for (auto i : makeIntervalRange(numSubRegions)) {
-        auto subRegion = getSubZoneRegion(zone, i);
+        auto subRegion = getSubZoneRegion(zone, i, info);
         if (_detector(DetectorType::selectTag, subRegion)) {
             selected(count) = i;
             ++count;
@@ -115,18 +115,29 @@ Refiner<TSubpaving, TDetector>::countSelectSubZones(std::size_t index,
 
 
 template <typename TSubpaving, typename TDetector>
-KOKKOS_FUNCTION
+KOKKOS_INLINE_FUNCTION
 void
 Refiner<TSubpaving, TDetector>::countSelectNewItemsFromTile(std::size_t index,
     NewItemTotals& runningTotals) const
 {
+    using BoolVec = typename DetectorType::template BoolVec<RegionType>;
+
     const auto& tile = _tiles(index);
     auto zoneId = tile.getOwningZoneIndex();
     std::size_t count = 0;
     auto& zone = _zones(zoneId);
     auto level = zone.getLevel();
     if (level < _targetDepth) {
-        if (_detector(DetectorType::refineTag, tile.getRegion())) {
+        BoolVec enable {};
+        if (_detector(DetectorType::refineTag, tile.getRegion(), enable)) {
+            for (std::size_t i = 0; i < subpavingDim; ++i) {
+                if (enable[i]) {
+                    _enableRefine[i].set(static_cast<unsigned>(index));
+                }
+                else {
+                    _enableRefine[i].reset(static_cast<unsigned>(index));
+                }
+            }
             count = countSelectSubZones(index, zone);
         }
     }
@@ -149,6 +160,11 @@ Refiner<TSubpaving, TDetector>::countNewZonesAndTiles()
     _selectedSubZones = Kokkos::View<std::size_t**>(
         Kokkos::ViewAllocateWithoutInitializing{"Selected Sub-Zones"},
         _numTiles, numSubZones);
+    std::for_each(begin(_enableRefine), end(_enableRefine),
+            [numTiles = _numTiles] (auto&& bitset) {
+        bitset = Kokkos::Bitset<DefaultExecSpace>(
+            static_cast<unsigned>(numTiles));
+    });
     NewItemTotals counts{};
     Kokkos::parallel_reduce(_numTiles, CountNewItemsFromTile<Refiner>{*this},
         counts);
@@ -205,19 +221,17 @@ template <typename TSubpaving, typename TDetector>
 KOKKOS_INLINE_FUNCTION
 typename Refiner<TSubpaving, TDetector>::RegionType
 Refiner<TSubpaving, TDetector>::getSubZoneRegion(const ZoneType& zone,
-    std::size_t subZoneLocalId) const
+    std::size_t subZoneLocalId, const SubdivisionInfoType& subdivInfo) const
 {
     using IntervalType = typename RegionType::IntervalType;
 
-    constexpr auto dim = SubpavingType::dimension();
-    const auto& info = _subdivisionInfos.d_view(zone.getLevel());
-    MultiIndex<dim> mId = info.getMultiIndex(subZoneLocalId);
+    MultiIndex<subpavingDim> mId = subdivInfo.getMultiIndex(subZoneLocalId);
 
     const auto& zoneRegion = zone.getRegion();
     RegionType ret;
-    for (auto i : makeIntervalRange(dim)) {
+    for (auto i : makeIntervalRange(subpavingDim)) {
         const auto& ival = zoneRegion[i];
-        auto delta = ival.length() / info.getRatio()[i];
+        auto delta = ival.length() / subdivInfo.getRatio()[i];
         ret[i] = IntervalType{
             ival.begin() + static_cast<ScalarType>(mId[i]*delta),
             ival.begin() + static_cast<ScalarType>((mId[i]+1)*delta)};
@@ -227,7 +241,23 @@ Refiner<TSubpaving, TDetector>::getSubZoneRegion(const ZoneType& zone,
 
 
 template <typename TSubpaving, typename TDetector>
-KOKKOS_FUNCTION
+KOKKOS_INLINE_FUNCTION
+typename Refiner<TSubpaving, TDetector>::SubdivisionRatioType
+Refiner<TSubpaving, TDetector>::getSubdivisionRatio(std::size_t level,
+    std::size_t tileIndex) const
+{
+    SubdivisionRatioType ret = _subdivisionInfos.d_view[level].getRatio();
+    for (std::size_t i = 0; i < subpavingDim; ++i) {
+        if (!_enableRefine[i].test(static_cast<unsigned>(tileIndex))) {
+            ret[i] = 1;
+        }
+    }
+    return ret;
+}
+
+
+template <typename TSubpaving, typename TDetector>
+KOKKOS_INLINE_FUNCTION
 void
 Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
 {
@@ -239,13 +269,15 @@ Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
     auto& tile = _tiles(index);
     auto ownerZoneId = tile.getOwningZoneIndex();
     auto& ownerZone = _zones(ownerZoneId);
-    auto level = ownerZone.getLevel() + 1;
+    auto level = ownerZone.getLevel();
+    auto newLevel = level + 1;
+    auto info = SubdivisionInfoType(getSubdivisionRatio(level, index));
 
     //Create first new zone, replace current tile and associate
     auto subZoneBeginId = _numZones + _subZoneStarts(index);
-    _zones(subZoneBeginId) =
-        ZoneType{getSubZoneRegion(ownerZone, _selectedSubZones(index, 0)),
-            level, ownerZoneId};
+    _zones(subZoneBeginId) = ZoneType{
+        getSubZoneRegion(ownerZone, _selectedSubZones(index, 0), info),
+        newLevel, ownerZoneId};
     _zones(subZoneBeginId).setTileIndex(index);
     tile = TileType{_zones(subZoneBeginId).getRegion(), subZoneBeginId};
 
@@ -254,9 +286,9 @@ Refiner<TSubpaving, TDetector>::refineTile(std::size_t index) const
     for (std::size_t i = 1; i < newZones; ++i) {
         auto zoneId = subZoneBeginId + i;
         auto tileId = tileBeginId + i - 1;
-        _zones(zoneId) =
-            ZoneType{getSubZoneRegion(ownerZone, _selectedSubZones(index, i)),
-                level, ownerZoneId};
+        _zones(zoneId) = ZoneType{
+            getSubZoneRegion(ownerZone, _selectedSubZones(index, i), info),
+            newLevel, ownerZoneId};
         _zones(zoneId).setTileIndex(tileId);
         _tiles(tileId) = TileType{_zones(zoneId).getRegion(), zoneId};
     }

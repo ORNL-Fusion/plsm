@@ -10,12 +10,11 @@ namespace plsm
 {
 namespace refine
 {
-template <typename TScalar, std::size_t Dim, typename... Tags>
-class BallDetector :
-    public Detector<BallDetector<TScalar, Dim, Tags...>, Tags...>
+template <typename TScalar, std::size_t Dim, typename TTag = void>
+class BallDetector : public Detector<BallDetector<TScalar, Dim, TTag>, TTag>
 {
 public:
-    using Superclass = Detector<BallDetector<TScalar, Dim, Tags...>, Tags...>;
+    using Superclass = Detector<BallDetector<TScalar, Dim, TTag>, TTag>;
     using ScalarType = TScalar;
     using ScalarDiff = DifferenceType<ScalarType>;
     using PointType = SpaceVector<ScalarType, Dim>;
@@ -33,36 +32,7 @@ public:
     {
     }
 
-    KOKKOS_INLINE_FUNCTION
-    bool
-    overlap(const RegionType& region) const
-    {
-        constexpr ScalarDiff zero = 0;
-        auto rad = static_cast<ScalarDiff>(_radius);
-        auto negRad = -rad;
-        ScalarType d = 0;
-        for (std::size_t i = 0; i < Dim; ++i) {
-            auto c_i = static_cast<ScalarDiff>(_center[i]);
-            auto r_lo_i = static_cast<ScalarDiff>(region[i].begin());
-            auto r_hi_i = static_cast<ScalarDiff>(region[i].end());
-            auto e = c_i - r_lo_i;
-            if (e < zero) {
-                if (e < negRad) {
-                    return false;
-                }
-                d += static_cast<ScalarType>(e*e);
-                continue;
-            }
-            e = c_i - r_hi_i;
-            if (e > zero) {
-                if (e > rad) {
-                    return false;
-                }
-                d += static_cast<ScalarType>(e*e);
-            }
-        }
-        return (d <= _radSq);
-    }
+    using Superclass::intersect;
 
     KOKKOS_INLINE_FUNCTION
     bool
@@ -105,6 +75,46 @@ public:
             return true;
         }
         return false;
+    }
+
+    KOKKOS_INLINE_FUNCTION
+    bool
+    overlap(const RegionType& region) const
+    {
+        constexpr ScalarDiff zero = 0;
+        auto rad = static_cast<ScalarDiff>(_radius);
+        auto negRad = -rad;
+        ScalarType d = 0;
+        for (std::size_t i = 0; i < Dim; ++i) {
+            auto c_i = static_cast<ScalarDiff>(_center[i]);
+            auto r_lo_i = static_cast<ScalarDiff>(region[i].begin());
+            auto r_hi_i = static_cast<ScalarDiff>(region[i].end());
+            auto e = c_i - r_lo_i;
+            if (e < zero) {
+                if (e < negRad) {
+                    return false;
+                }
+                d += static_cast<ScalarType>(e*e);
+                continue;
+            }
+            e = c_i - r_hi_i;
+            if (e > zero) {
+                if (e > rad) {
+                    return false;
+                }
+                d += static_cast<ScalarType>(e*e);
+            }
+        }
+        return (d <= _radSq);
+    }
+
+    using Superclass::refine;
+
+    KOKKOS_INLINE_FUNCTION
+    bool
+    refine(const RegionType& region) const
+    {
+        return intersect(region);
     }
 
     KOKKOS_INLINE_FUNCTION

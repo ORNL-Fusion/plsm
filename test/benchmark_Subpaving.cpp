@@ -39,7 +39,10 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
         {
             s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
             Interval<int> ival{0, 56};
-            s.refine(refine::RegionDetector<int, 3, Select>{{ival, ival, ival}});
+            using RegionDetector =
+                refine::RegionDetector<int, 3,
+                    std::tuple<refine::Overlap, refine::SelectAll>>;
+            s.refine(RegionDetector{{ival, ival, ival}});
         };
         // test::renderSubpaving(s);
     }
@@ -71,7 +74,10 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
     {
         BENCHMARK("refine: ball 2D-ish")
         {
-            s.refine(refine::BallDetector<int, 3, SelectAll>{{256,256,256}, 128});
+            using BallDetector =
+                refine::BallDetector<int, 3,
+                    std::tuple<refine::Intersect, refine::SelectAll>>;
+            s.refine(BallDetector{{256,256,256}, 128});
         };
         // test::renderSubpaving(s);
     }
@@ -87,8 +93,10 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
         {
             s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
             Interval<int> ival{0, 56};
-            s.refine(refine::RegionDetector<int, 3, Select>{
-                {ival, ival, Interval<int>{0, 512}}});
+            using RegionDetector =
+                refine::RegionDetector<int, 3,
+                    std::tuple<refine::Overlap, refine::SelectAll>>;
+            s.refine(RegionDetector{{ival, ival, Interval<int>{0, 512}}});
         };
         // test::renderSubpaving(s);
     }

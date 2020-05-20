@@ -23,17 +23,14 @@ TEMPLATE_LIST_TEST_CASE("RegionDetector - 2D", "[Detectors][template]",
     using Ival = Interval<TestType>;
     Region<TestType, 2> r{{Ival{128}, Ival{128}}};
 
-    SECTION("Intersect Mode")
-    {
-        using DetectorType = refine::RegionDetector<TestType, 2>;
-        // using RefineTag = typename DetectorType::RefineTag;
-        // using SelectTag = typename DetectorType::SelectTag;
-        DetectorType rd2{{Ival{32, 96}, Ival{32, 96}}};
+    using DetectorType = refine::RegionDetector<TestType, 2>;
+    // using RefineTag = typename DetectorType::RefineTag;
+    // using SelectTag = typename DetectorType::SelectTag;
+    DetectorType rd2{{Ival{32, 96}, Ival{32, 96}}};
 
-        REQUIRE(rd2.intersect(r));
-    }
+    REQUIRE(rd2.overlap(r));
 
-    //TODO: Need to distinguish between intersect and overlap like BallDetector
+    //TODO: Need to test intersect
 }
 
 TEMPLATE_LIST_TEST_CASE("RegionDetector - 3D", "[Detectors][template]",
@@ -59,8 +56,10 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 2D", "[Detectors][template]",
     Region<TestType, 2> r9{{Ival{112, 128}, Ival{16}}};
     Region<TestType, 2> r10{{Ival{112, 128}, Ival{112, 128}}};
 
-    SECTION("Intersect Mode")
+    SECTION("Default Mode")
     {
+        using refine::Intersect;
+        using refine::Overlap;
         using DetectorType = refine::BallDetector<TestType, 2>;
         using RefineTag = typename DetectorType::RefineTag;
         using SelectTag = typename DetectorType::SelectTag;
@@ -109,28 +108,17 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 2D", "[Detectors][template]",
         REQUIRE(!bd2.overlap(r8));
         REQUIRE(!bd2.overlap(r9));
         REQUIRE(!bd2.overlap(r10));
-        REQUIRE(bd2.select(r));
-        REQUIRE(bd2.select(r1));
-        REQUIRE(bd2.select(r2));
-        REQUIRE(bd2.select(r3));
-        REQUIRE(bd2.select(r4));
-        REQUIRE(bd2.select(r5));
-        REQUIRE(bd2.select(r6));
-        REQUIRE(!bd2.select(r7));
-        REQUIRE(!bd2.select(r8));
-        REQUIRE(!bd2.select(r9));
-        REQUIRE(!bd2.select(r10));
-        REQUIRE(bd2(Select{}, r));
-        REQUIRE(bd2(Select{}, r1));
-        REQUIRE(bd2(Select{}, r2));
-        REQUIRE(bd2(Select{}, r3));
-        REQUIRE(bd2(Select{}, r4));
-        REQUIRE(bd2(Select{}, r5));
-        REQUIRE(bd2(Select{}, r6));
-        REQUIRE(!bd2(Select{}, r7));
-        REQUIRE(!bd2(Select{}, r8));
-        REQUIRE(!bd2(Select{}, r9));
-        REQUIRE(!bd2(Select{}, r10));
+        REQUIRE(bd2(Overlap{}, r));
+        REQUIRE(bd2(Overlap{}, r1));
+        REQUIRE(bd2(Overlap{}, r2));
+        REQUIRE(bd2(Overlap{}, r3));
+        REQUIRE(bd2(Overlap{}, r4));
+        REQUIRE(bd2(Overlap{}, r5));
+        REQUIRE(bd2(Overlap{}, r6));
+        REQUIRE(!bd2(Overlap{}, r7));
+        REQUIRE(!bd2(Overlap{}, r8));
+        REQUIRE(!bd2(Overlap{}, r9));
+        REQUIRE(!bd2(Overlap{}, r10));
         REQUIRE(bd2(SelectTag{}, r));
         REQUIRE(bd2(SelectTag{}, r1));
         REQUIRE(bd2(SelectTag{}, r2));
@@ -144,11 +132,17 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 2D", "[Detectors][template]",
         REQUIRE(!bd2(SelectTag{}, r10));
     }
 
-    SECTION("Select Mode")
+    SECTION("Overlap Mode")
     {
-        using DetectorType = refine::BallDetector<TestType, 2, Select>;
+        using refine::Intersect;
+        using refine::Overlap;
+        using refine::Select;
+        using refine::SelectAll;
+        using DetectorType = refine::BallDetector<TestType, 2,
+            std::tuple<Overlap, SelectAll>>;
         using RefineTag = typename DetectorType::RefineTag;
         using SelectTag = typename DetectorType::SelectTag;
+        static_assert(std::is_same<SelectTag, SelectAll>::value, "");
         DetectorType bd2{{64, 64}, 64};
         REQUIRE(bd2.intersect(r));
         REQUIRE(bd2.intersect(r1));
@@ -231,7 +225,11 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 2D", "[Detectors][template]",
 
     SECTION("SelectAll Mode")
     {
-        using DetectorType = refine::BallDetector<TestType, 2, SelectAll>;
+        using refine::Intersect;
+        using refine::Select;
+        using refine::SelectAll;
+        using DetectorType = refine::BallDetector<TestType, 2,
+            std::tuple<Intersect, SelectAll>>;
         using RefineTag = typename DetectorType::RefineTag;
         using SelectTag = typename DetectorType::SelectTag;
         DetectorType bd2{{64, 64}, 64};
@@ -318,6 +316,8 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 2D", "[Detectors][template]",
 TEMPLATE_LIST_TEST_CASE("BallDetector - 3D", "[Detectors][template]",
     test::IntTypes)
 {
+    using refine::Intersect;
+    using refine::Overlap;
     using Ival = Interval<TestType>;
     refine::BallDetector<TestType, 3> bd3{{64, 64, 64}, 64};
     Region<TestType, 3> r{{Ival{0, 128}, Ival{0, 128}, Ival{0, 128}}};
@@ -401,6 +401,25 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 3D", "[Detectors][template]",
     REQUIRE(!bd3.overlap(ro6));
     REQUIRE(!bd3.overlap(ro7));
     REQUIRE(!bd3.overlap(ro8));
+    REQUIRE(bd3(Overlap{}, r));
+    REQUIRE(bd3(Overlap{}, rc1));
+    REQUIRE(bd3(Overlap{}, rc2));
+    REQUIRE(bd3(Overlap{}, rc3));
+    REQUIRE(bd3(Overlap{}, rc4));
+    REQUIRE(bd3(Overlap{}, rc5));
+    REQUIRE(bd3(Overlap{}, rc6));
+    REQUIRE(bd3(Overlap{}, rc7));
+    REQUIRE(bd3(Overlap{}, rc8));
+    REQUIRE(bd3(Overlap{}, r5));
+    REQUIRE(bd3(Overlap{}, r6));
+    REQUIRE(!bd3(Overlap{}, ro1));
+    REQUIRE(!bd3(Overlap{}, ro2));
+    REQUIRE(!bd3(Overlap{}, ro3));
+    REQUIRE(!bd3(Overlap{}, ro4));
+    REQUIRE(!bd3(Overlap{}, ro5));
+    REQUIRE(!bd3(Overlap{}, ro6));
+    REQUIRE(!bd3(Overlap{}, ro7));
+    REQUIRE(!bd3(Overlap{}, ro8));
     REQUIRE(bd3.select(r));
     REQUIRE(bd3.select(rc1));
     REQUIRE(bd3.select(rc2));
@@ -420,23 +439,4 @@ TEMPLATE_LIST_TEST_CASE("BallDetector - 3D", "[Detectors][template]",
     REQUIRE(!bd3.select(ro6));
     REQUIRE(!bd3.select(ro7));
     REQUIRE(!bd3.select(ro8));
-    REQUIRE(bd3(Select{}, r));
-    REQUIRE(bd3(Select{}, rc1));
-    REQUIRE(bd3(Select{}, rc2));
-    REQUIRE(bd3(Select{}, rc3));
-    REQUIRE(bd3(Select{}, rc4));
-    REQUIRE(bd3(Select{}, rc5));
-    REQUIRE(bd3(Select{}, rc6));
-    REQUIRE(bd3(Select{}, rc7));
-    REQUIRE(bd3(Select{}, rc8));
-    REQUIRE(bd3(Select{}, r5));
-    REQUIRE(bd3(Select{}, r6));
-    REQUIRE(!bd3(Select{}, ro1));
-    REQUIRE(!bd3(Select{}, ro2));
-    REQUIRE(!bd3(Select{}, ro3));
-    REQUIRE(!bd3(Select{}, ro4));
-    REQUIRE(!bd3(Select{}, ro5));
-    REQUIRE(!bd3(Select{}, ro6));
-    REQUIRE(!bd3(Select{}, ro7));
-    REQUIRE(!bd3(Select{}, ro8));
 }

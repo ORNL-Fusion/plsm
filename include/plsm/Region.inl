@@ -10,8 +10,6 @@ SpaceVector<double, Dim>
 Region<TScalar, Dim>::dispersion() const noexcept
 {
     SpaceVector<double, Dim> disp{};
-    auto vol = static_cast<double>(volume());
-
     for (std::size_t axis = 0; axis < Dim; ++axis) {
         double nSqSum {};
         auto ival = (*this)[axis];
@@ -19,7 +17,7 @@ Region<TScalar, Dim>::dispersion() const noexcept
             nSqSum += static_cast<double>(n*n);
         }
         auto nAvg = ival.midpoint();
-	auto factor = 1.0 / ival.length();
+        auto factor = 1.0 / static_cast<double>(ival.length());
         disp[axis] = (factor*nSqSum - nAvg*nAvg);
         // Convenient for computing coefficients
         if (ival.length() == 1) disp[axis] = 1.0;

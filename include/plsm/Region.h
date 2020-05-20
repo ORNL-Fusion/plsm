@@ -242,6 +242,23 @@ public:
 
 /*!
  * @relates Region
+ * @brief Insert a Region to an output stream
+ */
+template <typename T, std::size_t N>
+inline
+std::ostream&
+operator<<(std::ostream& os, const Region<T, N>& r)
+{
+    os << "{";
+    for (std::size_t i = 0; i < N; ++i) {
+        os << " " << r[i];
+    }
+    os << " }";
+    return os;
+}
+
+/*!
+ * @relates Region
  * @brief Check equality of two Regions, potentially using different limit types
  */
 template <typename T, typename U, std::size_t N>

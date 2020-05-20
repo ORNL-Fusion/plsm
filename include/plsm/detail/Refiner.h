@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 
+#include <Kokkos_Bitset.hpp>
 #include <Kokkos_Vector.hpp>
 
 #include <plsm/ContextUtility.h>
@@ -26,6 +27,13 @@ public:
     using TileType = typename SubpavingType::TileType;
     using RegionType = typename SubpavingType::RegionType;
     using DetectorType = TDetector;
+
+private:
+    static constexpr std::size_t subpavingDim = SubpavingType::dimension();
+
+public:
+    using SubdivisionRatioType = ::plsm::SubdivisionRatio<subpavingDim>;
+    using SubdivisionInfoType = SubdivisionInfo<subpavingDim>;
 
     void
     operator()();
@@ -52,12 +60,12 @@ public:
     std::size_t
     countSelectSubZones(std::size_t index, const ZoneType& zone) const;
 
-    KOKKOS_FUNCTION
+    KOKKOS_INLINE_FUNCTION
     void
     countSelectNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
         const;
 
-    KOKKOS_FUNCTION
+    KOKKOS_INLINE_FUNCTION
     void
     countNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
         const;
@@ -68,7 +76,7 @@ public:
     void
     findNewItemIndices();
 
-    KOKKOS_FUNCTION
+    KOKKOS_INLINE_FUNCTION
     void
     refineTile(std::size_t index) const;
 
@@ -77,7 +85,12 @@ public:
 
     KOKKOS_INLINE_FUNCTION
     RegionType
-    getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId) const;
+    getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId,
+        const SubdivisionInfoType& subdivInfo) const;
+
+    KOKKOS_INLINE_FUNCTION
+    SubdivisionRatioType
+    getSubdivisionRatio(std::size_t level, std::size_t tileIndex) const;
 
 protected:
     template <typename, std::size_t, typename, typename>
@@ -91,13 +104,17 @@ protected:
     ZonesView _zones;
     using TilesView = typename SubpavingType::template TilesView<OnDevice>;
     TilesView _tiles;
-    using SubdivisionInfoType = SubdivisionInfo<SubpavingType::dimension()>;
+
     Kokkos::DualView<SubdivisionInfoType*> _subdivisionInfos;
 
     std::size_t _currLevel;
     std::size_t _targetDepth;
 
     DetectorType _detector;
+
+    using DefaultExecSpace =
+        typename Kokkos::View<int*>::traits::execution_space;
+    Kokkos::Array<Kokkos::Bitset<DefaultExecSpace>, subpavingDim> _enableRefine;
 
     Kokkos::View<std::size_t**> _selectedSubZones;
 

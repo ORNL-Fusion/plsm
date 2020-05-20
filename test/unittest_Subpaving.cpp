@@ -8,6 +8,8 @@
 #include <plsm/refine/BallDetector.h>
 #include <plsm/refine/PolylineDetector.h>
 #include <plsm/refine/RegionDetector.h>
+#include <plsm/RenderSubpaving.h>
+#include <plsm/PrintSubpaving.h>
 using namespace plsm;
 
 TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
@@ -21,8 +23,9 @@ TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
     SubpavingType sp(r, {{{2, 2, 2}}});
     SECTION("Uniform Refinement")
     {
-        using refine::RegionDetector;
-        sp.refine(RegionDetector<TestType, 3, Select>{sp.getLatticeRegion()});
+        using RegionDetector = refine::RegionDetector<TestType, 3,
+            std::tuple<refine::Overlap, refine::SelectAll>>;
+        sp.refine(RegionDetector{sp.getLatticeRegion()});
         REQUIRE(sp.getTiles(onDevice).extent(0) == 64);
         auto spMemSz = sp.getDeviceMemorySize();
         std::cout << "Mem Size: " << spMemSz << '\n';

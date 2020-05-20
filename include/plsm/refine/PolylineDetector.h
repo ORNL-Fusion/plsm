@@ -11,13 +11,12 @@ namespace plsm
 {
 namespace refine
 {
-template <typename TScalar, std::size_t Dim, typename... Tags>
+template <typename TScalar, std::size_t Dim, typename TTag = void>
 class PolylineDetector :
-    public Detector<PolylineDetector<TScalar, Dim, Tags...>, Tags...>
+    public Detector<PolylineDetector<TScalar, Dim, TTag>, TTag>
 {
 public:
-    using Superclass =
-        Detector<PolylineDetector<TScalar, Dim, Tags...>, Tags...>;
+    using Superclass = Detector<PolylineDetector<TScalar, Dim, TTag>, TTag>;
     using ScalarType = TScalar;
     using PointType = SpaceVector<ScalarType, Dim>;
     using FlatType = CompactFlat<ScalarType, Dim>;
@@ -36,9 +35,11 @@ public:
         Kokkos::deep_copy(_flats, fMirror);
     }
 
+    using Superclass::refine;
+
     KOKKOS_INLINE_FUNCTION
     bool
-    intersect(const RegionType& region) const
+    refine(const RegionType& region) const
     {
         return region.intersects(_flats);
     }
