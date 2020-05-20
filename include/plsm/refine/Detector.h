@@ -187,6 +187,7 @@ public:
     }
 
 protected:
+    KOKKOS_INLINE_FUNCTION
     const TDerived*
     asDerived() const noexcept
     {
