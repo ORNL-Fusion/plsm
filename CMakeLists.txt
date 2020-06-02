@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
-set(Kokkos_ROOT ${Kokkos_DIR})
+set(Kokkos_PREFIX ${Kokkos_DIR})
 find_package(Kokkos 3 REQUIRED)
 if (${Kokkos_ENABLE_CUDA})
-    set(CMAKE_CXX_COMPILER "${Kokkos_ROOT}/bin/nvcc_wrapper")
+    set(CMAKE_CXX_COMPILER "${Kokkos_PREFIX}/bin/nvcc_wrapper")
 endif()
 set(ENV{KOKKOS_CMAKE_CXX_STANDARD} ${CMAKE_CXX_STANDARD})
 
@@ -47,8 +47,6 @@ set(PLSM_HEADERS
 )
 
 add_library(plsm INTERFACE)
-target_sources(plsm INTERFACE
-    $<BUILD_INTERFACE:${PLSM_HEADERS}>)
 target_include_directories(plsm INTERFACE
     $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
