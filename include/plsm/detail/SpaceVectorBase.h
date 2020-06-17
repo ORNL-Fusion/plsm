@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
+#include <ostream>
 
 #include <Kokkos_Array.hpp>
 
