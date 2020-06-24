@@ -60,12 +60,11 @@ add_subdirectory(doc)
 
 install(DIRECTORY include/plsm DESTINATION include)
 install(TARGETS plsm EXPORT plsm)
+install(EXPORT plsm DESTINATION lib/plsm)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(CMake/plsm-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake
-    INSTALL_DESTINATION lib/plsm/CMake
+    INSTALL_DESTINATION lib/plsm
 )
-
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake DESTINATION lib/plsm)
-install(EXPORT plsm DESTINATION lib/plsm)
