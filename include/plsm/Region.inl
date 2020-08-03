@@ -14,7 +14,7 @@ Region<TScalar, Dim>::dispersion() const noexcept
         double nSqSum {};
         auto ival = (*this)[axis];
         for (auto n : makeIntervalRange(ival)) {
-            nSqSum += static_cast<double>(n*n);
+            nSqSum += static_cast<double>(n)*static_cast<double>(n);
         }
         auto nAvg = ival.midpoint();
         auto factor = 1.0 / static_cast<double>(ival.length());
