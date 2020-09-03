@@ -21,9 +21,9 @@ struct OnDevice
 
 
 //! Tag instance for host memory space
-constexpr OnHost onHost{};
+inline constexpr OnHost onHost{};
 //! Tag instance for device memory space
-constexpr OnDevice onDevice{};
+inline constexpr OnDevice onDevice{};
 
 
 namespace detail

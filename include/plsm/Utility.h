@@ -10,12 +10,12 @@ namespace plsm
 {
 //! Convention chosen to represent an invalid value for the given type
 template <typename T>
-constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
+inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 
 
 //! Convention chosen to represent a wildcard value for the given type
 template <typename T>
-constexpr T wildcard = std::numeric_limits<T>::max();
+inline constexpr T wildcard = std::numeric_limits<T>::max();
 
 
 template <typename, std::size_t, typename, typename>

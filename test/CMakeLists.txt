@@ -45,6 +45,10 @@ function(create_test _name _sources_list)
         "${TESTING_SRC_DIR}/include"
         "${TESTING_BIN_DIR}"
     )
+
+    set_target_properties(${_name} PROPERTIES
+        BUILD_RPATH $<TARGET_FILE_DIR:Kokkos::kokkoscore>
+    )
     target_compile_options(${_name} PUBLIC
         $<IF:$<CONFIG:Debug>,
         -Wall
@@ -57,7 +61,6 @@ function(create_test _name _sources_list)
         -Woverloaded-virtual
         -Wswitch-enum
         -Wuseless-cast
-        -Wold-style-cast
         -Wcast-align
         -Wconversion
         -Wsign-conversion
