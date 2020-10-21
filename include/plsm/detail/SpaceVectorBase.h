@@ -31,9 +31,8 @@ public:
 
     using Kokkos::Array<ScalarType, Dim>::Array;
 
-    //@{
     /*!
-     * @brief Special copy constructors
+     * @brief Special copy constructor
      */
     KOKKOS_INLINE_FUNCTION
     SpaceVectorBase(std::initializer_list<ScalarType> ilist)
@@ -44,6 +43,9 @@ public:
         }
     }
 
+    /*!
+     * @brief Special copy constructor
+     */
     template <typename TScalar2, typename TDerived2>
     KOKKOS_INLINE_FUNCTION
     SpaceVectorBase(const SpaceVectorBase<TScalar2, Dim, TDerived2>& other)
@@ -52,7 +54,6 @@ public:
             (*this)[i] = static_cast<ScalarType>(other[i]);
         }
     }
-    //@}
 
     /*!
      * @brief Assignment from initializer_list
@@ -67,7 +68,6 @@ public:
         }
     }
 
-    //@{
     /*!
      * @brief Check if this vector has a non-zero component for the given axis
      * and zero components for every other axis
@@ -93,6 +93,9 @@ public:
         return ret;
     }
 
+    /*!
+     * @copydoc isOnAxis()
+     */
     template <typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
     KOKKOS_INLINE_FUNCTION
     bool
@@ -100,7 +103,6 @@ public:
     {
         return isOnAxis(static_cast<std::size_t>(axis));
     }
-    //@}
 
     /*!
      * @brief Construct a vector filled with the given value

@@ -143,7 +143,7 @@ public:
         return ret;
     }
 
-    //@{
+    //!@{
     /*!
      * @brief Subscript operator for accessing elements of the compact
      * representation
@@ -166,7 +166,7 @@ public:
         KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
         return _rep[i];
     }
-    //@}
+    //!@}
 
 private:
     //! Internal representation

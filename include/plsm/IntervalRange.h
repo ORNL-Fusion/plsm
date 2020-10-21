@@ -34,7 +34,7 @@ public:
     class Iterator
     {
     public:
-        //@{
+        //!@{
         /*!
          * @brief Types required for std::iterator_traits
          */
@@ -43,7 +43,7 @@ public:
         using pointer = const LimitType*;
         using reference = const LimitType&;
         using iterator_category = std::random_access_iterator_tag;
-        //@}
+        //!@}
 
         /*!
          * @brief Must be constructed with an initial value
@@ -275,7 +275,7 @@ operator==(const IntervalRange<TLimit>& a, const IntervalRange<TLimit>& b)
 }
 
 
-//@{
+//!@{
 /*!
  * @brief Template helper functions for constructing an IntervalRange
  */
@@ -304,5 +304,5 @@ makeIntervalRange(const Interval<TLimit>& ival) noexcept
 {
     return IntervalRange<TLimit>{ival.begin(), ival.end()};
 }
-//@}
+//!@}
 }

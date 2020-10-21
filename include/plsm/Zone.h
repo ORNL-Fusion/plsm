@@ -54,9 +54,8 @@ public:
         return (_tileId != invalid<std::size_t>);
     }
 
-    //@{
     /*!
-     * @brief Get/Set index of owned Tile
+     * @brief Get index of owned Tile
      */
     KOKKOS_INLINE_FUNCTION
     std::size_t
@@ -65,13 +64,15 @@ public:
         return _tileId;
     }
 
+    /*!
+     * @brief Set index of owned Tile
+     */
     KOKKOS_INLINE_FUNCTION
     void
     setTileIndex(std::size_t tileId) noexcept
     {
         _tileId = tileId;
     }
-    //@}
 
     /*!
      * @brief Disown Tile (reset Tile index)
@@ -93,9 +94,8 @@ public:
         return _level;
     }
 
-    //@{
     /*!
-     * @brief Get/Set Interval of indices to subzones
+     * @brief Get Interval of indices to subzones
      */
     KOKKOS_INLINE_FUNCTION
     const Interval<std::size_t>&
@@ -104,13 +104,15 @@ public:
         return _subZoneIds;
     }
 
+    /*!
+     * @brief Set Interval of indices to subzones
+     */
     KOKKOS_INLINE_FUNCTION
     void
     setSubZoneIndices(const Interval<std::size_t>& subZoneIds)
     {
         _subZoneIds = subZoneIds;
     }
-    //@}
 
     /*!
      * @brief Get IntervalRange over subzone indices

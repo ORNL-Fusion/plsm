@@ -209,7 +209,7 @@ public:
     bool
     intersects(const FlatType& a, const FlatType& b) const;
 
-    //@{
+    //!@{
     /*!
      * @brief Check if the Region overlaps the given "flat polyline"
      */
@@ -220,7 +220,7 @@ public:
 
     bool
     intersects(const std::vector<VectorType>& points) const;
-    //@}
+    //!@}
 
     /*!
      * @brief Check if the Region overlaps with another Region

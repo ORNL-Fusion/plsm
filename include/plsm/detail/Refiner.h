@@ -16,6 +16,9 @@ namespace plsm
 {
 namespace detail
 {
+/*!
+ * @brief Refiner handles the refinement and selection of the Subpaving tiles
+ */
 template <typename TSubpaving, typename TDetector>
 class Refiner
 {
@@ -63,11 +66,6 @@ public:
     KOKKOS_INLINE_FUNCTION
     void
     countSelectNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
-        const;
-
-    KOKKOS_INLINE_FUNCTION
-    void
-    countNewItemsFromTile(std::size_t index, NewItemTotals& runningTotals)
         const;
 
     void

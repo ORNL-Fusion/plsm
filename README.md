@@ -6,6 +6,8 @@ lattice.
 
 ### Dependencies
 
+#### C++17
+
 #### Kokkos
 At this point, Kokkos must be built separately. It should be installed (with
 `make install`) so that CMake settings can be gathered from plsm.
@@ -19,12 +21,16 @@ is header-only, and therefore nothing needs to be done by the user.
 
 ### CMake Instructions
 ```
-cmake -DCMAKE_BUILD_TYPE=Release \
+cmake \
+    -DCMAKE_BUILD_TYPE=<build-type> \
     -DKokkos_DIR=</path/to/kokkos/install> \
-    /path/to/plsm
+    </path/to/plsm>
 ```
 
 To build documentation:
 ```
 make plsmdoc
 ```
+
+## Usage
+See plsm::Subpaving

@@ -8,7 +8,9 @@ namespace plsm
 {
 /*!
  * @brief Segment represents a line segment between two points
+ *
  * @tparam TPoint Type representing a point
+ *
  * @test test_Segment.cpp
  */
 template <typename TPoint>

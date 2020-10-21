@@ -44,8 +44,9 @@ public:
     {
     }
 
+    //!@{
     /*!
-     * @brief Get the Region mapped from by this Tile
+     * @brief Get/Set the Region mapped from by this Tile
      */
     KOKKOS_INLINE_FUNCTION
     const RegionType&
@@ -54,17 +55,15 @@ public:
         return _region;
     }
 
-    /*!
-     * @brief Check if the Tile has a valid owner index
-     */
     KOKKOS_INLINE_FUNCTION
     bool
     hasOwningZone() const noexcept
     {
         return _owningZoneId != invalid<std::size_t>;
     }
+    //!}
 
-    //@{
+    //!@{
     /*!
      * @brief Get/Set index of owning Zone
      */
@@ -81,7 +80,7 @@ public:
     {
         _owningZoneId = id;
     }
-    //@}
+    //!@}
 
     /*!
      * @brief Check if the Tile has mapped data
@@ -93,7 +92,7 @@ public:
         return _data != invalid<ItemDataType>;
     }
 
-    //@{
+    //!@{
     /*!
      * @brief Get/Set mapped data item
      */
@@ -124,7 +123,7 @@ public:
     {
         _data = std::move(data);
     }
-    //@}
+    //!@}
 
 private:
     //! Region mapped from by this Tile

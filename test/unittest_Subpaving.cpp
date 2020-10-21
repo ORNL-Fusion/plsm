@@ -5,8 +5,6 @@
 
 #include <plsm/Subpaving.h>
 #include <plsm/TestingCommon.h>
-#include <plsm/refine/BallDetector.h>
-#include <plsm/refine/PolylineDetector.h>
 #include <plsm/refine/RegionDetector.h>
 #include <plsm/RenderSubpaving.h>
 #include <plsm/PrintSubpaving.h>
@@ -24,7 +22,7 @@ TEMPLATE_LIST_TEST_CASE("Subpaving Basic", "[Subpaving][template]",
     SECTION("Uniform Refinement")
     {
         using RegionDetector = refine::RegionDetector<TestType, 3,
-            std::tuple<refine::Overlap, refine::SelectAll>>;
+            refine::TagPair<refine::Overlap, refine::SelectAll>>;
         sp.refine(RegionDetector{sp.getLatticeRegion()});
         REQUIRE(sp.getTiles(onDevice).extent(0) == 64);
         auto spMemSz = sp.getDeviceMemorySize();

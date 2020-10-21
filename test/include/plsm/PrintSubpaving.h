@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <plsm/Subpaving.h>
+
 namespace plsm
 {
 namespace test

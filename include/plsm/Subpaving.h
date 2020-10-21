@@ -15,17 +15,22 @@
 namespace plsm
 {
 /*!
- * @brief An set of non-overlapping "tiles" which cover the space within a given
+ * @brief A set of non-overlapping "tiles" which cover the space within a given
  * Region of an N-dimensional lattice
  *
  * This data structure can refine according to a highly customizable
  * specification, including the ability to discard tiles that are, for example,
- * outside an area of interest
+ * outside an area of interest. Customization is available through the
+ * SubdivisionRatio instances provided to the constructor and through the
+ * specific refine::Detector passed to refine().
  *
  * @tparam TScalar The underlying type for scalar representation for the lattice
  * @tparam Dim The dimension of the lattice
  * @tparam TEnumIndex An optional enum type to be used to index the space
  * @tparam TItemData An optional data type to associate with each Tile
+ *
+ * @test unittest_Subpaving.cpp
+ * @test benchmark_Subpaving.cpp
  */
 template <typename TScalar, std::size_t Dim, typename TEnumIndex = void,
     typename TItemData = std::size_t>
@@ -77,8 +82,13 @@ public:
     Subpaving(const RegionType& region,
         const std::vector<SubdivisionRatio<Dim>>& subdivisionRatios);
 
+    //!@{
+    /*!
+     * Default copy operations
+     */
     Subpaving(const Subpaving&) = default;
     Subpaving& operator=(const Subpaving&) = default;
+    //!@}
 
     /*!
      * @brief Get the dimension of the lattice
@@ -204,14 +214,23 @@ public:
     /*! @endcond */
 
 private:
+    /*!
+     * @brief Check subdivision ratios for domain divisibility and copy final
+     * form (one per level) into device view
+     */
     void
     processSubdivisionRatios(const std::vector<SubdivisionRatio<Dim>>&);
 
 private:
+    //! Zones represent the entire subdivision tree for the root region
     ZonesDualView _zones;
+    //! Tiles represent the (selected) leaf nodes of the tree
     TilesDualView _tiles;
+    //! Region which fully encloses the domain of interest
     RegionType _rootRegion;
+    //! Collection of SubdivisionInfo, one per expected refinement level
     Kokkos::DualView<detail::SubdivisionInfo<Dim>*> _subdivisionInfos;
+    //! Level limit 
     std::size_t _refinementDepth{};
 };
 }

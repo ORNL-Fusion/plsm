@@ -12,15 +12,12 @@ namespace plsm
 template <typename T>
 inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 
-
 //! Convention chosen to represent a wildcard value for the given type
 template <typename T>
 inline constexpr T wildcard = std::numeric_limits<T>::max();
 
-
 template <typename, std::size_t, typename, typename>
 class Subpaving;
-
 
 namespace detail
 {
@@ -36,7 +33,6 @@ struct IsSubpaving : std::false_type
 {
 };
 
-
 template <typename TScalar, std::size_t Dim, typename TEnumIndex,
     typename TItemData>
 struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
@@ -44,7 +40,6 @@ struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
 {
 };
 /*! @endcond */
-
 
 /*!
  * @brief Determine the type for the result of a subtraction
@@ -56,15 +51,15 @@ struct DifferenceTypeHelper
         "Maybe you need a specialization "
         "(see DifferenceTypeHelper<SpaceVector>)");
 
+    //! Alias for difference type appropriate for T
     using Type =
-        std::conditional_t<std::is_integral<T>::value,
+        std::conditional_t<std::is_integral_v<T>,
             std::make_signed_t<T>,
-            std::conditional_t<std::is_floating_point<T>::value,
+            std::conditional_t<std::is_floating_point_v<T>,
                 T,
                 void>>;
 };
 }
-
 
 /*!
  * @brief Determine the type for the result of a subtraction
@@ -72,8 +67,6 @@ struct DifferenceTypeHelper
 template <typename T>
 using DifferenceType = typename detail::DifferenceTypeHelper<T>::Type;
 
-
-//@{
 /*!
  * @brief Specialized assert for requiring a value to be non-negative
  */
@@ -85,20 +78,18 @@ assertNonNegative(T value)
     assert(value >= T{});
 }
 
-
+/*!
+ * @brief Specialized assert for requiring a value to be non-negative
+ */
 template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
 KOKKOS_INLINE_FUNCTION
 constexpr void
 assertNonNegative(T)
 {
 }
-//@}
 
-
-//@{
 /**
- * Duplicate of the generic std::min, std::max, and std::abs to be used in
- * device kernels
+ * Duplicate of the generic std::min to be used in device kernels
  */
 template <typename T>
 KOKKOS_INLINE_FUNCTION
@@ -111,6 +102,9 @@ min(const T& a, const T& b)
     return a;
 }
 
+/**
+ * Duplicate of the generic std::max to be used in device kernels
+ */
 template <typename T>
 KOKKOS_INLINE_FUNCTION
 const T&
@@ -122,7 +116,10 @@ max(const T& a, const T& b)
     return a;
 }
 
-
+//!@{
+/**
+ * @brief Duplicate of the generic std::abs to be used in device kernels
+ */
 template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
 KOKKOS_INLINE_FUNCTION
 T
@@ -131,7 +128,6 @@ abs(T a)
     return max(-a, a);
 }
 
-
 template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
 KOKKOS_INLINE_FUNCTION
 T
@@ -139,5 +135,5 @@ abs(T a)
 {
     return a;
 }
-//@}
+//!@}
 }

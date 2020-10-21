@@ -163,7 +163,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(const PointType& point,
     return tileId;
 }
 
-
+//! @cond
 template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::plot()
@@ -190,4 +190,5 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::plot()
         ofs << q03 << " " << q11 << "\n";
     }
 }
+//! @endcond
 }

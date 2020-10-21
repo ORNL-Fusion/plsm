@@ -9,6 +9,8 @@ namespace plsm
 /*!
  * @brief EnumIndexed allows any 'std::array-like' class to be indexed with an
  * enum type
+ *
+ * @test unittest_EnumIndexed.cpp
  */
 template <typename TArray, typename TEnumIndex = void>
 struct EnumIndexed : TArray
@@ -31,7 +33,7 @@ struct EnumIndexed : TArray
     {
     }
 
-    //@{
+    //!@{
     /*!
      * @brief Indexing operators; separate size_t and enum versions because
      * Kokkos::Array allows enums without handling scoped enums
@@ -63,7 +65,7 @@ struct EnumIndexed : TArray
     {
         return TArray::operator[](i);
     }
-    //@}
+    //!@}
 };
 
 

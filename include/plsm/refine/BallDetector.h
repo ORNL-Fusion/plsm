@@ -10,18 +10,37 @@ namespace plsm
 {
 namespace refine
 {
+/*!
+ * BallDetector is a Detector implementing intersect() and overlap() with
+ * respect to a hyperball
+ *
+ * @test unittest_Detectors
+ * @test benchmark_Subpaving.cpp
+ */
 template <typename TScalar, std::size_t Dim, typename TTag = void>
 class BallDetector : public Detector<BallDetector<TScalar, Dim, TTag>, TTag>
 {
 public:
+    //! Alias for parent class type
     using Superclass = Detector<BallDetector<TScalar, Dim, TTag>, TTag>;
+    //! Underlying lattice scalar type
     using ScalarType = TScalar;
+    //! Type to use for scalar differences
     using ScalarDiff = DifferenceType<ScalarType>;
+    //! Spatial point representation
     using PointType = SpaceVector<ScalarType, Dim>;
+    //! Alias for Region
     using RegionType = Region<ScalarType, Dim>;
 
     using Superclass::Superclass;
 
+    /*!
+     * @brief Construct with ball center and radius
+     * @param center Ball center point
+     * @param radius Ball radius
+     * @param refineDepth Level limit on refinement (defaults to
+     * Detector::fullDepth)
+     */
     BallDetector(const PointType& center, const ScalarType& radius,
             std::size_t refineDepth = Superclass::fullDepth)
         :
@@ -34,6 +53,9 @@ public:
 
     using Superclass::intersect;
 
+    /*!
+     * @brief Test for intersection of given Region with hyperball boundary 
+     */
     KOKKOS_INLINE_FUNCTION
     bool
     intersect(const RegionType& region) const
@@ -77,6 +99,10 @@ public:
         return false;
     }
 
+    /*!
+     * @brief Test for if the given Region either intersects or is contained by
+     * the hyperball
+     */
     KOKKOS_INLINE_FUNCTION
     bool
     overlap(const RegionType& region) const
@@ -108,25 +134,12 @@ public:
         return (d <= _radSq);
     }
 
-    using Superclass::refine;
-
-    KOKKOS_INLINE_FUNCTION
-    bool
-    refine(const RegionType& region) const
-    {
-        return intersect(region);
-    }
-
-    KOKKOS_INLINE_FUNCTION
-    bool
-    select(const RegionType& region) const
-    {
-        return overlap(region);
-    }
-
 private:
+    //! Ball center point
     PointType _center{};
+    //! Ball radius
     ScalarType _radius{};
+    //! Square of ball radius
     ScalarType _radSq{};
 };
 }

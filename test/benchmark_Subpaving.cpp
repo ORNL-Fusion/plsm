@@ -23,7 +23,8 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
     {
         BENCHMARK("refine: ball")
         {
-            s.refine(refine::BallDetector<int, 3>{{256,256,256}, 128});
+            using Tag = refine::TagPair<refine::Intersect, refine::Overlap>;
+            s.refine(refine::BallDetector<int, 3, Tag>{{256,256,256}, 128});
         };
         // test::renderSubpaving(s);
     }
@@ -41,7 +42,7 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
             Interval<int> ival{0, 56};
             using RegionDetector =
                 refine::RegionDetector<int, 3,
-                    std::tuple<refine::Overlap, refine::SelectAll>>;
+                    refine::TagPair<refine::Overlap, refine::SelectAll>>;
             s.refine(RegionDetector{{ival, ival, ival}});
         };
         // test::renderSubpaving(s);
@@ -76,7 +77,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
         {
             using BallDetector =
                 refine::BallDetector<int, 3,
-                    std::tuple<refine::Intersect, refine::SelectAll>>;
+                    refine::TagPair<refine::Intersect, refine::SelectAll>>;
             s.refine(BallDetector{{256,256,256}, 128});
         };
         // test::renderSubpaving(s);
@@ -95,7 +96,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
             Interval<int> ival{0, 56};
             using RegionDetector =
                 refine::RegionDetector<int, 3,
-                    std::tuple<refine::Overlap, refine::SelectAll>>;
+                    refine::TagPair<refine::Overlap, refine::SelectAll>>;
             s.refine(RegionDetector{{ival, ival, Interval<int>{0, 512}}});
         };
         // test::renderSubpaving(s);
