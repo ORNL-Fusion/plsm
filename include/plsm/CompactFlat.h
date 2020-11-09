@@ -42,141 +42,134 @@ namespace plsm
 template <typename TScalar, std::size_t Dim>
 class CompactFlat
 {
-    template <typename TScalar2, std::size_t Dim2>
-    friend class CompactFlat;
+	template <typename TScalar2, std::size_t Dim2>
+	friend class CompactFlat;
 
 public:
-    //! Underlying scalar representation
-    using ScalarType = TScalar;
-    //! Type for representing a vector in the parent space
-    using VectorType = SpaceVector<ScalarType, Dim>;
+	//! Underlying scalar representation
+	using ScalarType = TScalar;
+	//! Type for representing a vector in the parent space
+	using VectorType = SpaceVector<ScalarType, Dim>;
 
-    /*!
-     * @brief Default construction represents full space (size() == 0,
-     * dimension() == Dim)
-     */
-    KOKKOS_INLINE_FUNCTION
-    CompactFlat() noexcept
-        :
-        _size{0}
-    {
-    }
+	/*!
+	 * @brief Default construction represents full space (size() == 0,
+	 * dimension() == Dim)
+	 */
+	KOKKOS_INLINE_FUNCTION
+	CompactFlat() noexcept : _size{0}
+	{
+	}
 
-    /*!
-     * @brief Construct from parent space vector
-     */
-    KOKKOS_INLINE_FUNCTION
-    CompactFlat(const VectorType& vector) noexcept
-        :
-        _size{0}
-    {
-        for (std::size_t i = 0; i < Dim; ++i) {
-            if (vector[i] == wildcard<TScalar>) {
-                continue;
-            }
-            _rep[_size] = vector[i];
-            _idMap[_size] = i;
-            ++_size;
-        }
-    }
+	/*!
+	 * @brief Construct from parent space vector
+	 */
+	KOKKOS_INLINE_FUNCTION
+	CompactFlat(const VectorType& vector) noexcept : _size{0}
+	{
+		for (std::size_t i = 0; i < Dim; ++i) {
+			if (vector[i] == wildcard<TScalar>) {
+				continue;
+			}
+			_rep[_size] = vector[i];
+			_idMap[_size] = i;
+			++_size;
+		}
+	}
 
-    /*!
-     * @brief Copy from another CompactFlat, with potentially a different scalar
-     * type
-     */
-    template <typename TScalar2>
-    KOKKOS_INLINE_FUNCTION
-    CompactFlat(const CompactFlat<TScalar2, Dim>& other)
-        :
-        _idMap{other._idMap},
-        _size{other._size}
-    {
-        for (std::size_t i = 0; i < _size; ++i) {
-            _rep[i] = static_cast<ScalarType>(other._rep[i]);
-        }
-    }
+	/*!
+	 * @brief Copy from another CompactFlat, with potentially a different scalar
+	 * type
+	 */
+	template <typename TScalar2>
+	KOKKOS_INLINE_FUNCTION
+	CompactFlat(const CompactFlat<TScalar2, Dim>& other) :
+		_idMap{other._idMap}, _size{other._size}
+	{
+		for (std::size_t i = 0; i < _size; ++i) {
+			_rep[i] = static_cast<ScalarType>(other._rep[i]);
+		}
+	}
 
-    /*!
-     * @brief Get dimension of flat: Dim - size()
-     */
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    dimension() const noexcept
-    {
-        return Dim - _size;
-    }
+	/*!
+	 * @brief Get dimension of flat: Dim - size()
+	 */
+	KOKKOS_INLINE_FUNCTION
+	std::size_t
+	dimension() const noexcept
+	{
+		return Dim - _size;
+	}
 
-    /*!
-     * @brief Get size of representation, that is, the number of specified
-     * coordinates
-     */
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    size() const noexcept
-    {
-        return _size;
-    }
+	/*!
+	 * @brief Get size of representation, that is, the number of specified
+	 * coordinates
+	 */
+	KOKKOS_INLINE_FUNCTION
+	std::size_t
+	size() const noexcept
+	{
+		return _size;
+	}
 
-    /*!
-     * @brief Map flat coordinate to parent space coordinate
-     */
-    KOKKOS_INLINE_FUNCTION
-    std::size_t
-    expandCoordinate(std::size_t i) const
-    {
-        KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
-        return _idMap[i];
-    }
+	/*!
+	 * @brief Map flat coordinate to parent space coordinate
+	 */
+	KOKKOS_INLINE_FUNCTION
+	std::size_t
+	expandCoordinate(std::size_t i) const
+	{
+		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
+		return _idMap[i];
+	}
 
-    /*!
-     * @brief Convert flat representation to parent space vector (with wildcard
-     * coordinate values as appropriate)
-     */
-    KOKKOS_INLINE_FUNCTION
-    VectorType
-    expand() const
-    {
-        auto ret = VectorType::filled(wildcard<ScalarType>);
-        for (std::size_t i = 0; i < _size; ++i) {
-            ret[expandCoordinate(i)] = _rep[i];
-        }
-        return ret;
-    }
+	/*!
+	 * @brief Convert flat representation to parent space vector (with wildcard
+	 * coordinate values as appropriate)
+	 */
+	KOKKOS_INLINE_FUNCTION
+	VectorType
+	expand() const
+	{
+		auto ret = VectorType::filled(wildcard<ScalarType>);
+		for (std::size_t i = 0; i < _size; ++i) {
+			ret[expandCoordinate(i)] = _rep[i];
+		}
+		return ret;
+	}
 
-    //!@{
-    /*!
-     * @brief Subscript operator for accessing elements of the compact
-     * representation
-     *
-     * @warning Index should be less than dimension(), which is usually not the
-     * same as Dim
-     */
-    KOKKOS_INLINE_FUNCTION
-    auto
-    operator[](std::size_t i) const
-    {
-        KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
-        return _rep[i];
-    }
+	//!@{
+	/*!
+	 * @brief Subscript operator for accessing elements of the compact
+	 * representation
+	 *
+	 * @warning Index should be less than dimension(), which is usually not the
+	 * same as Dim
+	 */
+	KOKKOS_INLINE_FUNCTION
+	auto
+	operator[](std::size_t i) const
+	{
+		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
+		return _rep[i];
+	}
 
-    KOKKOS_INLINE_FUNCTION
-    auto&
-    operator[](std::size_t i)
-    {
-        KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
-        return _rep[i];
-    }
-    //!@}
+	KOKKOS_INLINE_FUNCTION
+	auto&
+	operator[](std::size_t i)
+	{
+		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
+		return _rep[i];
+	}
+	//!@}
 
 private:
-    //! Internal representation
-    VectorType _rep;
-    //! Map of flat indices to parent space indices
-    Kokkos::Array<std::size_t, Dim> _idMap;
-    //! Size of internal representation
-    std::size_t _size;
+	//! Internal representation
+	VectorType _rep;
+	//! Map of flat indices to parent space indices
+	Kokkos::Array<std::size_t, Dim> _idMap;
+	//! Size of internal representation
+	std::size_t _size;
 };
-
 
 /*!
  * @relates CompactFlat
@@ -187,14 +180,13 @@ KOKKOS_INLINE_FUNCTION
 CompactFlat<T, N>
 operator-(const CompactFlat<T, N>& b, const CompactFlat<T, N>& a)
 {
-    assert(a.size() == b.size());
-    CompactFlat<T, N> ret{b};
-    for (std::size_t i = 0; i < a.size(); ++i) {
-        ret[i] -= a[i];
-    }
-    return ret;
+	assert(a.size() == b.size());
+	CompactFlat<T, N> ret{b};
+	for (std::size_t i = 0; i < a.size(); ++i) {
+		ret[i] -= a[i];
+	}
+	return ret;
 }
-
 
 namespace detail
 {
@@ -202,8 +194,8 @@ namespace detail
 template <typename TScalar, std::size_t Dim>
 struct DifferenceTypeHelper<::plsm::CompactFlat<TScalar, Dim>>
 {
-    using Type = ::plsm::CompactFlat<DifferenceType<TScalar>, Dim>;
+	using Type = ::plsm::CompactFlat<DifferenceType<TScalar>, Dim>;
 };
 //! @endcond
-}
-}
+} // namespace detail
+} // namespace plsm

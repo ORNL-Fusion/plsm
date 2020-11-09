@@ -41,8 +41,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: false
 BreakBeforeTernaryOperators: false
-# BreakConstructorInitializersBeforeComma: false
-BreakConstructorInitializers: BeforeComma
+BreakConstructorInitializers: AfterColon
 BreakInheritanceList: AfterColon
 BreakStringLiterals: true
 ColumnLimit:     80
@@ -50,7 +49,7 @@ CommentPragmas:  '^ IWYU pragma:'
 # CompactNamespaces: false
 
 # NOTE: Would like one per line always (with the colon on its own line)
-# ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
 
 # ConstructorInitializerIndentWidth: 4
 # ContinuationIndentWidth: 4

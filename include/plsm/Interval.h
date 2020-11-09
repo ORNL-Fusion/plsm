@@ -20,10 +20,9 @@ namespace plsm
  */
 enum class RangeElem
 {
-    first, /*!< The first element (as in front) */
-    last   /*!< The last element (inclusive, as in back) */
+	first, /*!< The first element (as in front) */
+	last /*!< The last element (inclusive, as in back) */
 };
-
 
 /*!
  * @brief Interval represtents a half-open range of integers
@@ -40,152 +39,139 @@ enum class RangeElem
 template <typename TLimit>
 class Interval
 {
-    static_assert(std::is_integral<TLimit>::value,
-        "plsm::Interval: template parameter must be an integral type");
+	static_assert(std::is_integral<TLimit>::value,
+		"plsm::Interval: template parameter must be an integral type");
 
 public:
-    //! Underlying type for representing interval limits
-    using LimitType = TLimit;
-    //! Unsigned type corresponding to LimitType
-    using SizeType = std::make_unsigned_t<LimitType>;
+	//! Underlying type for representing interval limits
+	using LimitType = TLimit;
+	//! Unsigned type corresponding to LimitType
+	using SizeType = std::make_unsigned_t<LimitType>;
 
-    /*!
-     * @brief Default construct empty interval [0, 0)
-     */
-    constexpr
-    Interval() noexcept
-        = default;
+	/*!
+	 * @brief Default construct empty interval [0, 0)
+	 */
+	constexpr Interval() noexcept = default;
 
-    /*!
-     * @brief Construct interval [0, end)
-     */
-    explicit
-    KOKKOS_INLINE_FUNCTION
-    constexpr
-    Interval(LimitType end) noexcept
-        :
-        _end{end}
-    {
-        assertNonNegative(end);
-    }
+	/*!
+	 * @brief Construct interval [0, end)
+	 */
+	explicit KOKKOS_INLINE_FUNCTION
+	constexpr Interval(LimitType end) noexcept : _end{end}
+	{
+		assertNonNegative(end);
+	}
 
-    /*!
-     * @brief Construct interval [begin, end)
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr
-    Interval(LimitType begin, LimitType end) noexcept
-        :
-        _begin{begin},
-        _end{end}
-    {
-        assert(begin <= end);
-    }
+	/*!
+	 * @brief Construct interval [begin, end)
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr Interval(LimitType begin, LimitType end) noexcept :
+		_begin{begin}, _end{end}
+	{
+		assert(begin <= end);
+	}
 
-    /*!
-     * @brief Defaulted copy operations
-     */
-    constexpr
-    Interval(const Interval&) noexcept
-        = default;
+	/*!
+	 * @brief Defaulted copy operations
+	 */
+	constexpr Interval(const Interval&) noexcept = default;
 
-    /*!
-     * @brief Defaulted copy operations
-     */
-    Interval&
-    operator=(const Interval&) noexcept
-        = default;
+	/*!
+	 * @brief Defaulted copy operations
+	 */
+	Interval&
+	operator=(const Interval&) noexcept = default;
 
-    /*!
-     * @brief Get the lower limit
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr LimitType
-    begin() const noexcept
-    {
-        return _begin;
-    }
+	/*!
+	 * @brief Get the lower limit
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr LimitType
+	begin() const noexcept
+	{
+		return _begin;
+	}
 
-    /*!
-     * @brief Get the upper limit
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr LimitType
-    end() const noexcept
-    {
-        return _end;
-    }
+	/*!
+	 * @brief Get the upper limit
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr LimitType
+	end() const noexcept
+	{
+		return _end;
+	}
 
-    /*!
-     * @brief Is the Interval empty (begin == end)
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr bool
-    empty() const noexcept
-    {
-        return _begin == _end;
-    }
+	/*!
+	 * @brief Is the Interval empty (begin == end)
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr bool
+	empty() const noexcept
+	{
+		return _begin == _end;
+	}
 
-    /*!
-     * @brief Get the size of the interval
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr SizeType
-    length() const noexcept
-    {
-        return static_cast<SizeType>(_end - _begin);
-    }
+	/*!
+	 * @brief Get the size of the interval
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr SizeType
+	length() const noexcept
+	{
+		return static_cast<SizeType>(_end - _begin);
+	}
 
-    /*!
-     * @brief Compute midpoint of owned interval
-     */
-    KOKKOS_INLINE_FUNCTION
-    double
-    midpoint() const noexcept
-    {
-        assert(!empty());
-        auto a = static_cast<double>(begin());
-        auto b = static_cast<double>(end() - 1);
-        return 0.5*(a + b);
-    }
+	/*!
+	 * @brief Compute midpoint of owned interval
+	 */
+	KOKKOS_INLINE_FUNCTION
+	double
+	midpoint() const noexcept
+	{
+		assert(!empty());
+		auto a = static_cast<double>(begin());
+		auto b = static_cast<double>(end() - 1);
+		return 0.5 * (a + b);
+	}
 
-    /*!
-     * @brief Check if a scalar value resides within the Interval
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr bool
-    contains(LimitType value) const noexcept
-    {
-        return (_begin <= value) && (value < _end);
-    }
+	/*!
+	 * @brief Check if a scalar value resides within the Interval
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr bool
+	contains(LimitType value) const noexcept
+	{
+		return (_begin <= value) && (value < _end);
+	}
 
-    /*!
-     * @brief Check if this Interval overlaps with another
-     * @todo Change name to "overlaps"
-     */
-    KOKKOS_INLINE_FUNCTION
-    constexpr bool
-    intersects(const Interval& other) const noexcept
-    {
-        if (empty() || other.empty()) {
-            return false;
-        }
-        if (other._begin < _begin && (other._end - 1) < _begin) {
-            return false;
-        }
-        if (_begin < other._begin && (_end - 1) < other._begin) {
-            return false;
-        }
-        return true;
-    }
+	/*!
+	 * @brief Check if this Interval overlaps with another
+	 * @todo Change name to "overlaps"
+	 */
+	KOKKOS_INLINE_FUNCTION
+	constexpr bool
+	intersects(const Interval& other) const noexcept
+	{
+		if (empty() || other.empty()) {
+			return false;
+		}
+		if (other._begin < _begin && (other._end - 1) < _begin) {
+			return false;
+		}
+		if (_begin < other._begin && (_end - 1) < other._begin) {
+			return false;
+		}
+		return true;
+	}
 
 private:
-    //! Lower limit
-    LimitType _begin{};
-    //! Upper limit
-    LimitType _end{};
+	//! Lower limit
+	LimitType _begin{};
+	//! Upper limit
+	LimitType _end{};
 };
-
 
 /*!
  * @relates Interval
@@ -197,9 +183,8 @@ KOKKOS_INLINE_FUNCTION
 constexpr bool
 operator==(const Interval<T>& a, const Interval<U> b) noexcept
 {
-    return (a.begin() == b.begin()) && (a.end() == b.end());
+	return (a.begin() == b.begin()) && (a.end() == b.end());
 }
-
 
 /*!
  * @relates Interval
@@ -210,23 +195,20 @@ KOKKOS_INLINE_FUNCTION
 constexpr bool
 operator!=(const Interval<T>& a, const Interval<U> b) noexcept
 {
-    return !(a == b);
+	return !(a == b);
 }
-
 
 /*!
  * @relates Interval
  * @brief Insert an Interval to an output stream
  */
 template <typename T>
-inline
-std::ostream&
+inline std::ostream&
 operator<<(std::ostream& os, const Interval<T>& x)
 {
-    os << '[' << begin(x) << ',' << end(x) << ')';
-    return os;
+	os << '[' << begin(x) << ',' << end(x) << ')';
+	return os;
 }
-
 
 /*!
  * @relates Interval
@@ -237,9 +219,8 @@ KOKKOS_INLINE_FUNCTION
 constexpr T
 begin(const Interval<T>& x) noexcept
 {
-    return x.begin();
+	return x.begin();
 }
-
 
 /*!
  * @relates Interval
@@ -250,9 +231,8 @@ KOKKOS_INLINE_FUNCTION
 constexpr T
 end(const Interval<T>& x) noexcept
 {
-    return x.end();
+	return x.end();
 }
-
 
 namespace detail
 {
@@ -262,34 +242,31 @@ struct GetRangeElemHelper
 {
 };
 
-
 template <>
 struct GetRangeElemHelper<RangeElem::first>
 {
-    template <typename T>
-    KOKKOS_INLINE_FUNCTION
-    constexpr T
-    operator()(const Interval<T>& x) noexcept
-    {
-        return x.begin();
-    }
+	template <typename T>
+	KOKKOS_INLINE_FUNCTION
+	constexpr T
+	operator()(const Interval<T>& x) noexcept
+	{
+		return x.begin();
+	}
 };
-
 
 template <>
 struct GetRangeElemHelper<RangeElem::last>
 {
-    template <typename T>
-    KOKKOS_INLINE_FUNCTION
-    constexpr T
-    operator()(const Interval<T>& x) noexcept
-    {
-        return x.end() - static_cast<T>(1);
-    }
+	template <typename T>
+	KOKKOS_INLINE_FUNCTION
+	constexpr T
+	operator()(const Interval<T>& x) noexcept
+	{
+		return x.end() - static_cast<T>(1);
+	}
 };
 //! @endcond
 } /* namespace detail */
-
 
 /*!
  * @relates Interval
@@ -301,6 +278,6 @@ KOKKOS_INLINE_FUNCTION
 constexpr TLimit
 get(const Interval<TLimit>& x) noexcept
 {
-    return detail::GetRangeElemHelper<Elem>{}(x);
+	return detail::GetRangeElemHelper<Elem>{}(x);
 }
 } /* namespace plsm */

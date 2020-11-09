@@ -23,16 +23,15 @@ namespace plsm
  */
 template <typename TScalar, std::size_t Dim>
 class SpaceVector :
-    public detail::SpaceVectorBase<TScalar, Dim, SpaceVector<TScalar, Dim>>
+	public detail::SpaceVectorBase<TScalar, Dim, SpaceVector<TScalar, Dim>>
 {
 public:
-    //! Alias to parent class type
-    using Superclass =
-        detail::SpaceVectorBase<TScalar, Dim, SpaceVector<TScalar, Dim>>;
+	//! Alias to parent class type
+	using Superclass =
+		detail::SpaceVectorBase<TScalar, Dim, SpaceVector<TScalar, Dim>>;
 
-    using Superclass::Superclass;
+	using Superclass::Superclass;
 };
-
 
 namespace detail
 {
@@ -40,8 +39,8 @@ namespace detail
 template <typename TScalar, std::size_t Dim>
 struct DifferenceTypeHelper<::plsm::SpaceVector<TScalar, Dim>>
 {
-    using Type = ::plsm::SpaceVector<DifferenceType<TScalar>, Dim>;
+	using Type = ::plsm::SpaceVector<DifferenceType<TScalar>, Dim>;
 };
 //! @endcond
-}
-}
+} // namespace detail
+} // namespace plsm

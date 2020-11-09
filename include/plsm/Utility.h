@@ -34,9 +34,9 @@ struct IsSubpaving : std::false_type
 };
 
 template <typename TScalar, std::size_t Dim, typename TEnumIndex,
-    typename TItemData>
+	typename TItemData>
 struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
-    std::true_type
+	std::true_type
 {
 };
 /*! @endcond */
@@ -47,19 +47,16 @@ struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
 template <typename T>
 struct DifferenceTypeHelper
 {
-    static_assert(std::is_arithmetic<T>::value,
-        "Maybe you need a specialization "
-        "(see DifferenceTypeHelper<SpaceVector>)");
+	static_assert(std::is_arithmetic<T>::value,
+		"Maybe you need a specialization "
+		"(see DifferenceTypeHelper<SpaceVector>)");
 
-    //! Alias for difference type appropriate for T
-    using Type =
-        std::conditional_t<std::is_integral_v<T>,
-            std::make_signed_t<T>,
-            std::conditional_t<std::is_floating_point_v<T>,
-                T,
-                void>>;
+	//! Alias for difference type appropriate for T
+	using Type =
+		std::conditional_t<std::is_integral_v<T>, std::make_signed_t<T>,
+			std::conditional_t<std::is_floating_point_v<T>, T, void>>;
 };
-}
+} // namespace detail
 
 /*!
  * @brief Determine the type for the result of a subtraction
@@ -75,7 +72,7 @@ KOKKOS_INLINE_FUNCTION
 constexpr void
 assertNonNegative(T value)
 {
-    assert(value >= T{});
+	assert(value >= T{});
 }
 
 /*!
@@ -83,8 +80,7 @@ assertNonNegative(T value)
  */
 template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
 KOKKOS_INLINE_FUNCTION
-constexpr void
-assertNonNegative(T)
+constexpr void assertNonNegative(T)
 {
 }
 
@@ -96,10 +92,10 @@ KOKKOS_INLINE_FUNCTION
 const T&
 min(const T& a, const T& b)
 {
-    if (b < a) {
-        return b;
-    }
-    return a;
+	if (b < a) {
+		return b;
+	}
+	return a;
 }
 
 /**
@@ -110,10 +106,10 @@ KOKKOS_INLINE_FUNCTION
 const T&
 max(const T& a, const T& b)
 {
-    if (a < b) {
-        return b;
-    }
-    return a;
+	if (a < b) {
+		return b;
+	}
+	return a;
 }
 
 //!@{
@@ -125,7 +121,7 @@ KOKKOS_INLINE_FUNCTION
 T
 abs(T a)
 {
-    return max(-a, a);
+	return max(-a, a);
 }
 
 template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
@@ -133,7 +129,7 @@ KOKKOS_INLINE_FUNCTION
 T
 abs(T a)
 {
-    return a;
+	return a;
 }
 //!@}
-}
+} // namespace plsm

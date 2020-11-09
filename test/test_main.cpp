@@ -6,6 +6,6 @@
 int
 main(int argc, char* argv[])
 {
-    Kokkos::ScopeGuard kokkosContext;
-    return Catch::Session().run(argc, argv);
+	Kokkos::ScopeGuard kokkosContext;
+	return Catch::Session().run(argc, argv);
 }

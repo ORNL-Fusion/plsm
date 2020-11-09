@@ -35,9 +35,8 @@ public:
 	 * Detector::fullDepth)
 	 */
 	RegionDetector(const RegionType& region,
-		std::size_t refineDepth = Superclass::fullDepth)
-		: Superclass(refineDepth)
-		, _region{region}
+		std::size_t refineDepth = Superclass::fullDepth) :
+		Superclass(refineDepth), _region{region}
 	{
 	}
 
@@ -101,7 +100,7 @@ private:
 	}
 
 private:
-    //! Reference region
+	//! Reference region
 	RegionType _region;
 };
 } // namespace refine

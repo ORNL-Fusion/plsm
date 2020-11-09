@@ -58,9 +58,9 @@ TEMPLATE_LIST_TEST_CASE(
 
 	SECTION("Default Mode")
 	{
-        using refine::TagPair;
 		using refine::Intersect;
 		using refine::Overlap;
+		using refine::TagPair;
 		using DetectorType =
 			refine::BallDetector<TestType, 2, TagPair<Intersect, Overlap>>;
 		using RefineTag = typename DetectorType::RefineTag;
@@ -213,8 +213,8 @@ TEMPLATE_LIST_TEST_CASE(
 		using DetectorType =
 			refine::BallDetector<TestType, 2, TagPair<Intersect, SelectAll>>;
 		DetectorType bd2{{64, 64}, 64};
-        constexpr auto refineTag = bd2.refineTag;
-        constexpr auto selectTag = bd2.selectTag;
+		constexpr auto refineTag = bd2.refineTag;
+		constexpr auto selectTag = bd2.selectTag;
 		REQUIRE(bd2.intersect(r));
 		REQUIRE(bd2.intersect(r1));
 		REQUIRE(bd2.intersect(r2));

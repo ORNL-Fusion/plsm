@@ -17,7 +17,7 @@ KOKKOS_INLINE_FUNCTION
 auto
 begin(Array<T, N, P>& a) noexcept
 {
-    return a.data();
+	return a.data();
 }
 
 /*!
@@ -29,7 +29,7 @@ KOKKOS_INLINE_FUNCTION
 auto
 end(Array<T, N, P>& a) noexcept
 {
-    return a.data() + static_cast<std::ptrdiff_t>(N);
+	return a.data() + static_cast<std::ptrdiff_t>(N);
 }
 
 /*!
@@ -41,7 +41,7 @@ KOKKOS_INLINE_FUNCTION
 auto
 begin(const Array<T, N, P>& a) noexcept
 {
-    return a.data();
+	return a.data();
 }
 
 /*!
@@ -53,6 +53,6 @@ KOKKOS_INLINE_FUNCTION
 auto
 end(const Array<T, N, P>& a) noexcept
 {
-    return a.data() + static_cast<std::ptrdiff_t>(N);
+	return a.data() + static_cast<std::ptrdiff_t>(N);
 }
-}
+} // namespace Kokkos

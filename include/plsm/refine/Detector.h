@@ -191,8 +191,7 @@ public:
 	/*!
 	 * @brief Construct with specified refinement depth
 	 */
-	Detector(std::size_t refineDepth)
-		: _depth{refineDepth}
+	Detector(std::size_t refineDepth) : _depth{refineDepth}
 	{
 	}
 
@@ -353,7 +352,7 @@ protected:
 	}
 
 protected:
-    //! Limit on refinement depth
+	//! Limit on refinement depth
 	std::size_t _depth{fullDepth};
 };
 } // namespace refine
