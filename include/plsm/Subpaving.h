@@ -102,6 +102,16 @@ public:
 	}
 
 	/*!
+	 * @brief Get the invalid index value
+	 */
+	static KOKKOS_INLINE_FUNCTION
+	constexpr std::size_t
+	invalidIndex() noexcept
+	{
+		return invalid<std::size_t>;
+	}
+
+	/*!
 	 * @brief Get root region
 	 */
 	const RegionType&
