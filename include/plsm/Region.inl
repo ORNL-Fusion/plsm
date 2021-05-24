@@ -4,13 +4,13 @@
 
 namespace plsm
 {
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 KOKKOS_INLINE_FUNCTION
 SpaceVector<double, Dim>
 Region<TScalar, Dim>::dispersion() const noexcept
 {
 	SpaceVector<double, Dim> disp{};
-	for (std::size_t axis = 0; axis < Dim; ++axis) {
+	for (DimType axis = 0; axis < Dim; ++axis) {
 		double nSqSum{};
 		auto ival = (*this)[axis];
 		for (auto n : makeIntervalRange(ival)) {
@@ -27,13 +27,13 @@ Region<TScalar, Dim>::dispersion() const noexcept
 	return disp;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 KOKKOS_INLINE_FUNCTION
 bool
 Region<TScalar, Dim>::contains(const VectorType& p) const
 {
 	bool ret = true;
-	for (std::size_t i = 0; i < Dim; ++i) {
+	for (DimType i = 0; i < Dim; ++i) {
 		if (!(*this)[i].contains(p[i])) {
 			ret = false;
 			break;
@@ -42,13 +42,13 @@ Region<TScalar, Dim>::contains(const VectorType& p) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 KOKKOS_INLINE_FUNCTION
 bool
 Region<TScalar, Dim>::intersects(const FlatType& p) const
 {
 	bool ret = true;
-	for (std::size_t i = 0; i < p.size(); ++i) {
+	for (DimType i = 0; i < p.size(); ++i) {
 		if (!(*this)[p.expandCoordinate(i)].contains(p[i])) {
 			ret = false;
 			break;
@@ -57,7 +57,7 @@ Region<TScalar, Dim>::intersects(const FlatType& p) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 KOKKOS_INLINE_FUNCTION
 bool
 Region<TScalar, Dim>::intersects(const FlatType& a, const FlatType& b) const
@@ -68,7 +68,7 @@ Region<TScalar, Dim>::intersects(const FlatType& a, const FlatType& b) const
 	}
 	else {
 		Segment<FlatType> segment{a, b};
-		for (std::size_t i = 0; i < a.size(); ++i) {
+		for (DimType i = 0; i < a.size(); ++i) {
 			if (intersectsFace<RangeElem::first>(i, segment) ||
 				intersectsFace<RangeElem::last>(i, segment)) {
 				ret = true;
@@ -79,7 +79,7 @@ Region<TScalar, Dim>::intersects(const FlatType& a, const FlatType& b) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 template <typename TPoint>
 KOKKOS_INLINE_FUNCTION
 bool
@@ -91,7 +91,7 @@ Region<TScalar, Dim>::intersects(Kokkos::View<TPoint*> points) const
 	}
 	else {
 		// Assumes each subsequent pair defines a segment
-		for (std::size_t i = 0; i < points.extent(0) - 1; ++i) {
+		for (IdType i = 0; i < points.extent(0) - 1; ++i) {
 			if (intersects(points[i], points[i + 1])) {
 				ret = true;
 				break;
@@ -101,7 +101,7 @@ Region<TScalar, Dim>::intersects(Kokkos::View<TPoint*> points) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 bool
 Region<TScalar, Dim>::intersects(const std::vector<VectorType>& points) const
 {
@@ -111,7 +111,7 @@ Region<TScalar, Dim>::intersects(const std::vector<VectorType>& points) const
 	}
 	else {
 		// Assumes each subsequent pair defines a segment
-		for (std::size_t i = 0; i < points.size() - 1; ++i) {
+		for (IdType i = 0; i < points.size() - 1; ++i) {
 			if (intersects(points[i], points[i + 1])) {
 				ret = true;
 				break;
@@ -121,13 +121,13 @@ Region<TScalar, Dim>::intersects(const std::vector<VectorType>& points) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 KOKKOS_INLINE_FUNCTION
 bool
 Region<TScalar, Dim>::intersects(const Region& other) const
 {
 	bool ret = true;
-	for (std::size_t i = 0; i < Dim; ++i) {
+	for (DimType i = 0; i < Dim; ++i) {
 		if (!(*this)[i].intersects(other[i])) {
 			ret = false;
 			break;
@@ -136,12 +136,12 @@ Region<TScalar, Dim>::intersects(const Region& other) const
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 template <RangeElem Elem>
 KOKKOS_INLINE_FUNCTION
 bool
 Region<TScalar, Dim>::intersectsFace(
-	std::size_t flatCoord, const Segment<FlatType>& segment) const
+	DimType flatCoord, const Segment<FlatType>& segment) const
 {
 	bool ret = false;
 	if (segment.vector()[flatCoord] != 0) {
@@ -154,7 +154,7 @@ Region<TScalar, Dim>::intersectsFace(
 		auto t = static_cast<double>(faceVal - origComp) / vecComp;
 		if (t >= 0.0 && t <= 1.0) {
 			ret = true;
-			for (std::size_t i = 0; i < sOrig.size(); ++i) {
+			for (DimType i = 0; i < sOrig.size(); ++i) {
 				if (i == flatCoord) {
 					continue;
 				}

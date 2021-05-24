@@ -21,7 +21,7 @@ namespace plsm
  *
  * @test test_SpaceVector.cpp
  */
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 class SpaceVector :
 	public detail::SpaceVectorBase<TScalar, Dim, SpaceVector<TScalar, Dim>>
 {
@@ -36,7 +36,7 @@ public:
 namespace detail
 {
 //! @cond
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 struct DifferenceTypeHelper<::plsm::SpaceVector<TScalar, Dim>>
 {
 	using Type = ::plsm::SpaceVector<DifferenceType<TScalar>, Dim>;

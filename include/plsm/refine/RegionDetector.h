@@ -15,7 +15,7 @@ namespace refine
  * @test unittest_Subpaving.cpp
  * @test benchmark_Subpaving.cpp
  */
-template <typename TScalar, std::size_t Dim, typename TTag = void>
+template <typename TScalar, DimType Dim, typename TTag = void>
 class RegionDetector : public Detector<RegionDetector<TScalar, Dim, TTag>, TTag>
 {
 public:
@@ -49,7 +49,7 @@ public:
 	intersect(const RegionType& region) const
 	{
 		bool ret = false;
-		for (std::size_t i = 0; i < region.dimension(); ++i) {
+		for (DimType i = 0; i < region.dimension(); ++i) {
 			auto ival0 = region[i];
 			auto ival1 = _region[i];
 			if (!ival0.intersects(ival1)) {

@@ -6,8 +6,12 @@
 
 #include <Kokkos_Macros.hpp>
 
+#include <plsm/config.h>
+
 namespace plsm
 {
+using DimType = std::size_t;
+
 //! Convention chosen to represent an invalid value for the given type
 template <typename T>
 inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
@@ -16,7 +20,7 @@ inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 template <typename T>
 inline constexpr T wildcard = std::numeric_limits<T>::max();
 
-template <typename, std::size_t, typename, typename>
+template <typename, DimType, typename, typename>
 class Subpaving;
 
 namespace detail
@@ -33,7 +37,7 @@ struct IsSubpaving : std::false_type
 {
 };
 
-template <typename TScalar, std::size_t Dim, typename TEnumIndex,
+template <typename TScalar, DimType Dim, typename TEnumIndex,
 	typename TItemData>
 struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
 	std::true_type

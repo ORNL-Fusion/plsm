@@ -29,7 +29,7 @@ TEMPLATE_LIST_TEST_CASE(
 		std::cout << "Mem Size: " << spMemSz << '\n';
 		sp.syncTiles(onHost);
 		REQUIRE(sp.getTiles().extent(0) == 64);
-		REQUIRE(sp.findTileId({3, 3, 3}) == invalid<std::size_t>);
+		REQUIRE(sp.findTileId({3, 3, 3}) == invalid<IdType>);
 		sp.syncAll(onHost);
 		REQUIRE(sp.findTileId({3, 3, 3}) == 63);
 

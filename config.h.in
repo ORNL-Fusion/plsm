@@ -1,0 +1,12 @@
+#pragma once
+
+#cmakedefine PLSM_USE_64BIT_INDEX_TYPE
+
+namespace plsm
+{
+#if defined(PLSM_USE_64BIT_INDEX_TYPE)
+using IdType = std::uint64_t;
+#else
+using IdType = std::uint32_t;
+#endif
+} // namespace plsm

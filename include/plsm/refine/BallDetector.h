@@ -17,7 +17,7 @@ namespace refine
  * @test unittest_Detectors
  * @test benchmark_Subpaving.cpp
  */
-template <typename TScalar, std::size_t Dim, typename TTag = void>
+template <typename TScalar, DimType Dim, typename TTag = void>
 class BallDetector : public Detector<BallDetector<TScalar, Dim, TTag>, TTag>
 {
 public:
@@ -64,7 +64,7 @@ public:
 		auto negRad = -rad;
 		ScalarType d_min = 0;
 		ScalarType d_max = 0;
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			auto c_i = static_cast<ScalarDiff>(_center[i]);
 			auto r_lo_i = static_cast<ScalarDiff>(region[i].begin());
 			auto r_hi_i = static_cast<ScalarDiff>(region[i].end());
@@ -111,7 +111,7 @@ public:
 		auto rad = static_cast<ScalarDiff>(_radius);
 		auto negRad = -rad;
 		ScalarType d = 0;
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			auto c_i = static_cast<ScalarDiff>(_center[i]);
 			auto r_lo_i = static_cast<ScalarDiff>(region[i].begin());
 			auto r_hi_i = static_cast<ScalarDiff>(region[i].end());

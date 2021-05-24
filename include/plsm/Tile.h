@@ -19,7 +19,7 @@ namespace plsm
  *
  * @test test_Tile.cpp
  */
-template <typename TRegion, typename TItemData = std::size_t>
+template <typename TRegion, typename TItemData = IdType>
 class Tile
 {
 public:
@@ -37,7 +37,7 @@ public:
 	 * @brief Construct with Region and owning Zone index
 	 */
 	KOKKOS_INLINE_FUNCTION
-	Tile(const RegionType& region, std::size_t owningZoneId) :
+	Tile(const RegionType& region, IdType owningZoneId) :
 		_region(region), _owningZoneId(owningZoneId)
 	{
 	}
@@ -57,7 +57,7 @@ public:
 	bool
 	hasOwningZone() const noexcept
 	{
-		return _owningZoneId != invalid<std::size_t>;
+		return _owningZoneId != invalid<IdType>;
 	}
 	//!}
 
@@ -66,7 +66,7 @@ public:
 	 * @brief Get/Set index of owning Zone
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	getOwningZoneIndex() const noexcept
 	{
 		return _owningZoneId;
@@ -74,7 +74,7 @@ public:
 
 	KOKKOS_INLINE_FUNCTION
 	void
-	setOwningZoneIndex(std::size_t id) noexcept
+	setOwningZoneIndex(IdType id) noexcept
 	{
 		_owningZoneId = id;
 	}
@@ -127,12 +127,12 @@ private:
 	//! Region mapped from by this Tile
 	RegionType _region;
 	//! Index of owning Zone
-	std::size_t _owningZoneId{invalid<std::size_t>};
+	IdType _owningZoneId{invalid<IdType>};
 
 	// FIXME: Idea would be to use optional<ItemDataType> to hold arbitrary
 	// data in a Tile. It needs to be initialized to an invalid state.
-	static_assert(std::is_same<ItemDataType, std::size_t>::value,
-		"Only std::size_t supported for now");
+	static_assert(std::is_same<ItemDataType, IdType>::value,
+		"Only IdType supported for now");
 	//! Mapped user data item
 	ItemDataType _data{invalid<ItemDataType>};
 };

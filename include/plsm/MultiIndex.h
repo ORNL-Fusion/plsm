@@ -14,14 +14,12 @@ namespace plsm
  *
  * @test test_MultiIndex.cpp
  */
-template <std::size_t Dim>
-class MultiIndex :
-	public detail::SpaceVectorBase<std::size_t, Dim, MultiIndex<Dim>>
+template <DimType Dim>
+class MultiIndex : public detail::SpaceVectorBase<IdType, Dim, MultiIndex<Dim>>
 {
 public:
 	//! Alias to parent class type
-	using Superclass =
-		detail::SpaceVectorBase<std::size_t, Dim, MultiIndex<Dim>>;
+	using Superclass = detail::SpaceVectorBase<IdType, Dim, MultiIndex<Dim>>;
 
 	using Superclass::Superclass;
 
@@ -31,10 +29,10 @@ public:
 	 * This is helpful for getting the linear size from a multi-index size
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	getProduct() const
 	{
-		std::size_t ret = 1;
+		IdType ret = 1;
 		for (auto i : makeIntervalRange(Dim)) {
 			ret *= (*this)[i];
 		}

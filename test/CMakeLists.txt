@@ -60,7 +60,6 @@ function(create_test _name _sources_list)
         -Wnon-virtual-dtor
         -Woverloaded-virtual
         -Wswitch-enum
-        -Wuseless-cast
         -Wcast-align
         -Wconversion
         -Wsign-conversion

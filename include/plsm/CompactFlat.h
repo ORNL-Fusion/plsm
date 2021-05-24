@@ -39,10 +39,10 @@ namespace plsm
  *
  * @test test_CompactFlat.cpp
  */
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 class CompactFlat
 {
-	template <typename TScalar2, std::size_t Dim2>
+	template <typename TScalar2, DimType Dim2>
 	friend class CompactFlat;
 
 public:
@@ -66,7 +66,7 @@ public:
 	KOKKOS_INLINE_FUNCTION
 	CompactFlat(const VectorType& vector) noexcept : _size{0}
 	{
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			if (vector[i] == wildcard<TScalar>) {
 				continue;
 			}
@@ -85,7 +85,7 @@ public:
 	CompactFlat(const CompactFlat<TScalar2, Dim>& other) :
 		_idMap{other._idMap}, _size{other._size}
 	{
-		for (std::size_t i = 0; i < _size; ++i) {
+		for (DimType i = 0; i < _size; ++i) {
 			_rep[i] = static_cast<ScalarType>(other._rep[i]);
 		}
 	}
@@ -94,7 +94,7 @@ public:
 	 * @brief Get dimension of flat: Dim - size()
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	DimType
 	dimension() const noexcept
 	{
 		return Dim - _size;
@@ -105,7 +105,7 @@ public:
 	 * coordinates
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	DimType
 	size() const noexcept
 	{
 		return _size;
@@ -115,8 +115,8 @@ public:
 	 * @brief Map flat coordinate to parent space coordinate
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
-	expandCoordinate(std::size_t i) const
+	DimType
+	expandCoordinate(DimType i) const
 	{
 		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
 		return _idMap[i];
@@ -131,7 +131,7 @@ public:
 	expand() const
 	{
 		auto ret = VectorType::filled(wildcard<ScalarType>);
-		for (std::size_t i = 0; i < _size; ++i) {
+		for (DimType i = 0; i < _size; ++i) {
 			ret[expandCoordinate(i)] = _rep[i];
 		}
 		return ret;
@@ -147,7 +147,7 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	auto
-	operator[](std::size_t i) const
+	operator[](DimType i) const
 	{
 		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
 		return _rep[i];
@@ -155,7 +155,7 @@ public:
 
 	KOKKOS_INLINE_FUNCTION
 	auto&
-	operator[](std::size_t i)
+	operator[](DimType i)
 	{
 		KOKKOS_ARRAY_BOUNDS_CHECK(i, _size);
 		return _rep[i];
@@ -166,23 +166,23 @@ private:
 	//! Internal representation
 	VectorType _rep;
 	//! Map of flat indices to parent space indices
-	Kokkos::Array<std::size_t, Dim> _idMap;
+	Kokkos::Array<DimType, Dim> _idMap;
 	//! Size of internal representation
-	std::size_t _size;
+	DimType _size;
 };
 
 /*!
  * @relates CompactFlat
  * @brief Subtract two CompactFlat objects
  */
-template <typename T, std::size_t N>
+template <typename T, DimType N>
 KOKKOS_INLINE_FUNCTION
 CompactFlat<T, N>
 operator-(const CompactFlat<T, N>& b, const CompactFlat<T, N>& a)
 {
 	assert(a.size() == b.size());
 	CompactFlat<T, N> ret{b};
-	for (std::size_t i = 0; i < a.size(); ++i) {
+	for (DimType i = 0; i < a.size(); ++i) {
 		ret[i] -= a[i];
 	}
 	return ret;
@@ -191,7 +191,7 @@ operator-(const CompactFlat<T, N>& b, const CompactFlat<T, N>& a)
 namespace detail
 {
 //! @cond
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 struct DifferenceTypeHelper<::plsm::CompactFlat<TScalar, Dim>>
 {
 	using Type = ::plsm::CompactFlat<DifferenceType<TScalar>, Dim>;

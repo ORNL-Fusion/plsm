@@ -32,8 +32,8 @@ namespace plsm
  * @test unittest_Subpaving.cpp
  * @test benchmark_Subpaving.cpp
  */
-template <typename TScalar, std::size_t Dim, typename TEnumIndex = void,
-	typename TItemData = std::size_t>
+template <typename TScalar, DimType Dim, typename TEnumIndex = void,
+	typename TItemData = IdType>
 class Subpaving
 {
 	template <typename TSubpaving, typename TSelector>
@@ -95,7 +95,7 @@ public:
 	 * @brief Get the dimension of the lattice
 	 */
 	static KOKKOS_INLINE_FUNCTION
-	constexpr std::size_t
+	constexpr DimType
 	dimension() noexcept
 	{
 		return Dim;
@@ -105,10 +105,10 @@ public:
 	 * @brief Get the invalid index value
 	 */
 	static KOKKOS_INLINE_FUNCTION
-	constexpr std::size_t
+	constexpr IdType
 	invalidIndex() noexcept
 	{
-		return invalid<std::size_t>;
+		return invalid<IdType>;
 	}
 
 	/*!
@@ -172,7 +172,7 @@ public:
 	 * @note This does not synchronize
 	 */
 	template <typename TContext = OnHost>
-	std::size_t
+	IdType
 	getNumberOfTiles(TContext context = onHost)
 	{
 		return getTiles(context).extent(0);
@@ -215,7 +215,7 @@ public:
 	 */
 	template <typename TContext = OnHost>
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	findTileId(const PointType& point, TContext context = onHost) const;
 
 	/*! @cond */

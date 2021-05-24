@@ -38,10 +38,17 @@ set(PLSM_HEADERS
     ${PLSM_HEADER_DIR}/Zone.h
 )
 
+set(PLSM_BINARY_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+option(PLSM_USE_64BIT_INDEX_TYPE "" FALSE)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/config.h.in
+    ${PLSM_BINARY_INCLUDE_DIR}/plsm/config.h
+)
+
 add_library(plsm INTERFACE)
 target_include_directories(plsm INTERFACE
-    $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${PLSM_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${PLSM_BINARY_INCLUDE_DIR}>
 )
 target_link_libraries(plsm INTERFACE Kokkos::kokkos)
 
@@ -51,6 +58,7 @@ add_subdirectory(test)
 add_subdirectory(doc)
 
 install(DIRECTORY include/plsm DESTINATION include)
+install(FILES ${PLSM_BINARY_INCLUDE_DIR}/plsm/config.h DESTINATION include/plsm)
 install(TARGETS plsm EXPORT plsm)
 install(EXPORT plsm DESTINATION lib/plsm)
 
@@ -59,4 +67,7 @@ configure_package_config_file(CMake/plsm-config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake
     INSTALL_DESTINATION lib/plsm
 )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake DESTINATION lib/plsm)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake
+    DESTINATION lib/plsm
+)

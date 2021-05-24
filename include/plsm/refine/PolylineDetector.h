@@ -21,7 +21,7 @@ namespace refine
  * @test unittest_Detectors
  * @test benchmark_Subpaving.cpp
  */
-template <typename TScalar, std::size_t Dim, typename TTag = void>
+template <typename TScalar, DimType Dim, typename TTag = void>
 class PolylineDetector :
 	public Detector<PolylineDetector<TScalar, Dim, TTag>, TTag>
 {
@@ -71,7 +71,27 @@ public:
 	bool
 	select(const RegionType& region) const
 	{
-		return (*this)(SelectAll{}, region);
+		// return (*this)(SelectAll{}, region);
+
+		for (std::size_t i = 0; i < _flats.size() - 1; ++i) {
+			const auto& p0 = _flats[i];
+			const auto& p1 = _flats[i + 1];
+			const auto& x = region[0].begin();
+			if (x < p0[0]) {
+				continue;
+			}
+			if (x >= p1[0]) {
+				continue;
+			}
+			auto m = static_cast<double>(p1[1] - p0[1]) /
+				static_cast<double>(p1[0] - p0[0]);
+			auto y = p0[1] + m * (x - p0[0]);
+			if (region[1].end() <= y) {
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 
 private:

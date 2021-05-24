@@ -12,7 +12,7 @@
 
 namespace plsm
 {
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
 	const std::vector<SubdivisionRatio<Dim>>& subdivisionRatios) :
 	_zones("zones", 1), _tiles("tiles", 1), _rootRegion(region)
@@ -31,7 +31,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
 	_tiles.sync_device();
 }
 
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
 	const std::vector<SubdivisionRatio<Dim>>& subdivRatios)
@@ -93,7 +93,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
 	_subdivisionInfos.sync_device();
 }
 
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 std::uint64_t
 Subpaving<TScalar, Dim, TEnum, TItemData>::getDeviceMemorySize() const noexcept
 {
@@ -109,7 +109,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::getDeviceMemorySize() const noexcept
 	return ret;
 }
 
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 template <typename TRefinementDetector>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
@@ -120,17 +120,17 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
 	refiner();
 }
 
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 template <typename TContext>
 KOKKOS_INLINE_FUNCTION
-std::size_t
+IdType
 Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
 	const PointType& point, TContext context) const
 {
 	auto zones = getZones(context);
-	std::size_t zoneId = 0;
+	IdType zoneId = 0;
 	auto zone = zones(zoneId);
-	auto tileId = invalid<std::size_t>;
+	auto tileId = invalid<IdType>;
 	if (!zone.getRegion().contains(point)) {
 		return tileId;
 	}
@@ -156,7 +156,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
 }
 
 //! @cond
-template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
 void
 Subpaving<TScalar, Dim, TEnum, TItemData>::plot()
 {

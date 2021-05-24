@@ -27,7 +27,7 @@ namespace plsm
  *
  * @test test_Region.cpp
  */
-template <typename TScalar, std::size_t Dim>
+template <typename TScalar, DimType Dim>
 class Region : public Kokkos::Array<Interval<TScalar>, Dim>
 {
 public:
@@ -56,7 +56,7 @@ public:
 	Region(std::initializer_list<IntervalType> ilist) noexcept
 	{
 		assert(ilist.size() == Dim);
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			(*this)[i] = ilist.begin()[i];
 		}
 	}
@@ -75,7 +75,7 @@ public:
 	explicit KOKKOS_INLINE_FUNCTION
 	Region(const VectorType& point) noexcept
 	{
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			(*this)[i] = IntervalType{point[i], point[i] + 1};
 		}
 	}
@@ -84,7 +84,7 @@ public:
 	 * @brief Dimension of lattice
 	 */
 	static KOKKOS_INLINE_FUNCTION
-	constexpr std::size_t
+	constexpr DimType
 	dimension() noexcept
 	{
 		return Dim;
@@ -155,7 +155,7 @@ public:
 	getOrigin() const noexcept
 	{
 		VectorType ret;
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			ret[i] = (*this)[i].begin();
 		}
 		return ret;
@@ -169,7 +169,7 @@ public:
 	getUpperLimitPoint() const noexcept
 	{
 		VectorType ret;
-		for (std::size_t i = 0; i < Dim; ++i) {
+		for (DimType i = 0; i < Dim; ++i) {
 			ret[i] = (*this)[i].end();
 		}
 		return ret;
@@ -231,20 +231,19 @@ public:
 	template <RangeElem Elem>
 	KOKKOS_INLINE_FUNCTION
 	bool
-	intersectsFace(
-		std::size_t flatCoord, const Segment<FlatType>& segment) const;
+	intersectsFace(DimType flatCoord, const Segment<FlatType>& segment) const;
 };
 
 /*!
  * @relates Region
  * @brief Insert a Region to an output stream
  */
-template <typename T, std::size_t N>
+template <typename T, DimType N>
 inline std::ostream&
 operator<<(std::ostream& os, const Region<T, N>& r)
 {
 	os << "{";
-	for (std::size_t i = 0; i < N; ++i) {
+	for (DimType i = 0; i < N; ++i) {
 		os << " " << r[i];
 	}
 	os << " }";
@@ -255,13 +254,13 @@ operator<<(std::ostream& os, const Region<T, N>& r)
  * @relates Region
  * @brief Check equality of two Regions, potentially using different limit types
  */
-template <typename T, typename U, std::size_t N>
+template <typename T, typename U, DimType N>
 KOKKOS_INLINE_FUNCTION
 bool
 operator==(const Region<T, N>& a, const Region<U, N>& b) noexcept
 {
 	bool ret = true;
-	for (std::size_t i = 0; i < N; ++i) {
+	for (DimType i = 0; i < N; ++i) {
 		if (a[i] != b[i]) {
 			ret = false;
 			break;
@@ -274,7 +273,7 @@ operator==(const Region<T, N>& a, const Region<U, N>& b) noexcept
  * @relates Region
  * @brief Two Regions are not equal
  */
-template <typename T, typename U, std::size_t N>
+template <typename T, typename U, DimType N>
 KOKKOS_INLINE_FUNCTION
 bool
 operator!=(const Region<T, N>& a, const Region<U, N>& b) noexcept

@@ -8,7 +8,7 @@ namespace plsm
  * @brief Set of ratios specifying how many subdivisions to make in each
  * dimension
  */
-template <std::size_t Dim>
+template <DimType Dim>
 using SubdivisionRatio = MultiIndex<Dim>;
 
 namespace detail
@@ -21,7 +21,7 @@ namespace detail
  * between linear and multi-indices within the grid defined according to those
  * ratios.
  */
-template <std::size_t Dim>
+template <DimType Dim>
 class SubdivisionInfo
 {
 public:
@@ -34,7 +34,7 @@ public:
 	SubdivisionInfo(const SubdivisionRatio<Dim>& ratio) : _ratio{ratio}
 	{
 		_sliceSize[Dim - 1] = 1;
-		for (auto i : makeIntervalRange(Dim - 1)) {
+		for (auto i : IntervalRange<IdType>(Dim - 1)) {
 			_sliceSize[Dim - 2 - i] =
 				_sliceSize[Dim - 1 - i] * _ratio[Dim - 1 - i];
 		}
@@ -55,11 +55,11 @@ public:
 	 * the subdivision ratio
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	getLinearIndex(const MultiIndex<Dim>& mId) const
 	{
-		std::size_t ret = 0;
-		for (auto i : makeIntervalRange(Dim)) {
+		IdType ret = 0;
+		for (auto i : IntervalRange<IdType>(Dim)) {
 			ret += mId[i] * _sliceSize[i];
 		}
 		return ret;
@@ -71,10 +71,10 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	MultiIndex<Dim>
-	getMultiIndex(std::size_t linearIndex) const
+	getMultiIndex(IdType linearIndex) const
 	{
 		MultiIndex<Dim> ret;
-		for (auto i : makeIntervalRange(Dim)) {
+		for (auto i : IntervalRange<IdType>(Dim)) {
 			ret[i] = linearIndex / _sliceSize[i];
 			linearIndex = linearIndex % _sliceSize[i];
 		}

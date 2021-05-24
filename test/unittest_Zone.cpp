@@ -31,7 +31,7 @@ TEMPLATE_LIST_TEST_CASE("Zone Basic", "[Zone][template]", test::IntTypes)
 	REQUIRE(zone2.hasTile());
 	REQUIRE(zone2.getTileIndex() == 1);
 
-	Interval<std::size_t> ival{8};
+	Interval<IdType> ival{8};
 	zone2.setSubZoneIndices(ival);
 	REQUIRE(zone2.getSubZoneIndices() == ival);
 	REQUIRE(zone2.getSubZoneRange().interval() == ival);

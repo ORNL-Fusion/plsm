@@ -4,6 +4,8 @@
 
 #include <Kokkos_Macros.hpp>
 
+#include <plsm/Utility.h>
+
 namespace plsm
 {
 /*!
@@ -32,33 +34,33 @@ struct EnumIndexed : TArray
 
 	//!@{
 	/*!
-	 * @brief Indexing operators; separate size_t and enum versions because
+	 * @brief Indexing operators; separate integer and enum versions because
 	 * Kokkos::Array allows enums without handling scoped enums
 	 */
 	KOKKOS_INLINE_FUNCTION
 	decltype(auto)
 	operator[](EnumIndex enumVal)
 	{
-		return TArray::operator[](static_cast<std::size_t>(enumVal));
+		return TArray::operator[](static_cast<DimType>(enumVal));
 	}
 
 	KOKKOS_INLINE_FUNCTION
 	decltype(auto)
 	operator[](EnumIndex enumVal) const
 	{
-		return TArray::operator[](static_cast<std::size_t>(enumVal));
+		return TArray::operator[](static_cast<DimType>(enumVal));
 	}
 
 	KOKKOS_INLINE_FUNCTION
 	decltype(auto)
-	operator[](std::size_t i)
+	operator[](DimType i)
 	{
 		return TArray::operator[](i);
 	}
 
 	KOKKOS_INLINE_FUNCTION
 	decltype(auto)
-	operator[](std::size_t i) const
+	operator[](DimType i) const
 	{
 		return TArray::operator[](i);
 	}

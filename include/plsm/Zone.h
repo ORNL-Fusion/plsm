@@ -36,7 +36,7 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	Zone(const RegionType& region, std::size_t level,
-		std::size_t parentId = invalid<std::size_t>) :
+		IdType parentId = invalid<IdType>) :
 		_region{region}, _level{level}, _parentId{parentId}
 	{
 	}
@@ -48,14 +48,14 @@ public:
 	bool
 	hasTile() const noexcept
 	{
-		return (_tileId != invalid<std::size_t>);
+		return (_tileId != invalid<IdType>);
 	}
 
 	/*!
 	 * @brief Get index of owned Tile
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	getTileIndex() const noexcept
 	{
 		return _tileId;
@@ -66,7 +66,7 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	void
-	setTileIndex(std::size_t tileId) noexcept
+	setTileIndex(IdType tileId) noexcept
 	{
 		_tileId = tileId;
 	}
@@ -78,7 +78,7 @@ public:
 	void
 	removeTile() noexcept
 	{
-		_tileId = invalid<std::size_t>;
+		_tileId = invalid<IdType>;
 	}
 
 	/*!
@@ -95,7 +95,7 @@ public:
 	 * @brief Get Interval of indices to subzones
 	 */
 	KOKKOS_INLINE_FUNCTION
-	const Interval<std::size_t>&
+	const Interval<IdType>&
 	getSubZoneIndices() const noexcept
 	{
 		return _subZoneIds;
@@ -106,7 +106,7 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	void
-	setSubZoneIndices(const Interval<std::size_t>& subZoneIds)
+	setSubZoneIndices(const Interval<IdType>& subZoneIds)
 	{
 		_subZoneIds = subZoneIds;
 	}
@@ -115,10 +115,10 @@ public:
 	 * @brief Get IntervalRange over subzone indices
 	 */
 	KOKKOS_INLINE_FUNCTION
-	IntervalRange<std::size_t>
+	IntervalRange<IdType>
 	getSubZoneRange() const noexcept
 	{
-		return IntervalRange<std::size_t>{_subZoneIds};
+		return IntervalRange<IdType>{_subZoneIds};
 	}
 
 	/*!
@@ -138,14 +138,14 @@ public:
 	bool
 	hasParent() const noexcept
 	{
-		return (_parentId != invalid<std::size_t>);
+		return (_parentId != invalid<IdType>);
 	}
 
 	/*!
 	 * @brief Get the index to the parent Zone
 	 */
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
+	IdType
 	getParentIndex() const noexcept
 	{
 		return _parentId;
@@ -157,10 +157,10 @@ private:
 	//! Subdivision level
 	std::size_t _level{};
 	//! Index to parent Zone
-	std::size_t _parentId{invalid<std::size_t>};
+	IdType _parentId{invalid<IdType>};
 	//! Interval of indices to subzones
-	Interval<std::size_t> _subZoneIds;
+	Interval<IdType> _subZoneIds;
 	//! Index to owned Tile
-	std::size_t _tileId{invalid<std::size_t>};
+	IdType _tileId{invalid<IdType>};
 };
 } // namespace plsm

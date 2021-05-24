@@ -32,7 +32,7 @@ public:
 	using DetectorType = TDetector;
 
 private:
-	static constexpr std::size_t subpavingDim = SubpavingType::dimension();
+	static constexpr DimType subpavingDim = SubpavingType::dimension();
 
 public:
 	using SubdivisionRatioType = ::plsm::SubdivisionRatio<subpavingDim>;
@@ -43,8 +43,8 @@ public:
 
 	struct NewItemTotals
 	{
-		std::size_t zones = 0;
-		std::size_t tiles = 0;
+		IdType zones = 0;
+		IdType tiles = 0;
 
 		NewItemTotals() = default;
 		NewItemTotals(const NewItemTotals&) = default;
@@ -60,13 +60,13 @@ public:
 	};
 
 	KOKKOS_INLINE_FUNCTION
-	std::size_t
-	countSelectSubZones(std::size_t index, const ZoneType& zone) const;
+	IdType
+	countSelectSubZones(IdType index, const ZoneType& zone) const;
 
 	KOKKOS_INLINE_FUNCTION
 	void
 	countSelectNewItemsFromTile(
-		std::size_t index, NewItemTotals& runningTotals) const;
+		IdType index, NewItemTotals& runningTotals) const;
 
 	void
 	countNewZonesAndTiles();
@@ -76,22 +76,22 @@ public:
 
 	KOKKOS_INLINE_FUNCTION
 	void
-	refineTile(std::size_t index) const;
+	refineTile(IdType index) const;
 
 	void
 	assignNewZonesAndTiles();
 
 	KOKKOS_INLINE_FUNCTION
 	RegionType
-	getSubZoneRegion(const ZoneType& zone, std::size_t subZoneLocalId,
+	getSubZoneRegion(const ZoneType& zone, IdType subZoneLocalId,
 		const SubdivisionInfoType& subdivInfo) const;
 
 	KOKKOS_INLINE_FUNCTION
 	SubdivisionRatioType
-	getSubdivisionRatio(std::size_t level, std::size_t tileIndex) const;
+	getSubdivisionRatio(std::size_t level, IdType tileIndex) const;
 
 protected:
-	template <typename, std::size_t, typename, typename>
+	template <typename, DimType, typename, typename>
 	friend class ::plsm::Subpaving;
 
 	Refiner(SubpavingType& subpaving, DetectorType detector);
@@ -114,14 +114,14 @@ protected:
 		typename Kokkos::View<int*>::traits::execution_space;
 	Kokkos::Array<Kokkos::Bitset<DefaultExecSpace>, subpavingDim> _enableRefine;
 
-	Kokkos::View<std::size_t**> _selectedSubZones;
+	Kokkos::View<IdType**> _selectedSubZones;
 
 	NewItemTotals _newItemTotals{};
-	std::size_t _numTiles;
-	std::size_t _numZones;
-	Kokkos::View<std::size_t*> _newZoneCounts;
-	Kokkos::View<std::size_t*> _subZoneStarts;
-	Kokkos::View<std::size_t*> _newTileStarts;
+	IdType _numTiles;
+	IdType _numZones;
+	Kokkos::View<IdType*> _newZoneCounts;
+	Kokkos::View<IdType*> _subZoneStarts;
+	Kokkos::View<IdType*> _newTileStarts;
 };
 } // namespace detail
 } // namespace plsm
