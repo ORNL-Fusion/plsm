@@ -11,6 +11,8 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
+#include <plsm/Subpaving.h>
+
 namespace plsm
 {
 namespace test

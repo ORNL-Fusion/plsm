@@ -88,7 +88,7 @@ TEST_CASE("Subpaving 2D(ish)", "[Subpaving]")
 		rspecPoints.push_back({{384, 256, wildcard<int>}});
 		rspecPoints.push_back({{512, 512, wildcard<int>}});
 
-		BENCHMARK("refine: z-aligned plus region 2D-ish")
+		// BENCHMARK("refine: z-aligned plus region 2D-ish")
 		{
 			s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
 			Interval<int> ival{0, 56};
