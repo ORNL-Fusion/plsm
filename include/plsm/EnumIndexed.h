@@ -9,26 +9,25 @@
 namespace plsm
 {
 /*!
- * @brief EnumIndexed allows any 'std::array-like' class to be indexed with an
- * enum type
+ * @brief Allows any 'std::array-like' class to be indexed with an enum type
  *
  * @test unittest_EnumIndexed.cpp
  */
-template <typename TArray, typename TEnumIndex = void>
-struct EnumIndexed : TArray
+template <typename TArray, typename TEnumIndex>
+struct IndexWithEnum : TArray
 {
 	//! Type of enum index
 	using EnumIndex = TEnumIndex;
 
 	using TArray::TArray;
 
-	EnumIndexed() noexcept(noexcept(TArray())) = default;
+	IndexWithEnum() noexcept(noexcept(TArray())) = default;
 
 	/*!
 	 * @brief Pass-through copy constructor for underlying container
 	 */
 	KOKKOS_INLINE_FUNCTION
-	EnumIndexed(const TArray& a) : TArray(a)
+	IndexWithEnum(const TArray& a) : TArray(a)
 	{
 	}
 
@@ -67,12 +66,25 @@ struct EnumIndexed : TArray
 	//!@}
 };
 
-/*!
- * @brief Specialization for when no enum type is provided
- */
-template <typename TArray>
-struct EnumIndexed<TArray, void> : TArray
+namespace detail
 {
-	using TArray::TArray;
+template <typename TArray, typename TEnumIndex = void>
+struct EnumIndexedHelper
+{
+	using Type = IndexWithEnum<TArray, TEnumIndex>;
 };
+
+template <typename TArray>
+struct EnumIndexedHelper<TArray, void>
+{
+	using Type = TArray;
+};
+} // namespace detail
+
+/*!
+ * @brief Allows any 'std::array-like' class to be indexed with an enum type
+ */
+template <typename TArray, typename TEnumIndex = void>
+using EnumIndexed =
+	typename detail::EnumIndexedHelper<TArray, TEnumIndex>::Type;
 } // namespace plsm
