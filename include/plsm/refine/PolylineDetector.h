@@ -52,7 +52,18 @@ public:
 		Kokkos::deep_copy(_flats, fMirror);
 	}
 
+	using Superclass::intersect;
 	using Superclass::refine;
+
+	/*!
+	 * @brief Test for intersection with polyline
+	 */
+	KOKKOS_INLINE_FUNCTION
+	bool
+	intersect(const RegionType& region) const
+	{
+		return region.intersects(_flats);
+	}
 
 	/*!
 	 * @brief Test for intersection with polyline
@@ -61,7 +72,7 @@ public:
 	bool
 	refine(const RegionType& region) const
 	{
-		return region.intersects(_flats);
+		return intersect(region);
 	}
 
 	/*!
@@ -72,6 +83,8 @@ public:
 	select(const RegionType& region) const
 	{
 		// return (*this)(SelectAll{}, region);
+
+		// WARNING: this only works for 3D, z-aligned planes
 
 		for (std::size_t i = 0; i < _flats.size() - 1; ++i) {
 			const auto& p0 = _flats[i];
