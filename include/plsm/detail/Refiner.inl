@@ -158,7 +158,7 @@ Refiner<TSubpaving, TDetector>::countNewZonesAndTiles()
 				static_cast<unsigned>(numTiles));
 		});
 	ItemTotals counts{};
-	Kokkos::parallel_reduce(
+	Kokkos::parallel_reduce("CountNewItemsFromTile",
 		_numTiles, CountNewItemsFromTile<Refiner>{*this}, counts);
 	Kokkos::fence();
 	_newItemTotals = counts;
@@ -176,7 +176,7 @@ Refiner<TSubpaving, TDetector>::findNewItemIndices()
 	auto newZoneCounts = _newZoneCounts;
 
 	// Initialize starts
-	Kokkos::parallel_for(
+	Kokkos::parallel_for("InitializeNewItemStarts",
 		_numTiles, KOKKOS_LAMBDA(IdType i) {
 			auto newZoneCount = newZoneCounts(i);
 			subZoneStarts(i) = newZoneCount;
@@ -184,7 +184,7 @@ Refiner<TSubpaving, TDetector>::findNewItemIndices()
 		});
 
 	ItemTotals totals{};
-	Kokkos::parallel_scan(
+	Kokkos::parallel_scan("ScanNewItemStarts",
 		_numTiles,
 		KOKKOS_LAMBDA(IdType i, ItemTotals & update, const bool finalPass) {
 			const auto tmpZones = subZoneStarts(i);
@@ -288,7 +288,7 @@ Refiner<TSubpaving, TDetector>::assignNewZonesAndTiles()
 	Kokkos::resize(_zones, _zones.extent(0) + _newItemTotals.zones);
 	Kokkos::resize(_tiles, _tiles.extent(0) + _newItemTotals.tiles);
 
-	Kokkos::parallel_for(_numTiles, RefineTile<Refiner>{*this});
+	Kokkos::parallel_for("RefineTile", _numTiles, RefineTile<Refiner>{*this});
 	Kokkos::fence();
 
 	_numTiles = static_cast<IdType>(_tiles.extent(0));
