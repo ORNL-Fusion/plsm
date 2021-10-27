@@ -41,17 +41,14 @@ public:
 	void
 	operator()();
 
-	struct NewItemTotals
+	struct ItemTotals
 	{
-		IdType zones = 0;
-		IdType tiles = 0;
-
-		NewItemTotals() = default;
-		NewItemTotals(const NewItemTotals&) = default;
+		IdType zones{0};
+		IdType tiles{0};
 
 		KOKKOS_INLINE_FUNCTION
-		volatile NewItemTotals&
-		operator+=(const volatile NewItemTotals& other) volatile
+		volatile ItemTotals&
+		operator+=(const volatile ItemTotals& other) volatile
 		{
 			zones += other.zones;
 			tiles += other.tiles;
@@ -65,8 +62,7 @@ public:
 
 	KOKKOS_INLINE_FUNCTION
 	void
-	countSelectNewItemsFromTile(
-		IdType index, NewItemTotals& runningTotals) const;
+	countSelectNewItemsFromTile(IdType index, ItemTotals& runningTotals) const;
 
 	void
 	countNewZonesAndTiles();
@@ -116,7 +112,7 @@ protected:
 
 	Kokkos::View<IdType**> _selectedSubZones;
 
-	NewItemTotals _newItemTotals{};
+	ItemTotals _newItemTotals{};
 	IdType _numTiles;
 	IdType _numZones;
 	Kokkos::View<IdType*> _newZoneCounts;

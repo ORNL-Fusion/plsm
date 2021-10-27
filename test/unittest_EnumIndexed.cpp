@@ -37,3 +37,8 @@ TEST_CASE("Enum-Indexed MultiIndex")
 	REQUIRE(i3[Axis::y] == 3);
 	REQUIRE(i3[Axis::z] == 4);
 }
+
+TEST_CASE("Void Index Type")
+{
+	static_assert(std::is_same_v<EnumIndexed<MultiIndex<3>>, MultiIndex<3>>);
+}

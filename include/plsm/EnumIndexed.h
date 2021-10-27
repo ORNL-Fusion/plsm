@@ -83,6 +83,10 @@ struct EnumIndexedHelper<TArray, void>
 
 /*!
  * @brief Allows any 'std::array-like' class to be indexed with an enum type
+ *
+ * Defaults to alias to `TArray` (when `void` is used). When an enum type
+ * template argument is used, this aliases to an instantiation of IndexWithEnum.
+ * See detail::EnumIndexedHelper definition(s).
  */
 template <typename TArray, typename TEnumIndex = void>
 using EnumIndexed =

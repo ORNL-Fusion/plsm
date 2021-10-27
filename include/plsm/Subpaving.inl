@@ -25,8 +25,6 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
 	_tiles.h_view(0) = TileType{_rootRegion, 0};
 	_tiles.modify_host();
 
-	_refinementDepth = 1;
-
 	_zones.sync_device();
 	_tiles.sync_device();
 }

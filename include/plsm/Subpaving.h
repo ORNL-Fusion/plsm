@@ -203,6 +203,15 @@ public:
 	}
 
 	/*!
+	 * @brief Get the current refinement depth
+	 */
+	std::size_t
+	getRefinementDepth() const noexcept
+	{
+		return _refinementDepth;
+	}
+
+	/*!
 	 * @brief Refine the Subpaving according to the given refine::Detector
 	 */
 	template <typename TRefinementDetector>

@@ -21,13 +21,13 @@ template <typename TRefiner>
 class CountNewItemsFromTile : public RefinerFunctor<TRefiner>
 {
 public:
-	using NewItemTotals = typename TRefiner::NewItemTotals;
+	using ItemTotals = typename TRefiner::ItemTotals;
 
 	using RefinerFunctor<TRefiner>::RefinerFunctor;
 
 	KOKKOS_INLINE_FUNCTION
 	void
-	operator()(IdType index, NewItemTotals& running) const
+	operator()(IdType index, ItemTotals& running) const
 	{
 		this->countSelectNewItemsFromTile(index, running);
 	}
@@ -84,6 +84,7 @@ Refiner<TSubpaving, TDetector>::operator()()
 	_subpaving._zones.modify_device();
 	_subpaving._tiles.d_view = _tiles;
 	_subpaving._tiles.modify_device();
+	_subpaving._refinementDepth = _currLevel;
 }
 
 template <typename TSubpaving, typename TDetector>
@@ -110,7 +111,7 @@ template <typename TSubpaving, typename TDetector>
 KOKKOS_INLINE_FUNCTION
 void
 Refiner<TSubpaving, TDetector>::countSelectNewItemsFromTile(
-	IdType index, NewItemTotals& runningTotals) const
+	IdType index, ItemTotals& runningTotals) const
 {
 	using BoolVec = typename DetectorType::template BoolVec<RegionType>;
 
@@ -156,7 +157,7 @@ Refiner<TSubpaving, TDetector>::countNewZonesAndTiles()
 			bitset = Kokkos::Bitset<DefaultExecSpace>(
 				static_cast<unsigned>(numTiles));
 		});
-	NewItemTotals counts{};
+	ItemTotals counts{};
 	Kokkos::parallel_reduce(
 		_numTiles, CountNewItemsFromTile<Refiner>{*this}, counts);
 	Kokkos::fence();
@@ -182,27 +183,20 @@ Refiner<TSubpaving, TDetector>::findNewItemIndices()
 			newTileStarts(i) = (newZoneCount == 0) ? 0 : newZoneCount - 1;
 		});
 
-	// Scan zone starts
+	ItemTotals totals{};
 	Kokkos::parallel_scan(
 		_numTiles,
-		KOKKOS_LAMBDA(IdType i, IdType & update, const bool finalPass) {
-			const auto tmp = subZoneStarts(i);
+		KOKKOS_LAMBDA(IdType i, ItemTotals & update, const bool finalPass) {
+			const auto tmpZones = subZoneStarts(i);
+			const auto tmpTiles = newTileStarts(i);
 			if (finalPass) {
-				subZoneStarts(i) = update;
+				subZoneStarts(i) = update.zones;
+				newTileStarts(i) = update.tiles;
 			}
-			update += tmp;
-		});
-
-	// Scan tile starts
-	Kokkos::parallel_scan(
-		_numTiles,
-		KOKKOS_LAMBDA(IdType i, IdType & update, const bool finalPass) {
-			const auto tmp = newTileStarts(i);
-			if (finalPass) {
-				newTileStarts(i) = update;
-			}
-			update += tmp;
-		});
+			update.zones += tmpZones;
+			update.tiles += tmpTiles;
+		},
+		totals);
 
 	Kokkos::fence();
 	_subZoneStarts = subZoneStarts;
