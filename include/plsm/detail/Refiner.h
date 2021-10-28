@@ -90,7 +90,7 @@ protected:
 	template <typename, DimType, typename, typename>
 	friend class ::plsm::Subpaving;
 
-	Refiner(SubpavingType& subpaving, DetectorType detector);
+	Refiner(SubpavingType& subpaving, const DetectorType& detector);
 
 protected:
 	SubpavingType& _subpaving;

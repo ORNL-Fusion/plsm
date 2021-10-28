@@ -5,6 +5,7 @@
 #include <plsm/Region.h>
 #include <plsm/TestingCommon.h>
 #include <plsm/refine/BallDetector.h>
+#include <plsm/refine/MultiDetector.h>
 #include <plsm/refine/PolylineDetector.h>
 #include <plsm/refine/RegionDetector.h>
 using namespace plsm;
@@ -380,4 +381,28 @@ TEMPLATE_LIST_TEST_CASE(
 	REQUIRE(!bd3(Overlap{}, ro6));
 	REQUIRE(!bd3(Overlap{}, ro7));
 	REQUIRE(!bd3(Overlap{}, ro8));
+}
+
+TEMPLATE_LIST_TEST_CASE(
+	"MultiDetector", "[Detectors][template]", test::IntTypes)
+{
+	using namespace refine;
+	using PD = PolylineDetector<TestType, 2>;
+	using Tags = TagPair<Overlap, SelectAll>;
+	using RD = RegionDetector<TestType, 2, Tags>;
+	auto md = makeMultiDetector(
+		PD{{{{0, 0}}, {{256, 128}}, {{384, 256}}, {{512, 512}}}},
+		RD{{{0, 56}, {0, 56}}});
+
+	Region<TestType, 2> r1{{{0, 16}, {0, 16}}};
+	Region<TestType, 2> r2{{{250, 300}, {100, 150}}};
+	Region<TestType, 2> r3{{{450, 500}, {0, 50}}};
+	typename PD::template BoolVec<Region<TestType, 2>> res;
+	REQUIRE(md.refine(r1, res));
+	REQUIRE(md.refine(r2, res));
+	REQUIRE(!md.refine(r3, res));
+
+	REQUIRE(md.select(r1));
+	REQUIRE(md.select(r2));
+	REQUIRE(!md.select(r3));
 }

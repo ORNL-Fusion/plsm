@@ -19,6 +19,7 @@ set(PLSM_HEADERS
     ${PLSM_HEADER_DIR}/detail/SubdivisionInfo.h
     ${PLSM_HEADER_DIR}/refine/BallDetector.h
     ${PLSM_HEADER_DIR}/refine/Detector.h
+    ${PLSM_HEADER_DIR}/refine/MultiDetector.h
     ${PLSM_HEADER_DIR}/refine/PolylineDetector.h
     ${PLSM_HEADER_DIR}/refine/RegionDetector.h
     ${PLSM_HEADER_DIR}/CompactFlat.h

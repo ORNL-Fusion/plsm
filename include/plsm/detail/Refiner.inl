@@ -49,7 +49,7 @@ public:
 
 template <typename TSubpaving, typename TDetector>
 Refiner<TSubpaving, TDetector>::Refiner(
-	SubpavingType& subpaving, TDetector detector) :
+	SubpavingType& subpaving, const DetectorType& detector) :
 	_subpaving(subpaving),
 	_zones(subpaving._zones.d_view),
 	_tiles(subpaving._tiles.d_view),

@@ -191,7 +191,7 @@ public:
 	/*!
 	 * @brief Construct with specified refinement depth
 	 */
-	Detector(std::size_t refineDepth) : _depth{refineDepth}
+	explicit Detector(std::size_t refineDepth) : _depth{refineDepth}
 	{
 	}
 
