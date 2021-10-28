@@ -175,7 +175,7 @@ public:
 	IdType
 	getNumberOfTiles(TContext context = onHost)
 	{
-		return getTiles(context).extent(0);
+		return static_cast<IdType>(getTiles(context).extent(0));
 	}
 
 	/*!

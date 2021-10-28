@@ -1,5 +1,7 @@
 #pragma once
 
+#include <plsm/Subpaving.h>
+
 #ifdef PLSM_ENABLE_VTK
 #include "vtkActor.h"
 #include "vtkCellArray.h"
@@ -10,8 +12,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-
-#include <plsm/Subpaving.h>
 
 namespace plsm
 {
@@ -116,16 +116,37 @@ renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
 	auto actor = vtkSmartPointer<vtkActor>::New();
 	actor->SetMapper(mapper);
 	actor->GetProperty()->SetColor(0, 0, 0);
-	auto renderer = vtkSmartPointer<vtkRenderer>::New();
+	static auto renderer = vtkSmartPointer<vtkRenderer>::New();
+	renderer->RemoveAllViewProps();
 	renderer->AddActor(actor);
 	renderer->SetBackground(1, 1, 1);
-	auto window = vtkSmartPointer<vtkRenderWindow>::New();
-	window->AddRenderer(renderer);
-	auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-	interactor->SetRenderWindow(window);
-	window->Render();
+	static auto interactor = [=]() {
+		auto window = vtkSmartPointer<vtkRenderWindow>::New();
+		window->AddRenderer(renderer);
+		auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+		interactor->SetRenderWindow(window);
+		return interactor;
+	}();
+	interactor->GetRenderWindow()->Render();
 	interactor->Start();
 }
 } // namespace test
 } // namespace plsm
+
+#else
+
+namespace plsm
+{
+namespace test
+{
+template <typename TScalar, std::size_t Dim, typename TItemData>
+void
+renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
+{
+	std::cout << "Number of Tiles: " << subpaving.getNumberOfTiles(onDevice)
+			  << std::endl;
+}
+} // namespace test
+} // namespace plsm
+
 #endif
