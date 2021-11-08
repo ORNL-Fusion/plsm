@@ -94,12 +94,12 @@ public:
 	 * @brief Compute volume, that is, the number of lattice points contained
 	 */
 	KOKKOS_INLINE_FUNCTION
-	typename IntervalType::SizeType
+	double
 	volume() const noexcept
 	{
-		typename IntervalType::SizeType ret{1};
+		double ret{1.0};
 		for (auto ival : *this) {
-			ret *= ival.length();
+			ret *= (double)ival.length();
 		}
 		return ret;
 	}
