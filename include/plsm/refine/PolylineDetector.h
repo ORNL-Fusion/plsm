@@ -87,19 +87,19 @@ public:
 		// WARNING: this only works for 3D, z-aligned planes
 
 		for (std::size_t i = 0; i < _flats.size() - 1; ++i) {
-			const auto& p0 = _flats[i];
-			const auto& p1 = _flats[i + 1];
-			const auto& x = region[0].begin();
+			const auto p0 = static_cast<CompactFlat<double, Dim>>(_flats[i]);
+			const auto p1 =
+				static_cast<CompactFlat<double, Dim>>(_flats[i + 1]);
+			const auto x = static_cast<double>(region[0].begin());
 			if (x < p0[0]) {
 				continue;
 			}
 			if (x >= p1[0]) {
 				continue;
 			}
-			auto m = static_cast<double>(p1[1] - p0[1]) /
-				static_cast<double>(p1[0] - p0[0]);
+			auto m = (p1[1] - p0[1]) / (p1[0] - p0[0]);
 			auto y = p0[1] + m * (x - p0[0]);
-			if (region[1].end() <= y) {
+			if (static_cast<double>(region[1].end()) <= y) {
 				return false;
 			}
 			return true;
