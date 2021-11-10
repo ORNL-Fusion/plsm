@@ -63,6 +63,9 @@ public:
 	template <typename TRegion>
 	using BoolVec = typename Head::template BoolVec<TRegion>;
 
+	MultiDetectorImpl(const MultiDetectorImpl&) = default;
+	MultiDetectorImpl(MultiDetectorImpl&&) = default;
+
 	/*!
 	 * @brief Construct with detector(s)
 	 *
@@ -74,9 +77,6 @@ public:
 		_detector(std::forward<THead>(detector))
 	{
 	}
-
-	MultiDetectorImpl(const MultiDetectorImpl&) = default;
-	MultiDetectorImpl(MultiDetectorImpl&&) = default;
 
 	/*!
 	 * @brief Perform logical disjunction with refine decisions along the chain
@@ -139,10 +139,12 @@ public:
 	 * @warning Number and order of provided detectors must match type list
 	 * given as class template arguments
 	 */
-	template <typename... Ts>
-	MultiDetector(Ts&&... detectors) : _impl(std::forward<Ts>(detectors)...)
+	template <typename T1, typename T2, typename... Ts>
+	MultiDetector(T1&& d1, T2&& d2, Ts&&... detectors) :
+		_impl(std::forward<T1>(d1), std::forward<T2>(d2),
+			std::forward<Ts>(detectors)...)
 	{
-		static_assert(sizeof...(Ts) == sizeof...(TDetectors),
+		static_assert(sizeof...(Ts) + 2 == sizeof...(TDetectors),
 			"The number of detectors given to constructor must match the "
 			"number of detector types");
 	}
