@@ -4,7 +4,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-project(plsm CXX)
+project(plsm
+    VERSION 1.1.0
+    LANGUAGES CXX
+)
 
 list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
 find_package(Kokkos 3 REQUIRED)
@@ -64,11 +67,16 @@ install(TARGETS plsm EXPORT plsm)
 install(EXPORT plsm DESTINATION lib/plsm)
 
 include(CMakePackageConfigHelpers)
-configure_package_config_file(CMake/plsm-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake
+configure_package_config_file(CMake/plsmConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsmConfig.cmake
     INSTALL_DESTINATION lib/plsm
 )
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsmConfigVersion.cmake
+    COMPATIBILITY SameMajorVersion
+)
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsm-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsmConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/plsmConfigVersion.cmake
     DESTINATION lib/plsm
 )
