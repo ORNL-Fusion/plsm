@@ -383,6 +383,12 @@ TEMPLATE_LIST_TEST_CASE(
 	REQUIRE(!bd3(Overlap{}, ro8));
 }
 
+#define K_REQUIRE(cond, line) \
+	if (!(cond)) { \
+		line = __LINE__; \
+		return; \
+	}
+
 TEMPLATE_LIST_TEST_CASE(
 	"MultiDetector", "[Detectors][template]", test::IntTypes)
 {
@@ -397,12 +403,19 @@ TEMPLATE_LIST_TEST_CASE(
 	Region<TestType, 2> r1{{{0, 16}, {0, 16}}};
 	Region<TestType, 2> r2{{{250, 300}, {100, 150}}};
 	Region<TestType, 2> r3{{{450, 500}, {0, 50}}};
-	typename PD::template BoolVec<Region<TestType, 2>> res;
-	REQUIRE(md.refine(r1, res));
-	REQUIRE(md.refine(r2, res));
-	REQUIRE(!md.refine(r3, res));
+	int failLine{0};
+	Kokkos::parallel_reduce(
+		1,
+		KOKKOS_LAMBDA(std::size_t, int& fl) {
+			typename PD::template BoolVec<Region<TestType, 2>> res;
+			K_REQUIRE(md.refine(r1, res), fl);
+			K_REQUIRE(md.refine(r2, res), fl);
+			K_REQUIRE(md.refine(r3, res), fl);
 
-	REQUIRE(md.select(r1));
-	REQUIRE(md.select(r2));
-	REQUIRE(!md.select(r3));
+			K_REQUIRE(md.select(r1), fl);
+			K_REQUIRE(md.select(r2), fl);
+			K_REQUIRE(!md.select(r3), fl);
+		},
+		failLine);
+	REQUIRE(failLine == 0);
 }
