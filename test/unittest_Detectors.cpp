@@ -410,7 +410,7 @@ TEMPLATE_LIST_TEST_CASE(
 			typename PD::template BoolVec<Region<TestType, 2>> res;
 			K_REQUIRE(md.refine(r1, res), fl);
 			K_REQUIRE(md.refine(r2, res), fl);
-			K_REQUIRE(md.refine(r3, res), fl);
+			K_REQUIRE(!md.refine(r3, res), fl);
 
 			K_REQUIRE(md.select(r1), fl);
 			K_REQUIRE(md.select(r2), fl);
