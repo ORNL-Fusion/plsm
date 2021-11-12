@@ -143,7 +143,7 @@ template <typename TScalar, std::size_t Dim, typename TItemData>
 void
 renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
 {
-	std::cout << "Number of Tiles: " << subpaving.getNumberOfTiles(onDevice)
+	std::cout << "\nNumber of Tiles: " << subpaving.getNumberOfTiles(onDevice)
 			  << std::endl;
 }
 } // namespace test

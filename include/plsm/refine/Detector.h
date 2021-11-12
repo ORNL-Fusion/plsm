@@ -9,6 +9,12 @@ namespace plsm
 namespace refine
 {
 /*!
+ * @brief Set of bool flags, one for each axis
+ */
+template <typename TRegion>
+using BoolVec = Kokkos::Array<bool, TRegion::dimension()>;
+
+/*!
  * Tag for straightforward refinement decision
  */
 struct Refine
@@ -168,12 +174,6 @@ public:
 	using RefineTag = typename Traits::RefineTag;
 	//! Tag specifying selection method
 	using SelectTag = typename Traits::SelectTag;
-
-	/*!
-	 * @brief Set of bool flags, one for each axis
-	 */
-	template <typename TRegion>
-	using BoolVec = Kokkos::Array<bool, TRegion::dimension()>;
 
 	//! Tag instance for refinement
 	static constexpr RefineTag refineTag{};

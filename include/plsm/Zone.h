@@ -42,6 +42,16 @@ public:
 	}
 
 	/*!
+	 * @brief Dimension of lattice
+	 */
+	static KOKKOS_INLINE_FUNCTION
+	constexpr DimType
+	dimension() noexcept
+	{
+		return RegionType::dimension();
+	}
+
+	/*!
 	 * @brief Check if Zone owns a Tile (has a valid Tile index)
 	 */
 	KOKKOS_INLINE_FUNCTION

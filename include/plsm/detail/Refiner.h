@@ -4,7 +4,6 @@
 #include <vector>
 
 #include <Kokkos_Bitset.hpp>
-#include <Kokkos_Vector.hpp>
 
 #include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
@@ -36,13 +35,15 @@ struct RefinerData
 {
 	static_assert(IsSubpaving<TSubpaving>::value);
 	using SubpavingType = TSubpaving;
-
-	static constexpr DimType subpavingDim = SubpavingType::dimension();
-
+	using ZoneType = typename SubpavingType::ZoneType;
+	using TileType = typename SubpavingType::TileType;
 	using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
 	using TilesView = typename SubpavingType::template TilesView<OnDevice>;
 	using DefaultExecSpace =
 		typename Kokkos::View<int*>::traits::execution_space;
+
+	static constexpr DimType subpavingDim = SubpavingType::dimension();
+
 	using SubdivisionInfoType = SubdivisionInfo<subpavingDim>;
 
 	using DetectorType = TDetector;
@@ -67,8 +68,8 @@ struct RefinerData
 	Kokkos::View<IdType*> newTileStarts{};
 
 	ItemTotals newItemTotals{};
-    IdType numZones {zones.size()};
-    IdType numTiles {tiles.size()};
+	IdType numZones{zones.size()};
+	IdType numTiles{tiles.size()};
 };
 
 /*!
@@ -84,8 +85,6 @@ public:
 	using TileType = typename SubpavingType::TileType;
 	using RegionType = typename SubpavingType::RegionType;
 	using DetectorType = TDetector;
-
-	using Data = RefinerData<TSubpaving, TDetector>;
 
 private:
 	static constexpr DimType subpavingDim = SubpavingType::dimension();
@@ -115,7 +114,7 @@ protected:
 protected:
 	SubpavingType& _subpaving;
 
-	Data _data;
+	RefinerData<TSubpaving, TDetector> _data;
 };
 } // namespace detail
 } // namespace plsm

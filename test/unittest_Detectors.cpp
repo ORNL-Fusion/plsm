@@ -407,7 +407,7 @@ TEMPLATE_LIST_TEST_CASE(
 	Kokkos::parallel_reduce(
 		1,
 		KOKKOS_LAMBDA(std::size_t, int& fl) {
-			typename PD::template BoolVec<Region<TestType, 2>> res;
+			BoolVec<Region<TestType, 2>> res;
 			K_REQUIRE(md.refine(r1, res), fl);
 			K_REQUIRE(md.refine(r2, res), fl);
 			K_REQUIRE(!md.refine(r3, res), fl);
