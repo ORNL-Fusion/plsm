@@ -6,8 +6,8 @@
 #include <Kokkos_Core.hpp>
 #include <Kokkos_DualView.hpp>
 
-#include <plsm/ContextUtility.h>
 #include <plsm/EnumIndexed.h>
+#include <plsm/Utility.h>
 #include <plsm/Zone.h>
 #include <plsm/detail/Refiner.h>
 #include <plsm/detail/SubdivisionInfo.h>
@@ -33,13 +33,17 @@ namespace plsm
  * @test benchmark_Subpaving.cpp
  */
 template <typename TScalar, DimType Dim, typename TEnumIndex = void,
-	typename TItemData = IdType>
+	typename TItemData = IdType, typename TMemSpace = detail::DefaultMemSpace>
 class Subpaving
 {
 	template <typename TSubpaving, typename TSelector>
 	friend class detail::Refiner;
 
+	static_assert(Kokkos::is_memory_space<TMemSpace>{});
+
 public:
+	//! The memory space for the subpaving data
+	using MemorySpace = TMemSpace;
 	//! Underlying type for scalar representation for the lattice
 	using ScalarType = TScalar;
 	//! The type to represent lattice regions
@@ -53,19 +57,15 @@ public:
 
 	//! The subdivision Zone
 	using ZoneType = Zone<RegionType>;
-	//! The type for the set of zones (host/device synchronized)
-	using ZonesDualView = Kokkos::DualView<ZoneType*>;
 	//! The type for the set of zones on the given memory space
-	template <typename TContext>
-	using ZonesView = detail::ContextualViewType<ZonesDualView, TContext>;
+	using ZonesView = Kokkos::View<ZoneType*, MemorySpace>;
 
 	//! The subpaving Tile
 	using TileType = Tile<RegionType, ItemDataType>;
 	//! The type for the set of tiles (host/device synchronized)
 	using TilesDualView = Kokkos::DualView<TileType*>;
 	//! The type for the set of tiles on the given memory space
-	template <typename TContext>
-	using TilesView = detail::ContextualViewType<TilesDualView, TContext>;
+	using TilesView = Kokkos::View<TileType*, MemorySpace>;
 
 	Subpaving() = delete;
 
@@ -127,79 +127,32 @@ public:
 	getDeviceMemorySize() const noexcept;
 
 	/*!
-	 * @brief Get tiles DualView
+	 * @brief Get tiles View
 	 * @todo Rename this
 	 */
-	TilesDualView
-	getTilesView()
+	const TilesView&
+	getTiles() const
 	{
 		return _tiles;
 	}
 
 	/*!
-	 * @brief Synchronize Tile data onto specified memory space
+	 * @brief Get current number of tiles
 	 */
-	template <typename TContext = OnHost>
-	void
-	syncTiles(TContext context = onHost)
-	{
-		detail::syncUpdate(_tiles, context);
-	}
-
-	/*!
-	 * @brief Synchronize Zone data onto specified memory space
-	 */
-	template <typename TContext = OnHost>
-	void
-	syncZones(TContext context = onHost)
-	{
-		detail::syncUpdate(_zones, context);
-	}
-
-	/*!
-	 * @brief Synchronize Zone and Tile data onto specified memory space
-	 */
-	template <typename TContext = OnHost>
-	void
-	syncAll(TContext context = onHost)
-	{
-		syncTiles(context);
-		syncZones(context);
-	}
-
-	/*!
-	 * @brief Get current number of tiles held in the specified memory space
-	 * @note This does not synchronize
-	 */
-	template <typename TContext = OnHost>
 	IdType
-	getNumberOfTiles(TContext context = onHost)
+	getNumberOfTiles() const
 	{
-		return static_cast<IdType>(getTiles(context).extent(0));
+		return static_cast<IdType>(_tiles.size());
 	}
 
 	/*!
-	 * @brief Get the set of tiles in the specified memory space
-	 * @note This does not synchronize
+	 * @brief Get the set of zones
 	 */
-	template <typename TContext = OnHost>
 	KOKKOS_INLINE_FUNCTION
-	const TilesView<TContext>&
-	getTiles(TContext context = onHost) const
+	const ZonesView&
+	getZones() const
 	{
-		return detail::getContextualView(_tiles, context);
-	}
-
-	/*!
-	 * @brief Get the set of zones in the specified memory space
-	 * @note This does not synchronize
-	 */
-	template <typename TContext = OnHost>
-	KOKKOS_INLINE_FUNCTION
-	const ZonesView<TContext>&
-	getZones(TContext context = onHost) const
-	{
-		return detail::getContextualView(_zones, context);
+		return _zones;
 	}
 
 	/*!
@@ -222,15 +175,9 @@ public:
 	 * @brief Perform a tree search (using the zones) for the given point, and
 	 * return the id of the containing tile (or invalid if not found)
 	 */
-	template <typename TContext = OnHost>
 	KOKKOS_INLINE_FUNCTION
 	IdType
-	findTileId(const PointType& point, TContext context = onHost) const;
-
-	/*! @cond */
-	void
-	plot();
-	/*! @endcond */
+	findTileId(const PointType& point) const;
 
 private:
 	/*!
@@ -242,9 +189,9 @@ private:
 
 private:
 	//! Zones represent the entire subdivision tree for the root region
-	ZonesDualView _zones;
+	ZonesView _zones;
 	//! Tiles represent the (selected) leaf nodes of the tree
-	TilesDualView _tiles;
+	TilesView _tiles;
 	//! Region which fully encloses the domain of interest
 	RegionType _rootRegion;
 	//! Collection of SubdivisionInfo, one per expected refinement level

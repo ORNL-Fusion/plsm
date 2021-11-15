@@ -24,22 +24,22 @@ TEMPLATE_LIST_TEST_CASE(
 		using RegionDetector = refine::RegionDetector<TestType, 3,
 			refine::TagPair<refine::Overlap, refine::SelectAll>>;
 		sp.refine(RegionDetector{sp.getLatticeRegion()});
-		REQUIRE(sp.getTiles(onDevice).extent(0) == 64);
-		sp.syncTiles(onHost);
 		REQUIRE(sp.getTiles().extent(0) == 64);
-		REQUIRE(sp.findTileId({3, 3, 3}) == invalid<IdType>);
-		sp.syncAll(onHost);
-		REQUIRE(sp.findTileId({3, 3, 3}) == 63);
+
+        // FIXME: Needs host space subpaving
+		// REQUIRE(sp.findTileId({3, 3, 3}) == invalid<IdType>);
+		// sp.syncAll(onHost);
+		// REQUIRE(sp.findTileId({3, 3, 3}) == 63);
 
 		using Range3D = Kokkos::MDRangePolicy<Kokkos::Rank<3>>;
 		std::size_t errors = 0;
-		auto tiles = sp.getTiles(onDevice);
+		auto tiles = sp.getTiles();
 
 		Kokkos::parallel_reduce(
 			Range3D({0, 0, 0}, {4, 4, 4}),
 			KOKKOS_LAMBDA(
 				TestType i, TestType j, TestType k, std::size_t & running) {
-				auto tileId = sp.findTileId(PointType{i, j, k}, onDevice);
+				auto tileId = sp.findTileId(PointType{i, j, k});
 				if (tileId == invalid<std::size_t>) {
 					++running;
 				}
@@ -53,7 +53,7 @@ TEMPLATE_LIST_TEST_CASE(
 			KOKKOS_LAMBDA(
 				TestType i, TestType j, TestType k, std::size_t & running) {
 				PointType p({i, j, k});
-				auto tileId = sp.findTileId(p, onDevice);
+				auto tileId = sp.findTileId(p);
 				if (tiles(tileId).getRegion().getOrigin() != p) {
 					++running;
 				}

@@ -17,9 +17,10 @@ namespace plsm
 {
 namespace test
 {
-template <typename TScalar, std::size_t Dim, typename TItemData>
-void
-renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
+inline void
+renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
 {
 	subpaving.syncTiles(onHost);
 	auto tiles = subpaving.getTiles();
@@ -139,14 +140,49 @@ namespace plsm
 {
 namespace test
 {
-template <typename TScalar, std::size_t Dim, typename TItemData>
-void
-renderSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving)
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
+inline void
+renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
 {
-	std::cout << "\nNumber of Tiles: " << subpaving.getNumberOfTiles(onDevice)
+	std::cout << "\nNumber of Tiles: " << subpaving.getNumberOfTiles()
 			  << std::endl;
 }
 } // namespace test
 } // namespace plsm
 
 #endif
+
+namespace plsm
+{
+namespace test
+{
+template <typename TScalar, std::size_t Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
+inline void
+plot(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
+{
+	auto tiles = subpaving.getTiles();
+	std::ofstream ofs("gp.txt");
+	for (auto i : makeIntervalRange(tiles.extent(0))) {
+		const auto& region = tiles(i).getRegion();
+		ofs << "\n";
+		ofs << region[0].begin() << " " << region[1].begin() << "\n";
+		ofs << region[0].end() << " " << region[1].begin() << "\n";
+		ofs << region[0].end() << " " << region[1].end() << "\n";
+		ofs << region[0].begin() << " " << region[1].end() << "\n";
+		ofs << region[0].begin() << " " << region[1].begin() << "\n";
+		ofs << "\n";
+		double q01 = 0.25 * region[0].begin() + 0.75 * region[0].end();
+		double q03 = 0.75 * region[0].begin() + 0.25 * region[0].end();
+		double q11 = 0.25 * region[1].begin() + 0.75 * region[1].end();
+		double q13 = 0.75 * region[1].begin() + 0.25 * region[1].end();
+		ofs << q01 << " " << q11 << "\n";
+		ofs << q03 << " " << q13 << "\n";
+		ofs << "\n";
+		ofs << q01 << " " << q13 << "\n";
+		ofs << q03 << " " << q11 << "\n";
+	}
+}
+} // namespace test
+} // namespace plsm

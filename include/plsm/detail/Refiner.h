@@ -37,10 +37,8 @@ struct RefinerData
 	using SubpavingType = TSubpaving;
 	using ZoneType = typename SubpavingType::ZoneType;
 	using TileType = typename SubpavingType::TileType;
-	using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
-	using TilesView = typename SubpavingType::template TilesView<OnDevice>;
-	using DefaultExecSpace =
-		typename Kokkos::View<int*>::traits::execution_space;
+	using ZonesView = typename SubpavingType::ZonesView;
+	using TilesView = typename SubpavingType::TilesView;
 
 	static constexpr DimType subpavingDim = SubpavingType::dimension();
 
