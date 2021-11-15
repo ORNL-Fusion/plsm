@@ -104,7 +104,7 @@ public:
 	assignNewItems();
 
 protected:
-	template <typename, DimType, typename, typename>
+	template <typename, DimType, typename, typename, typename>
 	friend class ::plsm::Subpaving;
 
 	Refiner(SubpavingType& subpaving, const DetectorType& detector);

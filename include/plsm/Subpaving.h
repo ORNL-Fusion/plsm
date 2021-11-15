@@ -62,13 +62,16 @@ public:
 
 	//! The subpaving Tile
 	using TileType = Tile<RegionType, ItemDataType>;
-	//! The type for the set of tiles (host/device synchronized)
-	using TilesDualView = Kokkos::DualView<TileType*>;
 	//! The type for the set of tiles on the given memory space
 	using TilesView = Kokkos::View<TileType*, MemorySpace>;
 
-	Subpaving() = delete;
+	using HostMirrorSpace = typename TilesView::traits::host_mirror_space;
 
+private:
+	template <typename, DimType, typename, typename, typename>
+	friend class ::plsm::Subpaving;
+
+public:
 	/*!
 	 * @brief Construct from root Region and set of subdivision ratios.
 	 *
@@ -109,6 +112,20 @@ public:
 	invalidIndex() noexcept
 	{
 		return invalid<IdType>;
+	}
+
+	Subpaving<TScalar, Dim, TEnumIndex, TItemData, HostMirrorSpace>
+	makeMirrorCopy() const
+	{
+		Subpaving<TScalar, Dim, TEnumIndex, TItemData, HostMirrorSpace> ret{};
+		resize(ret._zones, _zones.size());
+		deep_copy(ret._zones, _zones);
+		resize(ret._tiles, _tiles.size());
+		deep_copy(ret._tiles, _tiles);
+		ret._rootRegion = _rootRegion;
+		ret._subdivisionInfos = _subdivisionInfos;
+		ret._refinementDepth = _refinementDepth;
+		return ret;
 	}
 
 	/*!
@@ -180,6 +197,8 @@ public:
 	findTileId(const PointType& point) const;
 
 private:
+	Subpaving() = default;
+
 	/*!
 	 * @brief Check subdivision ratios for domain divisibility and copy final
 	 * form (one per level) into device view

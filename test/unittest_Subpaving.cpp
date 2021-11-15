@@ -26,10 +26,8 @@ TEMPLATE_LIST_TEST_CASE(
 		sp.refine(RegionDetector{sp.getLatticeRegion()});
 		REQUIRE(sp.getTiles().extent(0) == 64);
 
-        // FIXME: Needs host space subpaving
-		// REQUIRE(sp.findTileId({3, 3, 3}) == invalid<IdType>);
-		// sp.syncAll(onHost);
-		// REQUIRE(sp.findTileId({3, 3, 3}) == 63);
+		auto sph = sp.makeMirrorCopy();
+		REQUIRE(sph.findTileId({3, 3, 3}) == 63);
 
 		using Range3D = Kokkos::MDRangePolicy<Kokkos::Rank<3>>;
 		std::size_t errors = 0;
