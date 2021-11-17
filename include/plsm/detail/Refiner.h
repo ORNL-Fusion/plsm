@@ -5,7 +5,6 @@
 
 #include <Kokkos_Bitset.hpp>
 
-#include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>
 #include <plsm/Utility.h>
@@ -33,7 +32,7 @@ struct ItemTotals
 template <typename TSubpaving, typename TDetector>
 struct RefinerData
 {
-	static_assert(IsSubpaving<TSubpaving>::value);
+	static_assert(IsSubpaving<TSubpaving>{});
 	using SubpavingType = TSubpaving;
 	using ZoneType = typename SubpavingType::ZoneType;
 	using TileType = typename SubpavingType::TileType;

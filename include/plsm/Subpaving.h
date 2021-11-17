@@ -33,7 +33,7 @@ namespace plsm
  * @test benchmark_Subpaving.cpp
  */
 template <typename TScalar, DimType Dim, typename TEnumIndex = void,
-	typename TItemData = IdType, typename TMemSpace = detail::DefaultMemSpace>
+	typename TItemData = IdType, typename TMemSpace = DefaultMemSpace>
 class Subpaving
 {
 	template <typename TSubpaving, typename TSelector>

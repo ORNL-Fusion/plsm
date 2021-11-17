@@ -26,7 +26,6 @@ set(PLSM_HEADERS
     ${PLSM_HEADER_DIR}/refine/PolylineDetector.h
     ${PLSM_HEADER_DIR}/refine/RegionDetector.h
     ${PLSM_HEADER_DIR}/CompactFlat.h
-    ${PLSM_HEADER_DIR}/ContextUtility.h
     ${PLSM_HEADER_DIR}/EnumIndexed.h
     ${PLSM_HEADER_DIR}/Interval.h
     ${PLSM_HEADER_DIR}/IntervalRange.h

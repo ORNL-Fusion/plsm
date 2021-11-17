@@ -23,8 +23,6 @@ inline constexpr T wildcard = std::numeric_limits<T>::max();
 template <typename, DimType, typename, typename, typename>
 class Subpaving;
 
-namespace detail
-{
 using DefaultExecSpace = Kokkos::DefaultExecutionSpace;
 using DefaultMemSpace = typename DefaultExecSpace::memory_space;
 
@@ -49,6 +47,8 @@ struct IsSubpaving<
 };
 /*! @endcond */
 
+namespace detail
+{
 /*!
  * @brief Determine the type for the result of a subtraction
  */
