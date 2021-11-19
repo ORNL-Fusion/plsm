@@ -66,12 +66,16 @@ public:
 	using TilesView = Kokkos::View<TileType*, MemorySpace>;
 
 	using HostMirrorSpace = typename TilesView::traits::host_mirror_space;
+	using HostMirror =
+		Subpaving<TScalar, Dim, TEnumIndex, TItemData, HostMirrorSpace>;
 
 private:
 	template <typename, DimType, typename, typename, typename>
 	friend class ::plsm::Subpaving;
 
 public:
+	Subpaving() = default;
+
 	/*!
 	 * @brief Construct from root Region and set of subdivision ratios.
 	 *
@@ -114,10 +118,10 @@ public:
 		return invalid<IdType>;
 	}
 
-	Subpaving<TScalar, Dim, TEnumIndex, TItemData, HostMirrorSpace>
+	HostMirror
 	makeMirrorCopy() const
 	{
-		Subpaving<TScalar, Dim, TEnumIndex, TItemData, HostMirrorSpace> ret{};
+		HostMirror ret{};
 		resize(ret._zones, _zones.size());
 		deep_copy(ret._zones, _zones);
 		resize(ret._tiles, _tiles.size());
@@ -197,8 +201,6 @@ public:
 	findTileId(const PointType& point) const;
 
 private:
-	Subpaving() = default;
-
 	/*!
 	 * @brief Check subdivision ratios for domain divisibility and copy final
 	 * form (one per level) into device view
@@ -218,6 +220,23 @@ private:
 	//! Level limit
 	std::size_t _refinementDepth{};
 };
+
+namespace detail
+{
+template <typename TMemSpace, typename TSubpaving>
+struct MemSpaceSubpavingHelper;
+
+template <typename TMemSpace, typename TS, DimType Dim, typename TE,
+	typename TD, typename TM>
+struct MemSpaceSubpavingHelper<TMemSpace, Subpaving<TS, Dim, TE, TD, TM>>
+{
+	using Type = Subpaving<TS, Dim, TE, TD, TMemSpace>;
+};
+} // namespace detail
+
+template <typename TMemSpace, typename TSubpaving>
+using MemSpaceSubpaving =
+	typename detail::MemSpaceSubpavingHelper<TMemSpace, TSubpaving>::Type;
 } // namespace plsm
 
 #include <plsm/Subpaving.inl>

@@ -25,6 +25,8 @@ class Subpaving;
 
 using DefaultExecSpace = Kokkos::DefaultExecutionSpace;
 using DefaultMemSpace = typename DefaultExecSpace::memory_space;
+using DeviceMemSpace = DefaultMemSpace;
+using HostMemSpace = Kokkos::HostSpace;
 
 /*!
  * @brief Checks whether T is an instantiation of Subpaving

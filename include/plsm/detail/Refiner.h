@@ -33,6 +33,7 @@ template <typename TSubpaving, typename TDetector>
 struct RefinerData
 {
 	static_assert(IsSubpaving<TSubpaving>{});
+
 	using SubpavingType = TSubpaving;
 	using ZoneType = typename SubpavingType::ZoneType;
 	using TileType = typename SubpavingType::TileType;

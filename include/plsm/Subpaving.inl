@@ -101,8 +101,8 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::getDeviceMemorySize()
 {
 	std::uint64_t ret{};
 
-	ret += _tiles.d_view.required_allocation_size(_tiles.d_view.extent(0));
-	ret += _zones.d_view.required_allocation_size(_zones.d_view.extent(0));
+	ret += _tiles.required_allocation_size(_tiles.size());
+	ret += _zones.required_allocation_size(_zones.size());
 	ret += sizeof(_rootRegion);
 	ret += _subdivisionInfos.d_view.required_allocation_size(
 		_subdivisionInfos.d_view.extent(0));
