@@ -166,8 +166,8 @@ template <typename TSubpaving, typename TDetector>
 void
 Refiner<TSubpaving, TDetector>::operator()()
 {
-	std::size_t currLevel = 0;
-	for (; currLevel < _data.targetDepth; ++currLevel) {
+	for (_data.currLevel = 0; _data.currLevel < _data.targetDepth;
+		 ++_data.currLevel) {
 		countNewItems();
 
 		if (_data.newItemTotals.zones == 0) {
@@ -183,7 +183,7 @@ Refiner<TSubpaving, TDetector>::operator()()
 	_subpaving._zones.modify_device();
 	_subpaving._tiles.d_view = _data.tiles;
 	_subpaving._tiles.modify_device();
-	_subpaving._refinementDepth = currLevel;
+	_subpaving._refinementDepth = _data.currLevel;
 }
 
 template <typename TSubpaving, typename TDetector>
