@@ -15,7 +15,7 @@ KOKKOS_INLINE_FUNCTION
 SubdivisionRatio<TData::subpavingDim>
 getSubdivisionRatio(const TData& data, std::size_t level, IdType tileIndex)
 {
-	auto ret = data.subdivisionInfos.d_view[level].getRatio();
+	auto ret = data.subdivisionInfos[level].getRatio();
 	for (DimType i = 0; i < data.subpavingDim; ++i) {
 		if (!data.enableRefine[i].test(static_cast<unsigned>(tileIndex))) {
 			ret[i] = 1;
@@ -154,12 +154,14 @@ template <typename TSubpaving, typename TDetector>
 Refiner<TSubpaving, TDetector>::Refiner(
 	SubpavingType& subpaving, const DetectorType& detector) :
 	_subpaving(subpaving),
+	_subdivInfoMirror(create_mirror_view(subpaving._subdivisionInfos)),
 	_data{subpaving._zones, subpaving._tiles, subpaving._subdivisionInfos,
 		detector,
 		(detector.depth() == detector.fullDepth) ?
-			subpaving._subdivisionInfos.h_view.size() :
+			subpaving._subdivisionInfos.size() :
 			detector.depth()}
 {
+	deep_copy(_subdivInfoMirror, _data.subdivisionInfos);
 }
 
 template <typename TSubpaving, typename TDetector>
@@ -192,7 +194,7 @@ Refiner<TSubpaving, TDetector>::countNewItems()
 	_data.newZoneCounts =
 		Kokkos::View<IdType*>(AllocNoInit{"New Zone Counts"}, numTiles);
 	auto numSubZones =
-		_data.subdivisionInfos.h_view(_data.currLevel).getRatio().getProduct();
+		_subdivInfoMirror[_data.currLevel].getRatio().getProduct();
 	_data.selectedSubZones = Kokkos::View<IdType**>(
 		AllocNoInit{"Selected Sub-Zones"}, numTiles, numSubZones);
 	std::for_each(begin(_data.enableRefine), end(_data.enableRefine),

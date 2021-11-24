@@ -4,7 +4,6 @@
 #include <vector>
 
 #include <Kokkos_Core.hpp>
-#include <Kokkos_DualView.hpp>
 
 #include <plsm/EnumIndexed.h>
 #include <plsm/Utility.h>
@@ -127,7 +126,7 @@ public:
 		resize(ret._tiles, _tiles.size());
 		deep_copy(ret._tiles, _tiles);
 		ret._rootRegion = _rootRegion;
-		ret._subdivisionInfos = _subdivisionInfos;
+		resize(ret._subdivisionInfos, _subdivisionInfos.size());
 		ret._refinementDepth = _refinementDepth;
 		return ret;
 	}
@@ -216,7 +215,7 @@ private:
 	//! Region which fully encloses the domain of interest
 	RegionType _rootRegion;
 	//! Collection of SubdivisionInfo, one per expected refinement level
-	Kokkos::DualView<detail::SubdivisionInfo<Dim>*> _subdivisionInfos;
+	Kokkos::View<detail::SubdivisionInfo<Dim>*, MemorySpace> _subdivisionInfos;
 	//! Level limit
 	std::size_t _refinementDepth{};
 };

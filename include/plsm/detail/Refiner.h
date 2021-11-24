@@ -49,7 +49,7 @@ struct RefinerData
 	ZonesView zones;
 	TilesView tiles;
 
-	Kokkos::DualView<SubdivisionInfoType*> subdivisionInfos;
+	Kokkos::View<SubdivisionInfoType*> subdivisionInfos;
 
 	DetectorType detector;
 
@@ -111,6 +111,7 @@ protected:
 
 protected:
 	SubpavingType& _subpaving;
+	typename Kokkos::View<SubdivisionInfoType*>::HostMirror _subdivInfoMirror;
 
 	RefinerData<TSubpaving, TDetector> _data;
 };

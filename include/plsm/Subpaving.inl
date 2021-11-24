@@ -85,12 +85,13 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 		}
 	}
 
-	_subdivisionInfos = Kokkos::DualView<detail::SubdivisionInfo<Dim>*>{
-		"Subdivision Infos", subdivisionRatios.size()};
+	_subdivisionInfos =
+		Kokkos::View<detail::SubdivisionInfo<Dim>*, MemorySpace>{
+			"Subdivision Infos", subdivisionRatios.size()};
+	auto subdivInfoMirror = create_mirror_view(_subdivisionInfos);
 	std::copy(begin(subdivisionRatios), end(subdivisionRatios),
-		_subdivisionInfos.h_view.data());
-	_subdivisionInfos.modify_host();
-	_subdivisionInfos.sync_device();
+		subdivInfoMirror.data());
+	deep_copy(_subdivisionInfos, subdivInfoMirror);
 }
 
 template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
@@ -104,8 +105,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::getDeviceMemorySize()
 	ret += _tiles.required_allocation_size(_tiles.size());
 	ret += _zones.required_allocation_size(_zones.size());
 	ret += sizeof(_rootRegion);
-	ret += _subdivisionInfos.d_view.required_allocation_size(
-		_subdivisionInfos.d_view.extent(0));
+	ret += _subdivisionInfos.required_allocation_size(_subdivisionInfos.size());
 	ret += sizeof(_refinementDepth);
 
 	return ret;
