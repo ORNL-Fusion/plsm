@@ -5,7 +5,6 @@
 
 #include <Kokkos_Bitset.hpp>
 
-#include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>
 #include <plsm/Utility.h>
@@ -33,14 +32,13 @@ struct ItemTotals
 template <typename TSubpaving, typename TDetector>
 struct RefinerData
 {
-	static_assert(IsSubpaving<TSubpaving>::value);
+	static_assert(IsSubpaving<TSubpaving>{});
+
 	using SubpavingType = TSubpaving;
 	using ZoneType = typename SubpavingType::ZoneType;
 	using TileType = typename SubpavingType::TileType;
-	using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
-	using TilesView = typename SubpavingType::template TilesView<OnDevice>;
-	using DefaultExecSpace =
-		typename Kokkos::View<int*>::traits::execution_space;
+	using ZonesView = typename SubpavingType::ZonesView;
+	using TilesView = typename SubpavingType::TilesView;
 
 	static constexpr DimType subpavingDim = SubpavingType::dimension();
 
@@ -106,7 +104,7 @@ public:
 	assignNewItems();
 
 protected:
-	template <typename, DimType, typename, typename>
+	template <typename, DimType, typename, typename, typename>
 	friend class ::plsm::Subpaving;
 
 	Refiner(SubpavingType& subpaving, const DetectorType& detector);

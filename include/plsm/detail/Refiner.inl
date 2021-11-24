@@ -154,8 +154,8 @@ template <typename TSubpaving, typename TDetector>
 Refiner<TSubpaving, TDetector>::Refiner(
 	SubpavingType& subpaving, const DetectorType& detector) :
 	_subpaving(subpaving),
-	_data{subpaving._zones.d_view, subpaving._tiles.d_view,
-		subpaving._subdivisionInfos, detector,
+	_data{subpaving._zones, subpaving._tiles, subpaving._subdivisionInfos,
+		detector,
 		(detector.depth() == detector.fullDepth) ?
 			subpaving._subdivisionInfos.h_view.size() :
 			detector.depth()}
@@ -179,10 +179,8 @@ Refiner<TSubpaving, TDetector>::operator()()
 		assignNewItems();
 	}
 
-	_subpaving._zones.d_view = _data.zones;
-	_subpaving._zones.modify_device();
-	_subpaving._tiles.d_view = _data.tiles;
-	_subpaving._tiles.modify_device();
+	_subpaving._zones = _data.zones;
+	_subpaving._tiles = _data.tiles;
 	_subpaving._refinementDepth = _data.currLevel;
 }
 

@@ -12,26 +12,28 @@
 
 namespace plsm
 {
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
-Subpaving<TScalar, Dim, TEnum, TItemData>::Subpaving(const RegionType& region,
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::Subpaving(
+	const RegionType& region,
 	const std::vector<SubdivisionRatio<Dim>>& subdivisionRatios) :
 	_zones("zones", 1), _tiles("tiles", 1), _rootRegion(region)
 {
 	processSubdivisionRatios(subdivisionRatios);
 
-	_zones.h_view(0) = ZoneType{_rootRegion, 0};
-	_zones.modify_host();
+	auto zonesMirror = create_mirror_view(_zones);
+	zonesMirror[0] = ZoneType{_rootRegion, 0};
+	deep_copy(_zones, zonesMirror);
 
-	_tiles.h_view(0) = TileType{_rootRegion, 0};
-	_tiles.modify_host();
-
-	_zones.sync_device();
-	_tiles.sync_device();
+	auto tilesMirror = create_mirror_view(_tiles);
+	tilesMirror[0] = TileType{_rootRegion, 0};
+	deep_copy(_tiles, tilesMirror);
 }
 
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
 void
-Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 	const std::vector<SubdivisionRatio<Dim>>& subdivRatios)
 {
 	auto subdivisionRatios = subdivRatios;
@@ -91,14 +93,16 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::processSubdivisionRatios(
 	_subdivisionInfos.sync_device();
 }
 
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
 std::uint64_t
-Subpaving<TScalar, Dim, TEnum, TItemData>::getDeviceMemorySize() const noexcept
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::getDeviceMemorySize()
+	const noexcept
 {
 	std::uint64_t ret{};
 
-	ret += _tiles.d_view.required_allocation_size(_tiles.d_view.extent(0));
-	ret += _zones.d_view.required_allocation_size(_zones.d_view.extent(0));
+	ret += _tiles.required_allocation_size(_tiles.size());
+	ret += _zones.required_allocation_size(_zones.size());
 	ret += sizeof(_rootRegion);
 	ret += _subdivisionInfos.d_view.required_allocation_size(
 		_subdivisionInfos.d_view.extent(0));
@@ -107,10 +111,11 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::getDeviceMemorySize() const noexcept
 	return ret;
 }
 
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
 template <typename TRefinementDetector>
 void
-Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::refine(
 	TRefinementDetector&& detector)
 {
 	using Refiner = detail::Refiner<Subpaving, TRefinementDetector>;
@@ -118,16 +123,15 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::refine(
 	refiner();
 }
 
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
-template <typename TContext>
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
 KOKKOS_INLINE_FUNCTION
 IdType
-Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
-	const PointType& point, TContext context) const
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::findTileId(
+	const PointType& point) const
 {
-	auto zones = getZones(context);
 	IdType zoneId = 0;
-	auto zone = zones(zoneId);
+	auto zone = _zones(zoneId);
 	auto tileId = invalid<IdType>;
 	if (!zone.getRegion().contains(point)) {
 		return tileId;
@@ -139,7 +143,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
 		}
 		auto newZoneId = zoneId;
 		for (auto subZoneId : zone.getSubZoneRange()) {
-			if (zones(subZoneId).getRegion().contains(point)) {
+			if (_zones(subZoneId).getRegion().contains(point)) {
 				newZoneId = subZoneId;
 				break;
 			}
@@ -148,37 +152,8 @@ Subpaving<TScalar, Dim, TEnum, TItemData>::findTileId(
 			break;
 		}
 		zoneId = newZoneId;
-		zone = zones(zoneId);
+		zone = _zones(zoneId);
 	}
 	return tileId;
 }
-
-//! @cond
-template <typename TScalar, DimType Dim, typename TEnum, typename TItemData>
-void
-Subpaving<TScalar, Dim, TEnum, TItemData>::plot()
-{
-	auto tiles = getTiles();
-	std::ofstream ofs("gp.txt");
-	for (auto i : makeIntervalRange(tiles.extent(0))) {
-		const auto& region = tiles(i).getRegion();
-		ofs << "\n";
-		ofs << region[0].begin() << " " << region[1].begin() << "\n";
-		ofs << region[0].end() << " " << region[1].begin() << "\n";
-		ofs << region[0].end() << " " << region[1].end() << "\n";
-		ofs << region[0].begin() << " " << region[1].end() << "\n";
-		ofs << region[0].begin() << " " << region[1].begin() << "\n";
-		ofs << "\n";
-		double q01 = 0.25 * region[0].begin() + 0.75 * region[0].end();
-		double q03 = 0.75 * region[0].begin() + 0.25 * region[0].end();
-		double q11 = 0.25 * region[1].begin() + 0.75 * region[1].end();
-		double q13 = 0.75 * region[1].begin() + 0.25 * region[1].end();
-		ofs << q01 << " " << q11 << "\n";
-		ofs << q03 << " " << q13 << "\n";
-		ofs << "\n";
-		ofs << q01 << " " << q13 << "\n";
-		ofs << q03 << " " << q11 << "\n";
-	}
-}
-//! @endcond
 } // namespace plsm
