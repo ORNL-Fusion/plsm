@@ -38,6 +38,7 @@ struct RefinerData
 	using ZoneType = typename SubpavingType::ZoneType;
 	using TileType = typename SubpavingType::TileType;
 	using ZonesView = typename SubpavingType::ZonesView;
+	using ZonesRAView = typename SubpavingType::ZonesRAView;
 	using TilesView = typename SubpavingType::TilesView;
 
 	static constexpr DimType subpavingDim = SubpavingType::dimension();
@@ -47,6 +48,7 @@ struct RefinerData
 	using DetectorType = TDetector;
 
 	ZonesView zones;
+	ZonesRAView zonesRA;
 	TilesView tiles;
 
 	Kokkos::View<SubdivisionInfoType*> subdivisionInfos;

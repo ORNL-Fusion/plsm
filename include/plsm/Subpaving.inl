@@ -17,7 +17,11 @@ template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
 Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::Subpaving(
 	const RegionType& region,
 	const std::vector<SubdivisionRatio<Dim>>& subdivisionRatios) :
-	_zones("zones", 1), _tiles("tiles", 1), _rootRegion(region)
+	_zones("zones", 1),
+	_zonesRA(_zones),
+	_tiles("tiles", 1),
+	_tilesRA(_tiles),
+	_rootRegion(region)
 {
 	processSubdivisionRatios(subdivisionRatios);
 
@@ -131,7 +135,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::findTileId(
 	const PointType& point) const
 {
 	IdType zoneId = 0;
-	auto zone = _zones(zoneId);
+	auto zone = _zonesRA(zoneId);
 	auto tileId = invalid<IdType>;
 	if (!zone.getRegion().contains(point)) {
 		return tileId;
@@ -143,7 +147,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::findTileId(
 		}
 		auto newZoneId = zoneId;
 		for (auto subZoneId : zone.getSubZoneRange()) {
-			if (_zones(subZoneId).getRegion().contains(point)) {
+			if (_zonesRA(subZoneId).getRegion().contains(point)) {
 				newZoneId = subZoneId;
 				break;
 			}
@@ -152,7 +156,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::findTileId(
 			break;
 		}
 		zoneId = newZoneId;
-		zone = _zones(zoneId);
+		zone = _zonesRA(zoneId);
 	}
 	return tileId;
 }
