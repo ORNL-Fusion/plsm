@@ -58,11 +58,17 @@ public:
 	using ZoneType = Zone<RegionType>;
 	//! The type for the set of zones on the given memory space
 	using ZonesView = Kokkos::View<ZoneType*, MemorySpace>;
+	//! Read-only random-access view of zones
+	using ZonesRAView =
+		Kokkos::View<const ZoneType*, MemorySpace, Kokkos::MemoryRandomAccess>;
 
 	//! The subpaving Tile
 	using TileType = Tile<RegionType, ItemDataType>;
 	//! The type for the set of tiles on the given memory space
 	using TilesView = Kokkos::View<TileType*, MemorySpace>;
+	//! Read-only random-access view of tiles
+	using TilesRAView =
+		Kokkos::View<const TileType*, MemorySpace, Kokkos::MemoryRandomAccess>;
 
 	using HostMirrorSpace = typename TilesView::traits::host_mirror_space;
 	using HostMirror =
@@ -121,10 +127,14 @@ public:
 	makeMirrorCopy() const
 	{
 		HostMirror ret{};
-		resize(ret._zones, _zones.size());
-		deep_copy(ret._zones, _zones);
-		resize(ret._tiles, _tiles.size());
-		deep_copy(ret._tiles, _tiles);
+		auto zones = create_mirror_view(_zones);
+		deep_copy(zones, _zones);
+		ret.setZones(zones);
+
+		auto tiles = create_mirror_view(_tiles);
+		deep_copy(tiles, _tiles);
+		ret.setTiles(tiles);
+
 		ret._rootRegion = _rootRegion;
 		resize(ret._subdivisionInfos, _subdivisionInfos.size());
 		ret._refinementDepth = _refinementDepth;
@@ -147,9 +157,9 @@ public:
 	getDeviceMemorySize() const noexcept;
 
 	/*!
-	 * @brief Get tiles View
-	 * @todo Rename this
+	 * @brief Get the set of tiles
 	 */
+	KOKKOS_INLINE_FUNCTION
 	const TilesView&
 	getTiles() const
 	{
@@ -157,8 +167,19 @@ public:
 	}
 
 	/*!
+	 * @brief Get random-access tiles view
+	 */
+	KOKKOS_INLINE_FUNCTION
+	const TilesRAView&
+	getRandomAccessTiles() const
+	{
+		return _tilesRA;
+	}
+
+	/*!
 	 * @brief Get current number of tiles
 	 */
+	KOKKOS_INLINE_FUNCTION
 	IdType
 	getNumberOfTiles() const
 	{
@@ -173,6 +194,16 @@ public:
 	getZones() const
 	{
 		return _zones;
+	}
+
+	/*!
+	 * @brief Get random-access zones view
+	 */
+	KOKKOS_INLINE_FUNCTION
+	const ZonesRAView&
+	getRandomAccessZones() const
+	{
+		return _zonesRA;
 	}
 
 	/*!
@@ -200,6 +231,26 @@ public:
 	findTileId(const PointType& point) const;
 
 private:
+	void
+	setZones(const ZonesView& zones)
+	{
+		_zones = zones;
+		_zonesRA = _zones;
+	}
+
+	void
+	setTiles(const TilesView& tiles)
+	{
+		_tiles = tiles;
+		_tilesRA = _tiles;
+	}
+
+	void
+	setRefinementDepth(std::size_t depth)
+	{
+		_refinementDepth = depth;
+	}
+
 	/*!
 	 * @brief Check subdivision ratios for domain divisibility and copy final
 	 * form (one per level) into device view
@@ -210,8 +261,10 @@ private:
 private:
 	//! Zones represent the entire subdivision tree for the root region
 	ZonesView _zones;
+	ZonesRAView _zonesRA;
 	//! Tiles represent the (selected) leaf nodes of the tree
 	TilesView _tiles;
+	TilesRAView _tilesRA;
 	//! Region which fully encloses the domain of interest
 	RegionType _rootRegion;
 	//! Collection of SubdivisionInfo, one per expected refinement level

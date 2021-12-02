@@ -82,7 +82,7 @@ countNewItemsFromTile(
 	const auto& tile = data.tiles(index);
 	auto zoneId = tile.getOwningZoneIndex();
 	IdType count = 0;
-	auto& zone = data.zones(zoneId);
+	auto& zone = data.zonesRA(zoneId);
 	auto level = zone.getLevel();
 	if (level < data.targetDepth) {
 		BoolVec enable{};
@@ -132,7 +132,7 @@ refineTile(const TData& data, IdType index)
 		getSubZoneRegion(ownerZone, data.selectedSubZones(index, 0), info),
 		newLevel, ownerZoneId};
 	data.zones(subZoneBeginId).setTileIndex(index);
-	tile = TileType{data.zones(subZoneBeginId).getRegion(), subZoneBeginId};
+	tile = TileType{data.zonesRA(subZoneBeginId).getRegion(), subZoneBeginId};
 
 	// Create and associate remaining zones and tiles
 	auto tileBeginId = data.numTiles + data.newTileStarts(index);
@@ -143,7 +143,7 @@ refineTile(const TData& data, IdType index)
 			getSubZoneRegion(ownerZone, data.selectedSubZones(index, i), info),
 			newLevel, ownerZoneId};
 		data.zones(zoneId).setTileIndex(tileId);
-		data.tiles(tileId) = TileType{data.zones(zoneId).getRegion(), zoneId};
+		data.tiles(tileId) = TileType{data.zonesRA(zoneId).getRegion(), zoneId};
 	}
 
 	ownerZone.removeTile();
@@ -155,8 +155,8 @@ Refiner<TSubpaving, TDetector>::Refiner(
 	SubpavingType& subpaving, const DetectorType& detector) :
 	_subpaving(subpaving),
 	_subdivInfoMirror(create_mirror_view(subpaving._subdivisionInfos)),
-	_data{subpaving._zones, subpaving._tiles, subpaving._subdivisionInfos,
-		detector,
+	_data{subpaving._zones, subpaving._zonesRA, subpaving._tiles,
+		subpaving._subdivisionInfos, detector,
 		(detector.depth() == detector.fullDepth) ?
 			subpaving._subdivisionInfos.size() :
 			detector.depth()}
@@ -181,9 +181,9 @@ Refiner<TSubpaving, TDetector>::operator()()
 		assignNewItems();
 	}
 
-	_subpaving._zones = _data.zones;
-	_subpaving._tiles = _data.tiles;
-	_subpaving._refinementDepth = _data.currLevel;
+	_subpaving.setZones(_data.zones);
+	_subpaving.setTiles(_data.tiles);
+	_subpaving.setRefinementDepth(_data.currLevel);
 }
 
 template <typename TSubpaving, typename TDetector>
@@ -258,6 +258,7 @@ void
 Refiner<TSubpaving, TDetector>::assignNewItems()
 {
 	Kokkos::resize(_data.zones, _data.numZones + _data.newItemTotals.zones);
+	_data.zonesRA = _data.zones;
 	Kokkos::resize(_data.tiles, _data.numTiles + _data.newItemTotals.tiles);
 
 	auto data = _data;

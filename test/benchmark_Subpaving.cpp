@@ -54,7 +54,6 @@ TEST_CASE("Subpaving 2D", "[Subpaving]")
 				PD{{{{0, 0}}, {{256, 128}}, {{384, 256}}, {{512, 512}}}},
 				RD{{Ival{0, 56}, Ival{0, 56}}}));
 		};
-		std::cout << "z-aligned\n";
 		test::renderSubpaving(spv);
 	}
 }
@@ -62,6 +61,7 @@ TEST_CASE("Subpaving 2D", "[Subpaving]")
 TEST_CASE("Subpaving 3D", "[Subpaving]")
 {
 	using namespace refine;
+	using Range3D = Kokkos::MDRangePolicy<Kokkos::Rank<3>>;
 	using RegionType = typename Subpaving<int, 3>::RegionType;
 	using Ival = Interval<int>;
 	RegionType r{{Ival{0, 512}, Ival{0, 512}, Ival{0, 512}}};
@@ -77,6 +77,21 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
 			s.refine(BallDetector<int, 3, Tags>{{256, 256, 256}, 128});
 		};
 		test::renderSubpaving(s);
+		std::size_t errors = 0;
+		BENCHMARK("search: ball")
+		{
+			auto tiles = s.getTiles();
+			Kokkos::parallel_reduce(
+				tiles.size(),
+				KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+					auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+					if (id != i) {
+						++running;
+					}
+				},
+				errors);
+		};
+		REQUIRE(errors == 0);
 	}
 
 	SECTION("z-aligned")
@@ -111,6 +126,21 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
 				RegionDetector{{ival, ival, ival}}));
 		};
 		test::renderSubpaving(s);
+		std::size_t errors = 0;
+		BENCHMARK("search: z-aligned polyline plus box")
+		{
+			auto tiles = s.getTiles();
+			Kokkos::parallel_reduce(
+				tiles.size(),
+				KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+					auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+					if (id != i) {
+						++running;
+					}
+				},
+				errors);
+		};
+		REQUIRE(errors == 0);
 	}
 
 	SECTION("x-aligned")
@@ -190,9 +220,24 @@ TEST_CASE("Subpaving with XRN Defaults", "[Subpaving][XRN]")
 	rspecPoints.push_back({{0, 0, wild}});
 	rspecPoints.push_back({{1000, 500, wild}});
 	rspecPoints.push_back({{10240, 8192, wild}});
-	BENCHMARK("refine: XRN Default")
+	BENCHMARK("refine: XRN")
 	{
 		s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
 	};
 	test::renderSubpaving(s);
+    std::size_t errors = 0;
+    BENCHMARK("search: XRN")
+    {
+        auto tiles = s.getTiles();
+        Kokkos::parallel_reduce(
+            tiles.size(),
+            KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+                auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+                if (id != i) {
+                    ++running;
+                }
+            },
+            errors);
+    };
+    REQUIRE(errors == 0);
 }
