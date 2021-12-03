@@ -20,9 +20,9 @@ namespace test
 template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
 	typename TMemSpace>
 inline void
-renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
+renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& sp)
 {
-	subpaving.syncTiles(onHost);
+	auto subpaving = sp.makeMirrorCopy();
 	auto tiles = subpaving.getTiles();
 
 	auto numTiles = tiles.extent(0);
@@ -124,9 +124,9 @@ renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
 	static auto interactor = [=]() {
 		auto window = vtkSmartPointer<vtkRenderWindow>::New();
 		window->AddRenderer(renderer);
-		auto interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-		interactor->SetRenderWindow(window);
-		return interactor;
+		auto ia = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+		ia->SetRenderWindow(window);
+		return ia;
 	}();
 	interactor->GetRenderWindow()->Render();
 	interactor->Start();

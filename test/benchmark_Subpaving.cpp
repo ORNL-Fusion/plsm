@@ -61,7 +61,6 @@ TEST_CASE("Subpaving 2D", "[Subpaving]")
 TEST_CASE("Subpaving 3D", "[Subpaving]")
 {
 	using namespace refine;
-	using Range3D = Kokkos::MDRangePolicy<Kokkos::Rank<3>>;
 	using RegionType = typename Subpaving<int, 3>::RegionType;
 	using Ival = Interval<int>;
 	RegionType r{{Ival{0, 512}, Ival{0, 512}, Ival{0, 512}}};
@@ -225,19 +224,19 @@ TEST_CASE("Subpaving with XRN Defaults", "[Subpaving][XRN]")
 		s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
 	};
 	test::renderSubpaving(s);
-    std::size_t errors = 0;
-    BENCHMARK("search: XRN")
-    {
-        auto tiles = s.getTiles();
-        Kokkos::parallel_reduce(
-            tiles.size(),
-            KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
-                auto id = s.findTileId(tiles[i].getRegion().getOrigin());
-                if (id != i) {
-                    ++running;
-                }
-            },
-            errors);
-    };
-    REQUIRE(errors == 0);
+	std::size_t errors = 0;
+	BENCHMARK("search: XRN")
+	{
+		auto tiles = s.getTiles();
+		Kokkos::parallel_reduce(
+			tiles.size(),
+			KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+				auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+				if (id != i) {
+					++running;
+				}
+			},
+			errors);
+	};
+	REQUIRE(errors == 0);
 }
