@@ -50,6 +50,47 @@ renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& sp)
 				region[0].end(), region[1].end(), region[2].end());
 			points->InsertNextPoint(
 				region[0].begin(), region[1].end(), region[2].end());
+
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId);
+			cells->InsertCellPoint(pId + 1);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 1);
+			cells->InsertCellPoint(pId + 2);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 2);
+			cells->InsertCellPoint(pId + 3);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 3);
+			cells->InsertCellPoint(pId);
+
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 4);
+			cells->InsertCellPoint(pId + 5);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 5);
+			cells->InsertCellPoint(pId + 6);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 6);
+			cells->InsertCellPoint(pId + 7);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 7);
+			cells->InsertCellPoint(pId + 4);
+
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 0);
+			cells->InsertCellPoint(pId + 4);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 1);
+			cells->InsertCellPoint(pId + 5);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 2);
+			cells->InsertCellPoint(pId + 6);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 3);
+			cells->InsertCellPoint(pId + 7);
+
+			pId += 8;
 		}
 		else if (Dim == 2) {
 			points->InsertNextPoint(region[0].begin(), region[1].begin(), 0.0);
@@ -57,55 +98,24 @@ renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& sp)
 			points->InsertNextPoint(region[0].end(), region[1].end(), 0.0);
 			points->InsertNextPoint(region[0].begin(), region[1].end(), 0.0);
 
-			points->InsertNextPoint(region[0].begin(), region[1].begin(), 0.0);
-			points->InsertNextPoint(region[0].end(), region[1].begin(), 0.0);
-			points->InsertNextPoint(region[0].end(), region[1].end(), 0.0);
-			points->InsertNextPoint(region[0].begin(), region[1].end(), 0.0);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId);
+			cells->InsertCellPoint(pId + 1);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 1);
+			cells->InsertCellPoint(pId + 2);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 2);
+			cells->InsertCellPoint(pId + 3);
+			cells->InsertNextCell(2);
+			cells->InsertCellPoint(pId + 3);
+			cells->InsertCellPoint(pId);
+
+			pId += 4;
 		}
 		else {
 			throw std::runtime_error("Unsupported dimensionality");
 		}
-
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId);
-		cells->InsertCellPoint(pId + 1);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 1);
-		cells->InsertCellPoint(pId + 2);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 2);
-		cells->InsertCellPoint(pId + 3);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 3);
-		cells->InsertCellPoint(pId);
-
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 4);
-		cells->InsertCellPoint(pId + 5);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 5);
-		cells->InsertCellPoint(pId + 6);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 6);
-		cells->InsertCellPoint(pId + 7);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 7);
-		cells->InsertCellPoint(pId + 4);
-
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 0);
-		cells->InsertCellPoint(pId + 4);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 1);
-		cells->InsertCellPoint(pId + 5);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 2);
-		cells->InsertCellPoint(pId + 6);
-		cells->InsertNextCell(2);
-		cells->InsertCellPoint(pId + 3);
-		cells->InsertCellPoint(pId + 7);
-
-		pId += 8;
 	}
 
 	auto pd = vtkSmartPointer<vtkPolyData>::New();

@@ -50,23 +50,69 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 		}
 		return ret;
 	};
-	auto ratioProduct = std::accumulate(next(begin(subdivisionRatios)),
-		end(subdivisionRatios), subdivisionRatios.front(), elementWiseProduct);
 
-	auto getIntervalLength = [](const IntervalType& ival) {
-		return ival.length();
-	};
+	// Compute per-dimension ratio product for provided subdivision ratios
+	auto ratioProduct =
+		std::accumulate(begin(subdivisionRatios), end(subdivisionRatios),
+			SubdivisionRatio<Dim>::filled(1), elementWiseProduct);
+
+	// Get root region extents (what is being subdivided)
 	std::array<typename IntervalType::SizeType, Dim> extents;
 	std::transform(begin(_rootRegion), end(_rootRegion), begin(extents),
-		getIntervalLength);
+		[](auto&& ival) { return ival.length(); });
 
-	// FIXME: infinite loop when ratios do not evenly divide extents
+	auto nonSelfFactors = [](auto x) {
+		using T = std::remove_reference_t<decltype(x)>;
+		std::vector<T> result;
+
+		// This will loop from 2 to sqrt(x)
+		for (T i = 2; i * i <= x; ++i) {
+			// Check if i divides x without leaving a remainder
+			if (x % i == 0) {
+				result.push_back(i);
+				// Include other factor if not root
+				if (x / i != i) {
+					result.push_back(x / i);
+				}
+			}
+		}
+
+		std::sort(begin(result), end(result));
+		return result;
+	};
+
+	auto getNextFactor = [nonSelfFactors](auto toSub, auto refFactor) {
+		using T = std::remove_reference_t<decltype(refFactor)>;
+		if (toSub % refFactor == 0) {
+			return refFactor;
+		}
+		auto opt = nonSelfFactors(toSub);
+		if (opt.empty()) {
+			return static_cast<T>(toSub);
+		}
+		T ret = 0;
+		for (auto i : opt) {
+			if (i > refFactor) {
+				continue;
+			}
+			ret = i;
+		}
+		if (ret == 0) {
+			ret = opt.front();
+		}
+		return ret;
+	};
+
+	// Create additional ratio(s) until space is fully subdivided
 	for (;;) {
 		bool needAnotherLevel = false;
-		auto newRatio = SubdivisionRatio<Dim>::filled(1);
+		auto nextRatio = SubdivisionRatio<Dim>::filled(1);
 		for (auto i : makeIntervalRange(Dim)) {
 			if (ratioProduct[i] < extents[i]) {
-				newRatio[i] = subdivisionRatios.back()[i];
+				// Determine next ratio to use to subdivide leftovers. Use last
+				// ratio if possible
+				nextRatio[i] = getNextFactor(
+					extents[i] / ratioProduct[i], subdivisionRatios.back()[i]);
 				needAnotherLevel = true;
 			}
 		}
@@ -75,8 +121,8 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 			break;
 		}
 
-		subdivisionRatios.push_back(newRatio);
-		ratioProduct = elementWiseProduct(ratioProduct, newRatio);
+		subdivisionRatios.push_back(nextRatio);
+		ratioProduct = elementWiseProduct(ratioProduct, nextRatio);
 	}
 
 	for (auto i : makeIntervalRange(Dim)) {
@@ -96,6 +142,30 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 	std::copy(begin(subdivisionRatios), end(subdivisionRatios),
 		subdivInfoMirror.data());
 	deep_copy(_subdivisionInfos, subdivInfoMirror);
+}
+
+template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
+	typename TMemSpace>
+typename Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::HostMirror
+Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::makeMirrorCopy() const
+{
+	HostMirror ret{};
+	auto zones = create_mirror_view(_zones);
+	deep_copy(zones, _zones);
+	ret.setZones(zones);
+
+	auto tiles = create_mirror_view(_tiles);
+	deep_copy(tiles, _tiles);
+	ret.setTiles(tiles);
+
+	ret._rootRegion = _rootRegion;
+
+	resize(ret._subdivisionInfos, _subdivisionInfos.size());
+	deep_copy(ret._subdivisionInfos, _subdivisionInfos);
+
+	ret._refinementDepth = _refinementDepth;
+
+	return ret;
 }
 
 template <typename TScalar, DimType Dim, typename TEnum, typename TItemData,
