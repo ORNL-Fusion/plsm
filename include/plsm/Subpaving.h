@@ -13,6 +13,11 @@
 
 namespace plsm
 {
+namespace test
+{
+template <typename>
+struct SubpavingTester;
+}
 /*!
  * @brief A set of non-overlapping "tiles" which cover the space within a given
  * Region of an N-dimensional lattice
@@ -35,6 +40,9 @@ template <typename TScalar, DimType Dim, typename TEnumIndex = void,
 	typename TItemData = IdType, typename TMemSpace = DefaultMemSpace>
 class Subpaving
 {
+	template <typename>
+	friend class ::plsm::test::SubpavingTester;
+
 	template <typename TSubpaving, typename TSelector>
 	friend class detail::Refiner;
 
@@ -124,22 +132,7 @@ public:
 	}
 
 	HostMirror
-	makeMirrorCopy() const
-	{
-		HostMirror ret{};
-		auto zones = create_mirror_view(_zones);
-		deep_copy(zones, _zones);
-		ret.setZones(zones);
-
-		auto tiles = create_mirror_view(_tiles);
-		deep_copy(tiles, _tiles);
-		ret.setTiles(tiles);
-
-		ret._rootRegion = _rootRegion;
-		resize(ret._subdivisionInfos, _subdivisionInfos.size());
-		ret._refinementDepth = _refinementDepth;
-		return ret;
-	}
+	makeMirrorCopy() const;
 
 	/*!
 	 * @brief Get root region

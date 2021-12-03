@@ -10,6 +10,46 @@
 #include <plsm/refine/RegionDetector.h>
 using namespace plsm;
 
+namespace plsm::test
+{
+template <typename TSubpaving>
+struct SubpavingTester
+{
+	using Ratio = SubdivisionRatio<TSubpaving::dimension()>;
+
+	void
+	checkRatios(const std::vector<Ratio>& ratios)
+	{
+		auto infos = subpaving.makeMirrorCopy()._subdivisionInfos;
+		REQUIRE(infos.size() == ratios.size());
+	}
+
+	TSubpaving subpaving;
+};
+
+template <typename TSubpaving>
+SubpavingTester(const TSubpaving&) -> SubpavingTester<TSubpaving>;
+} // namespace plsm::test
+
+TEMPLATE_LIST_TEST_CASE(
+	"Process Subdivision Ratios", "[Subpaving][template]", test::IntTypes)
+{
+	auto subpaving = Subpaving<TestType, 2>({{{0, 100}, {0, 100}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {2, 2}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 250}, {0, 50}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {5, 2}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{10, 20}, {25, 35}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios({{{5, 5}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}});
+}
+
 TEMPLATE_LIST_TEST_CASE(
 	"Subpaving Basic", "[Subpaving][template]", test::IntTypes)
 {
