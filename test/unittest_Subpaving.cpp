@@ -48,6 +48,14 @@ TEMPLATE_LIST_TEST_CASE(
 	subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}});
 	test::SubpavingTester{subpaving}.checkRatios(
 		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{23, 11}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{23, 11}, {23, 7}, {2, 5}, {2, 3}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{2, 3}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{2, 3}, {2, 5}, {23, 7}, {23, 11}}});
 }
 
 TEMPLATE_LIST_TEST_CASE(
