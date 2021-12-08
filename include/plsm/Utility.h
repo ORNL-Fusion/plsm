@@ -4,7 +4,7 @@
 #include <limits>
 #include <type_traits>
 
-#include <Kokkos_Macros.hpp>
+#include <Kokkos_Core.hpp>
 
 #include <plsm/config.h>
 
@@ -20,11 +20,14 @@ inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 template <typename T>
 inline constexpr T wildcard = std::numeric_limits<T>::max();
 
-template <typename, DimType, typename, typename>
+template <typename, DimType, typename, typename, typename>
 class Subpaving;
 
-namespace detail
-{
+using DefaultExecSpace = Kokkos::DefaultExecutionSpace;
+using DefaultMemSpace = typename DefaultExecSpace::memory_space;
+using DeviceMemSpace = DefaultMemSpace;
+using HostMemSpace = Kokkos::HostSpace;
+
 /*!
  * @brief Checks whether T is an instantiation of Subpaving
  */
@@ -38,13 +41,16 @@ struct IsSubpaving : std::false_type
 };
 
 template <typename TScalar, DimType Dim, typename TEnumIndex,
-	typename TItemData>
-struct IsSubpaving<::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData>> :
+	typename TItemData, typename TMemSpace>
+struct IsSubpaving<
+	::plsm::Subpaving<TScalar, Dim, TEnumIndex, TItemData, TMemSpace>> :
 	std::true_type
 {
 };
 /*! @endcond */
 
+namespace detail
+{
 /*!
  * @brief Determine the type for the result of a subtraction
  */

@@ -26,7 +26,6 @@ TEST_CASE("Subpaving 2D", "[Subpaving]")
 			using Tags = TagPair<Intersect, SelectAll>;
 			s.refine(BallDetector<int, 2, Tags>{{0, 0}, 500});
 		};
-		std::cout << "depth: " << s.getRefinementDepth() << '\n';
 		test::renderSubpaving(s);
 	}
 
@@ -55,7 +54,6 @@ TEST_CASE("Subpaving 2D", "[Subpaving]")
 				PD{{{{0, 0}}, {{256, 128}}, {{384, 256}}, {{512, 512}}}},
 				RD{{Ival{0, 56}, Ival{0, 56}}}));
 		};
-		std::cout << "z-aligned\n";
 		test::renderSubpaving(spv);
 	}
 }
@@ -78,6 +76,21 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
 			s.refine(BallDetector<int, 3, Tags>{{256, 256, 256}, 128});
 		};
 		test::renderSubpaving(s);
+		std::size_t errors = 0;
+		BENCHMARK("search: ball")
+		{
+			auto tiles = s.getTiles();
+			Kokkos::parallel_reduce(
+				tiles.size(),
+				KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+					auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+					if (id != i) {
+						++running;
+					}
+				},
+				errors);
+		};
+		REQUIRE(errors == 0);
 	}
 
 	SECTION("z-aligned")
@@ -112,6 +125,21 @@ TEST_CASE("Subpaving 3D", "[Subpaving]")
 				RegionDetector{{ival, ival, ival}}));
 		};
 		test::renderSubpaving(s);
+		std::size_t errors = 0;
+		BENCHMARK("search: z-aligned polyline plus box")
+		{
+			auto tiles = s.getTiles();
+			Kokkos::parallel_reduce(
+				tiles.size(),
+				KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+					auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+					if (id != i) {
+						++running;
+					}
+				},
+				errors);
+		};
+		REQUIRE(errors == 0);
 	}
 
 	SECTION("x-aligned")
@@ -183,17 +211,32 @@ TEST_CASE("Subpaving with XRN Defaults", "[Subpaving][XRN]")
 {
 	using RegionType = typename Subpaving<int, 3>::RegionType;
 	using Ival = Interval<int>;
-	RegionType r{{Ival{0, 5120}, Ival{0, 4096}, Ival{0, 16}}};
-	Subpaving<int, 3> s(r, {{{10, 8, 2}}, {{8, 8, 2}}});
+	RegionType r{{Ival{0, 10240}, Ival{0, 8192}, Ival{0, 16}}};
+	Subpaving<int, 3> s(r, {{{10, 8, 2}}, {{2, 2, 2}}});
 	std::vector<SpaceVector<int, 3>> rspecPoints;
 	constexpr auto wild = wildcard<int>;
 	// rspecPoints.push_back({{wild, wild, 3}});
 	rspecPoints.push_back({{0, 0, wild}});
 	rspecPoints.push_back({{1000, 500, wild}});
-	rspecPoints.push_back({{5120, 4096, wild}});
-	BENCHMARK("refine: XRN Default")
+	rspecPoints.push_back({{10240, 8192, wild}});
+	BENCHMARK("refine: XRN")
 	{
 		s.refine(refine::PolylineDetector<int, 3>{rspecPoints});
 	};
 	test::renderSubpaving(s);
+	std::size_t errors = 0;
+	BENCHMARK("search: XRN")
+	{
+		auto tiles = s.getTiles();
+		Kokkos::parallel_reduce(
+			tiles.size(),
+			KOKKOS_LAMBDA(std::size_t i, std::size_t & running) {
+				auto id = s.findTileId(tiles[i].getRegion().getOrigin());
+				if (id != i) {
+					++running;
+				}
+			},
+			errors);
+	};
+	REQUIRE(errors == 0);
 }

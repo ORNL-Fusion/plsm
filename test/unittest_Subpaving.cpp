@@ -10,6 +10,54 @@
 #include <plsm/refine/RegionDetector.h>
 using namespace plsm;
 
+namespace plsm::test
+{
+template <typename TSubpaving>
+struct SubpavingTester
+{
+	using Ratio = SubdivisionRatio<TSubpaving::dimension()>;
+
+	void
+	checkRatios(const std::vector<Ratio>& ratios)
+	{
+		auto infos = subpaving.makeMirrorCopy()._subdivisionInfos;
+		REQUIRE(infos.size() == ratios.size());
+	}
+
+	TSubpaving subpaving;
+};
+
+template <typename TSubpaving>
+SubpavingTester(const TSubpaving&) -> SubpavingTester<TSubpaving>;
+} // namespace plsm::test
+
+TEMPLATE_LIST_TEST_CASE(
+	"Process Subdivision Ratios", "[Subpaving][template]", test::IntTypes)
+{
+	auto subpaving = Subpaving<TestType, 2>({{{0, 100}, {0, 100}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {2, 2}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 250}, {0, 50}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {5, 2}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{10, 20}, {25, 35}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios({{{5, 5}, {2, 2}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{23, 11}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{23, 11}, {23, 7}, {2, 5}, {2, 3}}});
+
+	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{2, 3}}});
+	test::SubpavingTester{subpaving}.checkRatios(
+		{{{2, 3}, {2, 5}, {23, 7}, {23, 11}}});
+}
+
 TEMPLATE_LIST_TEST_CASE(
 	"Subpaving Basic", "[Subpaving][template]", test::IntTypes)
 {
@@ -24,22 +72,20 @@ TEMPLATE_LIST_TEST_CASE(
 		using RegionDetector = refine::RegionDetector<TestType, 3,
 			refine::TagPair<refine::Overlap, refine::SelectAll>>;
 		sp.refine(RegionDetector{sp.getLatticeRegion()});
-		REQUIRE(sp.getTiles(onDevice).extent(0) == 64);
-		sp.syncTiles(onHost);
 		REQUIRE(sp.getTiles().extent(0) == 64);
-		REQUIRE(sp.findTileId({3, 3, 3}) == invalid<IdType>);
-		sp.syncAll(onHost);
-		REQUIRE(sp.findTileId({3, 3, 3}) == 63);
+
+		auto sph = sp.makeMirrorCopy();
+		REQUIRE(sph.findTileId({3, 3, 3}) == 63);
 
 		using Range3D = Kokkos::MDRangePolicy<Kokkos::Rank<3>>;
 		std::size_t errors = 0;
-		auto tiles = sp.getTiles(onDevice);
+		auto tiles = sp.getTiles();
 
 		Kokkos::parallel_reduce(
 			Range3D({0, 0, 0}, {4, 4, 4}),
 			KOKKOS_LAMBDA(
 				TestType i, TestType j, TestType k, std::size_t & running) {
-				auto tileId = sp.findTileId(PointType{i, j, k}, onDevice);
+				auto tileId = sp.findTileId(PointType{i, j, k});
 				if (tileId == invalid<std::size_t>) {
 					++running;
 				}
@@ -53,7 +99,7 @@ TEMPLATE_LIST_TEST_CASE(
 			KOKKOS_LAMBDA(
 				TestType i, TestType j, TestType k, std::size_t & running) {
 				PointType p({i, j, k});
-				auto tileId = sp.findTileId(p, onDevice);
+				auto tileId = sp.findTileId(p);
 				if (tiles(tileId).getRegion().getOrigin() != p) {
 					++running;
 				}

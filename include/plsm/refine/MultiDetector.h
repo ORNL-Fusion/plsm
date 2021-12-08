@@ -60,9 +60,6 @@ public:
 	//! Alias for next link in the chain
 	using Tail = MultiDetectorImpl<TDetectors...>;
 
-	template <typename TRegion>
-	using BoolVec = typename Head::template BoolVec<TRegion>;
-
 	MultiDetectorImpl(const MultiDetectorImpl&) = default;
 	MultiDetectorImpl(MultiDetectorImpl&&) = default;
 
@@ -127,9 +124,6 @@ class MultiDetector : public Detector<MultiDetector<TDetectors...>>
 public:
 	//! Alias for parent class type
 	using Superclass = Detector<MultiDetector<TDetectors...>>;
-
-	template <typename TRegion>
-	using BoolVec = typename Superclass::template BoolVec<TRegion>;
 
 	MultiDetector(const MultiDetector&) = default;
 	MultiDetector(MultiDetector&&) = default;

@@ -8,11 +8,11 @@ namespace plsm
 {
 namespace test
 {
-template <typename TScalar, std::size_t Dim, typename TItemData>
+template <typename TSubpaving>
 void
-printSubpaving(Subpaving<TScalar, Dim, TItemData>& subpaving, std::ostream& os)
+printSubpaving(TSubpaving& subpaving, std::ostream& os)
 {
-	subpaving.syncAll(onHost);
+	static_assert(plsm::IsSubpaving<TSubpaving>{});
 	auto tiles = subpaving.getTiles();
 	auto zones = subpaving.getZones();
 	os << "Zones: " << zones.size() << '\n';

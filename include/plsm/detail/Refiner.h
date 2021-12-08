@@ -4,9 +4,7 @@
 #include <vector>
 
 #include <Kokkos_Bitset.hpp>
-#include <Kokkos_Vector.hpp>
 
-#include <plsm/ContextUtility.h>
 #include <plsm/SpaceVector.h>
 #include <plsm/Subpaving.h>
 #include <plsm/Utility.h>
@@ -16,6 +14,64 @@ namespace plsm
 {
 namespace detail
 {
+struct ItemTotals
+{
+	IdType zones{0};
+	IdType tiles{0};
+
+	KOKKOS_INLINE_FUNCTION
+	volatile ItemTotals&
+	operator+=(const volatile ItemTotals& other) volatile
+	{
+		zones += other.zones;
+		tiles += other.tiles;
+		return *this;
+	}
+};
+
+template <typename TSubpaving, typename TDetector>
+struct RefinerData
+{
+	static_assert(IsSubpaving<TSubpaving>{});
+
+	using SubpavingType = TSubpaving;
+	using ZoneType = typename SubpavingType::ZoneType;
+	using TileType = typename SubpavingType::TileType;
+	using ZonesView = typename SubpavingType::ZonesView;
+	using ZonesRAView = typename SubpavingType::ZonesRAView;
+	using TilesView = typename SubpavingType::TilesView;
+
+	static constexpr DimType subpavingDim = SubpavingType::dimension();
+
+	using SubdivisionInfoType = SubdivisionInfo<subpavingDim>;
+
+	using DetectorType = TDetector;
+
+	ZonesView zones;
+	ZonesRAView zonesRA;
+	TilesView tiles;
+
+	Kokkos::View<SubdivisionInfoType*> subdivisionInfos;
+
+	DetectorType detector;
+
+	std::size_t targetDepth;
+	std::size_t currLevel{};
+
+	Kokkos::Array<Kokkos::Bitset<DefaultExecSpace>, subpavingDim>
+		enableRefine{};
+
+	Kokkos::View<IdType**> selectedSubZones{};
+
+	Kokkos::View<IdType*> newZoneCounts{};
+	Kokkos::View<IdType*> subZoneStarts{};
+	Kokkos::View<IdType*> newTileStarts{};
+
+	ItemTotals newItemTotals{};
+	IdType numZones{zones.size()};
+	IdType numTiles{tiles.size()};
+};
+
 /*!
  * @brief Refiner handles the refinement and selection of the Subpaving tiles
  */
@@ -23,7 +79,6 @@ template <typename TSubpaving, typename TDetector>
 class Refiner
 {
 public:
-	static_assert(IsSubpaving<TSubpaving>::value, "");
 	using SubpavingType = TSubpaving;
 	using ScalarType = typename SubpavingType::ScalarType;
 	using ZoneType = typename SubpavingType::ZoneType;
@@ -41,83 +96,26 @@ public:
 	void
 	operator()();
 
-	struct ItemTotals
-	{
-		IdType zones{0};
-		IdType tiles{0};
-
-		KOKKOS_INLINE_FUNCTION
-		volatile ItemTotals&
-		operator+=(const volatile ItemTotals& other) volatile
-		{
-			zones += other.zones;
-			tiles += other.tiles;
-			return *this;
-		}
-	};
-
-	KOKKOS_INLINE_FUNCTION
-	IdType
-	countSelectSubZones(IdType index, const ZoneType& zone) const;
-
-	KOKKOS_INLINE_FUNCTION
 	void
-	countSelectNewItemsFromTile(IdType index, ItemTotals& runningTotals) const;
-
-	void
-	countNewZonesAndTiles();
+	countNewItems();
 
 	void
 	findNewItemIndices();
 
-	KOKKOS_INLINE_FUNCTION
 	void
-	refineTile(IdType index) const;
-
-	void
-	assignNewZonesAndTiles();
-
-	KOKKOS_INLINE_FUNCTION
-	RegionType
-	getSubZoneRegion(const ZoneType& zone, IdType subZoneLocalId,
-		const SubdivisionInfoType& subdivInfo) const;
-
-	KOKKOS_INLINE_FUNCTION
-	SubdivisionRatioType
-	getSubdivisionRatio(std::size_t level, IdType tileIndex) const;
+	assignNewItems();
 
 protected:
-	template <typename, DimType, typename, typename>
+	template <typename, DimType, typename, typename, typename>
 	friend class ::plsm::Subpaving;
 
 	Refiner(SubpavingType& subpaving, const DetectorType& detector);
 
 protected:
 	SubpavingType& _subpaving;
-	using ZonesView = typename SubpavingType::template ZonesView<OnDevice>;
-	ZonesView _zones;
-	using TilesView = typename SubpavingType::template TilesView<OnDevice>;
-	TilesView _tiles;
+	typename Kokkos::View<SubdivisionInfoType*>::HostMirror _subdivInfoMirror;
 
-	Kokkos::DualView<SubdivisionInfoType*> _subdivisionInfos;
-
-	std::size_t _currLevel;
-	std::size_t _targetDepth;
-
-	DetectorType _detector;
-
-	using DefaultExecSpace =
-		typename Kokkos::View<int*>::traits::execution_space;
-	Kokkos::Array<Kokkos::Bitset<DefaultExecSpace>, subpavingDim> _enableRefine;
-
-	Kokkos::View<IdType**> _selectedSubZones;
-
-	ItemTotals _newItemTotals{};
-	IdType _numTiles;
-	IdType _numZones;
-	Kokkos::View<IdType*> _newZoneCounts;
-	Kokkos::View<IdType*> _subZoneStarts;
-	Kokkos::View<IdType*> _newTileStarts;
+	RefinerData<TSubpaving, TDetector> _data;
 };
 } // namespace detail
 } // namespace plsm
