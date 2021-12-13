@@ -8,6 +8,79 @@
 
 namespace plsm
 {
+template <typename TRegion, typename TItem = void>
+struct TileData
+{
+	//! Alias for Region
+	using RegionType = TRegion;
+	//! User data type to be mapped from Tile
+	using ItemType = TItem;
+
+	KOKKOS_INLINE_FUNCTION
+	decltype(auto)
+	getItem() noexcept
+	{
+		return item;
+	}
+
+	KOKKOS_INLINE_FUNCTION
+	decltype(auto)
+	getItem() const noexcept
+	{
+		return item;
+	}
+
+	template <typename T>
+	KOKKOS_INLINE_FUNCTION
+	void
+	setItem(T&& v)
+	{
+		item = std::forward<T>(v);
+	}
+
+	//! Region mapped from by this Tile
+	RegionType region;
+	//! Index of owning Zone
+	IdType owningZoneId{invalid<IdType>};
+
+	static_assert(std::is_integral_v<ItemType>);
+	//! Mapped user data item
+	ItemType item{invalid<ItemType>};
+};
+
+template <typename TRegion>
+struct TileData<TRegion, void>
+{
+	//! Alias for Region
+	using RegionType = TRegion;
+
+	KOKKOS_INLINE_FUNCTION
+	decltype(auto)
+	getItem() noexcept
+	{
+		return invalid<IdType>;
+	}
+
+	KOKKOS_INLINE_FUNCTION
+	decltype(auto)
+	getItem() const noexcept
+	{
+		return invalid<IdType>;
+	}
+
+	template <typename T>
+	KOKKOS_INLINE_FUNCTION
+	void
+	setItem([[maybe_unused]] T&&)
+	{
+	}
+
+	//! Region mapped from by this Tile
+	RegionType region;
+	//! Index of owning Zone
+	IdType owningZoneId{invalid<IdType>};
+};
+
 /*!
  * @brief Tile is used as a non-overlapped lattice region
  *
@@ -19,7 +92,7 @@ namespace plsm
  *
  * @test test_Tile.cpp
  */
-template <typename TRegion, typename TItemData = IdType>
+template <typename TRegion, typename TItemData = void>
 class Tile
 {
 public:
@@ -38,11 +111,10 @@ public:
 	 */
 	KOKKOS_INLINE_FUNCTION
 	Tile(const RegionType& region, IdType owningZoneId) :
-		_region(region), _owningZoneId(owningZoneId)
+		_data{region, owningZoneId}
 	{
 	}
 
-	//!@{
 	/*!
 	 * @brief Get/Set the Region mapped from by this Tile
 	 */
@@ -50,16 +122,18 @@ public:
 	const RegionType&
 	getRegion() const noexcept
 	{
-		return _region;
+		return _data.region;
 	}
 
+	/*!
+	 * @brief Check if this tile has a valid owning zone id
+	 */
 	KOKKOS_INLINE_FUNCTION
 	bool
 	hasOwningZone() const noexcept
 	{
-		return _owningZoneId != invalid<IdType>;
+		return _data.owningZoneId != invalid<IdType>;
 	}
-	//!}
 
 	//!@{
 	/*!
@@ -69,14 +143,14 @@ public:
 	IdType
 	getOwningZoneIndex() const noexcept
 	{
-		return _owningZoneId;
+		return _data.owningZoneId;
 	}
 
 	KOKKOS_INLINE_FUNCTION
 	void
 	setOwningZoneIndex(IdType id) noexcept
 	{
-		_owningZoneId = id;
+		_data.owningZoneId = id;
 	}
 	//!@}
 
@@ -87,7 +161,7 @@ public:
 	bool
 	hasData() const noexcept
 	{
-		return _data != invalid<ItemDataType>;
+		return !isInvalid(_data.getItem());
 	}
 
 	//!@{
@@ -95,45 +169,29 @@ public:
 	 * @brief Get/Set mapped data item
 	 */
 	KOKKOS_INLINE_FUNCTION
-	ItemDataType&
+	decltype(auto)
 	getData() noexcept
 	{
-		return _data;
+		return _data.getItem();
 	}
 
 	KOKKOS_INLINE_FUNCTION
-	const ItemDataType&
+	decltype(auto)
 	getData() const noexcept
 	{
-		return _data;
+		return _data.getItem();
 	}
 
+	template <typename T>
 	KOKKOS_INLINE_FUNCTION
 	void
-	setData(const ItemDataType& data)
+	setData(T&& data)
 	{
-		_data = data;
-	}
-
-	KOKKOS_INLINE_FUNCTION
-	void
-	setData(ItemDataType&& data)
-	{
-		_data = std::move(data);
+		_data.setItem(std::forward<T>(data));
 	}
 	//!@}
 
 private:
-	//! Region mapped from by this Tile
-	RegionType _region;
-	//! Index of owning Zone
-	IdType _owningZoneId{invalid<IdType>};
-
-	// FIXME: Idea would be to use optional<ItemDataType> to hold arbitrary
-	// data in a Tile. It needs to be initialized to an invalid state.
-	static_assert(std::is_same<ItemDataType, IdType>::value,
-		"Only IdType supported for now");
-	//! Mapped user data item
-	ItemDataType _data{invalid<ItemDataType>};
+	TileData<RegionType, ItemDataType> _data;
 };
 } // namespace plsm

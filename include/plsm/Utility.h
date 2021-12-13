@@ -16,6 +16,14 @@ using DimType = std::size_t;
 template <typename T>
 inline constexpr T invalid = std::numeric_limits<T>::max() - static_cast<T>(1);
 
+template <typename T>
+KOKKOS_INLINE_FUNCTION
+constexpr bool
+isInvalid(const T& val) noexcept
+{
+	return val == invalid<T>;
+}
+
 //! Convention chosen to represent a wildcard value for the given type
 template <typename T>
 inline constexpr T wildcard = std::numeric_limits<T>::max();

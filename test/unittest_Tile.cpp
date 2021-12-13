@@ -15,7 +15,7 @@ TEMPLATE_LIST_TEST_CASE("Tile Basic", "[Tile][template]", test::IntTypes)
 
 	using Ival = typename RegionType::IntervalType;
 	RegionType r1{Ival{12}, Ival{8}};
-	TileType t1{r1, 0};
+	Tile<RegionType, TestType> t1{r1, 0};
 	REQUIRE(t1.hasOwningZone());
 	REQUIRE(t1.getOwningZoneIndex() == 0);
 	REQUIRE(!t1.getRegion().empty());

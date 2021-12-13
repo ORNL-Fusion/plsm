@@ -37,7 +37,7 @@ struct SubpavingTester;
  * @test benchmark_Subpaving.cpp
  */
 template <typename TScalar, DimType Dim, typename TEnumIndex = void,
-	typename TItemData = IdType, typename TMemSpace = DefaultMemSpace>
+	typename TItemData = void, typename TMemSpace = DefaultMemSpace>
 class Subpaving
 {
 	template <typename>

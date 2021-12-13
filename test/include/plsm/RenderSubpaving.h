@@ -156,6 +156,7 @@ inline void
 renderSubpaving(Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>& subpaving)
 {
 	std::cout << "\nNumber of Tiles: " << subpaving.getNumberOfTiles()
+			  << "\nMemory Size: " << subpaving.getDeviceMemorySize()
 			  << std::endl;
 }
 } // namespace test
