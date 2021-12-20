@@ -28,33 +28,37 @@ struct SubpavingTester
 };
 
 template <typename TSubpaving>
-SubpavingTester(const TSubpaving&) -> SubpavingTester<TSubpaving>;
+SubpavingTester<TSubpaving>
+makeSubpavingTester(const TSubpaving& subpaving)
+{
+	return SubpavingTester<TSubpaving>{subpaving};
+}
 } // namespace plsm::test
 
 TEMPLATE_LIST_TEST_CASE(
 	"Process Subdivision Ratios", "[Subpaving][template]", test::IntTypes)
 {
 	auto subpaving = Subpaving<TestType, 2>({{{0, 100}, {0, 100}}}, {{{5, 5}}});
-	test::SubpavingTester{subpaving}.checkRatios(
+	test::makeSubpavingTester(subpaving).checkRatios(
 		{{{5, 5}, {5, 5}, {2, 2}, {2, 2}}});
 
 	subpaving = Subpaving<TestType, 2>({{{0, 250}, {0, 50}}}, {{{5, 5}}});
-	test::SubpavingTester{subpaving}.checkRatios(
+	test::makeSubpavingTester(subpaving).checkRatios(
 		{{{5, 5}, {5, 5}, {5, 2}, {2, 2}}});
 
 	subpaving = Subpaving<TestType, 2>({{{10, 20}, {25, 35}}}, {{{5, 5}}});
-	test::SubpavingTester{subpaving}.checkRatios({{{5, 5}, {2, 2}}});
+	test::makeSubpavingTester(subpaving).checkRatios({{{5, 5}, {2, 2}}});
 
 	subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}});
-	test::SubpavingTester{subpaving}.checkRatios(
+	test::makeSubpavingTester(subpaving).checkRatios(
 		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}});
 
 	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{23, 11}}});
-	test::SubpavingTester{subpaving}.checkRatios(
+	test::makeSubpavingTester(subpaving).checkRatios(
 		{{{23, 11}, {23, 7}, {2, 5}, {2, 3}}});
 
 	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{2, 3}}});
-	test::SubpavingTester{subpaving}.checkRatios(
+	test::makeSubpavingTester(subpaving).checkRatios(
 		{{{2, 3}, {2, 5}, {23, 7}, {23, 11}}});
 }
 

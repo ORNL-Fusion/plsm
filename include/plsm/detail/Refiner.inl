@@ -123,7 +123,7 @@ refineTile(const TData& data, IdType index)
 	auto& ownerZone = data.zones(ownerZoneId);
 	auto level = ownerZone.getLevel();
 	auto newLevel = level + 1;
-	auto info = SubdivisionInfo<data.subpavingDim>{
+	auto info = SubdivisionInfo<TData::subpavingDim>{
 		getSubdivisionRatio(data, level, index)};
 
 	// Create first new zone, replace current tile and associate
