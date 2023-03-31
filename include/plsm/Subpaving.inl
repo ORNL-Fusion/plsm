@@ -86,7 +86,7 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 		if (toSub % refFactor == 0) {
 			return refFactor;
 		}
-		auto opt = nonSelfFactors(toSub);
+		auto opt = nonSelfFactors(static_cast<T>(toSub));
 		if (opt.empty()) {
 			return static_cast<T>(toSub);
 		}

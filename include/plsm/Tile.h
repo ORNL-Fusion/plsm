@@ -131,8 +131,8 @@ private:
 
 	// FIXME: Idea would be to use optional<ItemDataType> to hold arbitrary
 	// data in a Tile. It needs to be initialized to an invalid state.
-	static_assert(std::is_same<ItemDataType, IdType>::value,
-		"Only IdType supported for now");
+	static_assert(
+		std::is_same<ItemDataType, IdType>{}, "Only IdType supported for now");
 	//! Mapped user data item
 	ItemDataType _data{invalid<ItemDataType>};
 };

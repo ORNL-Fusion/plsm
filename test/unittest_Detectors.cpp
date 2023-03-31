@@ -146,7 +146,7 @@ TEMPLATE_LIST_TEST_CASE(
 			refine::BallDetector<TestType, 2, TagPair<Overlap, SelectAll>>;
 		using RefineTag = typename DetectorType::RefineTag;
 		using SelectTag = typename DetectorType::SelectTag;
-		static_assert(std::is_same<SelectTag, SelectAll>::value, "");
+		static_assert(std::is_same<SelectTag, SelectAll>{});
 		DetectorType bd2{{64, 64}, 64};
 		REQUIRE(bd2.intersect(r));
 		REQUIRE(bd2.intersect(r1));

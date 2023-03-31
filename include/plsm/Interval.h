@@ -39,8 +39,9 @@ enum class RangeElem
 template <typename TLimit>
 class Interval
 {
-	static_assert(std::is_integral<TLimit>::value,
-		"plsm::Interval: template parameter must be an integral type");
+	static_assert(std::is_integral<TLimit>{},
+		"plsm::Interval: limit type template parameter must be an integral "
+		"type");
 
 public:
 	//! Underlying type for representing interval limits
