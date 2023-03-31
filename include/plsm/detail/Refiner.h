@@ -68,8 +68,8 @@ struct RefinerData
 	Kokkos::View<IdType*> newTileStarts{};
 
 	ItemTotals newItemTotals{};
-	IdType numZones{zones.size()};
-	IdType numTiles{tiles.size()};
+	IdType numZones{static_cast<IdType>(zones.size())};
+	IdType numTiles{static_cast<IdType>(tiles.size())};
 };
 
 /*!

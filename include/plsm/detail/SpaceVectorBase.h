@@ -96,7 +96,7 @@ public:
 	/*!
 	 * @copydoc isOnAxis()
 	 */
-	template <typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+	template <typename T, std::enable_if_t<std::is_enum<T>{}, int> = 0>
 	KOKKOS_INLINE_FUNCTION
 	bool
 	isOnAxis(T axis) const noexcept

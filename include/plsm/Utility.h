@@ -57,14 +57,14 @@ namespace detail
 template <typename T>
 struct DifferenceTypeHelper
 {
-	static_assert(std::is_arithmetic<T>::value,
+	static_assert(std::is_arithmetic<T>{},
 		"Maybe you need a specialization "
 		"(see DifferenceTypeHelper<SpaceVector>)");
 
 	//! Alias for difference type appropriate for T
 	using Type =
-		std::conditional_t<std::is_integral_v<T>, std::make_signed_t<T>,
-			std::conditional_t<std::is_floating_point_v<T>, T, void>>;
+		std::conditional_t<std::is_integral<T>{}, std::make_signed_t<T>,
+			std::conditional_t<std::is_floating_point<T>{}, T, void>>;
 };
 } // namespace detail
 
@@ -77,7 +77,7 @@ using DifferenceType = typename detail::DifferenceTypeHelper<T>::Type;
 /*!
  * @brief Specialized assert for requiring a value to be non-negative
  */
-template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+template <typename T, std::enable_if_t<std::is_signed<T>{}, int> = 0>
 KOKKOS_INLINE_FUNCTION
 constexpr void
 assertNonNegative(T value)
@@ -88,9 +88,10 @@ assertNonNegative(T value)
 /*!
  * @brief Specialized assert for requiring a value to be non-negative
  */
-template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
+template <typename T, std::enable_if_t<std::is_unsigned<T>{}, int> = 0>
 KOKKOS_INLINE_FUNCTION
-constexpr void assertNonNegative(T)
+constexpr void
+assertNonNegative(T)
 {
 }
 
@@ -126,7 +127,7 @@ max(const T& a, const T& b)
 /**
  * @brief Duplicate of the generic std::abs to be used in device kernels
  */
-template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+template <typename T, std::enable_if_t<std::is_signed<T>{}, int> = 0>
 KOKKOS_INLINE_FUNCTION
 T
 abs(T a)
@@ -134,7 +135,7 @@ abs(T a)
 	return max(-a, a);
 }
 
-template <typename T, std::enable_if_t<std::is_unsigned<T>::value, int> = 0>
+template <typename T, std::enable_if_t<std::is_unsigned<T>{}, int> = 0>
 KOKKOS_INLINE_FUNCTION
 T
 abs(T a)

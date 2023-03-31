@@ -267,8 +267,8 @@ Refiner<TSubpaving, TDetector>::assignNewItems()
 		KOKKOS_LAMBDA(IdType id) { refineTile(data, id); });
 	Kokkos::fence();
 
-	_data.numZones = _data.zones.size();
-	_data.numTiles = _data.tiles.size();
+	_data.numZones = static_cast<IdType>(_data.zones.size());
+	_data.numTiles = static_cast<IdType>(_data.tiles.size());
 }
 } // namespace detail
 } // namespace plsm

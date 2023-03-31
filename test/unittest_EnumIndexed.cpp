@@ -40,5 +40,5 @@ TEST_CASE("Enum-Indexed MultiIndex")
 
 TEST_CASE("Void Index Type")
 {
-	static_assert(std::is_same_v<EnumIndexed<MultiIndex<3>>, MultiIndex<3>>);
+	static_assert(std::is_same<EnumIndexed<MultiIndex<3>>, MultiIndex<3>>{});
 }

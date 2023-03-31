@@ -26,7 +26,7 @@ set(TESTING_SRC_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 # Get Catch2 single-header
 file(DOWNLOAD
-    https://raw.githubusercontent.com/catchorg/Catch2/v2.11.1/single_include/catch2/catch.hpp
+    https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp
     "${TESTING_BIN_DIR}/catch.hpp"
 )
 
