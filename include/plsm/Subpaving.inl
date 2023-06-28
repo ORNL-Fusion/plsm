@@ -85,7 +85,9 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 	auto getNextFactor = [nonSelfFactors](auto toSub, auto refFactor) {
 		using T = std::remove_reference_t<decltype(refFactor)>;
 		if (toSub % refFactor == 0) {
-			return refFactor;
+			if (refFactor != 1) {
+				return refFactor;
+			}
 		}
 		auto opt = nonSelfFactors(static_cast<T>(toSub));
 		if (opt.empty()) {

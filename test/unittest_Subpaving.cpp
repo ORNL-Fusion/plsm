@@ -17,11 +17,24 @@ struct SubpavingTester
 {
 	using Ratio = SubdivisionRatio<TSubpaving::dimension()>;
 
-	void
+	bool
 	checkRatios(const std::vector<Ratio>& ratios)
 	{
+		bool ret = true;
 		auto infos = subpaving.makeMirrorCopy()._subdivisionInfos;
-		REQUIRE(infos.size() == ratios.size());
+#define EXPR infos.size() == ratios.size()
+		CHECK(EXPR);
+		if (!(EXPR)) {
+			return false;
+		}
+#undef EXPR
+		for (std::size_t i = 0; i < infos.size(); ++i) {
+#define EXPR infos[i].getRatio() == ratios[i]
+			ret = ret && EXPR;
+			CHECK(EXPR);
+#undef EXPR
+		}
+		return ret;
 	}
 
 	TSubpaving subpaving;
@@ -38,28 +51,63 @@ makeSubpavingTester(const TSubpaving& subpaving)
 TEMPLATE_LIST_TEST_CASE(
 	"Process Subdivision Ratios", "[Subpaving][template]", test::IntTypes)
 {
-	auto subpaving = Subpaving<TestType, 2>({{{0, 100}, {0, 100}}}, {{{5, 5}}});
-	test::makeSubpavingTester(subpaving).checkRatios(
-		{{{5, 5}, {5, 5}, {2, 2}, {2, 2}}});
+	Subpaving<TestType, 2> subpaving;
 
-	subpaving = Subpaving<TestType, 2>({{{0, 250}, {0, 50}}}, {{{5, 5}}});
-	test::makeSubpavingTester(subpaving).checkRatios(
-		{{{5, 5}, {5, 5}, {5, 2}, {2, 2}}});
+	REQUIRE_NOTHROW(
+		subpaving = Subpaving<TestType, 2>({{{0, 100}, {0, 100}}}, {{{5, 5}}}));
+	REQUIRE(test::makeSubpavingTester(subpaving).checkRatios(
+		{{{5, 5}, {5, 5}, {2, 2}, {2, 2}}}));
 
-	subpaving = Subpaving<TestType, 2>({{{10, 20}, {25, 35}}}, {{{5, 5}}});
-	test::makeSubpavingTester(subpaving).checkRatios({{{5, 5}, {2, 2}}});
+	REQUIRE_NOTHROW(
+		subpaving = Subpaving<TestType, 2>({{{0, 250}, {0, 50}}}, {{{5, 5}}}));
+	REQUIRE(test::makeSubpavingTester(subpaving).checkRatios(
+		{{{5, 5}, {5, 5}, {5, 2}, {2, 1}}}));
 
-	subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}});
-	test::makeSubpavingTester(subpaving).checkRatios(
-		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}});
+	REQUIRE_NOTHROW(
+		subpaving = Subpaving<TestType, 2>({{{10, 20}, {25, 35}}}, {{{5, 5}}}));
+	REQUIRE(
+		test::makeSubpavingTester(subpaving).checkRatios({{{5, 5}, {2, 2}}}));
 
-	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{23, 11}}});
-	test::makeSubpavingTester(subpaving).checkRatios(
-		{{{23, 11}, {23, 7}, {2, 5}, {2, 3}}});
+	REQUIRE_NOTHROW(
+		subpaving = Subpaving<TestType, 2>({{{0, 300}, {0, 275}}}, {{{5, 5}}}));
+	REQUIRE(test::makeSubpavingTester(subpaving).checkRatios(
+		{{{5, 5}, {5, 5}, {4, 11}, {3, 1}}}));
 
-	subpaving = Subpaving<TestType, 2>({{{0, 2116}, {0, 1155}}}, {{{2, 3}}});
-	test::makeSubpavingTester(subpaving).checkRatios(
-		{{{2, 3}, {2, 5}, {23, 7}, {23, 11}}});
+	REQUIRE_NOTHROW(subpaving = Subpaving<TestType, 2>(
+						{{{0, 2116}, {0, 1155}}}, {{{23, 11}}}));
+	REQUIRE(test::makeSubpavingTester(subpaving).checkRatios(
+		{{{23, 11}, {23, 7}, {2, 5}, {2, 3}}}));
+
+	REQUIRE_NOTHROW(subpaving = Subpaving<TestType, 2>(
+						{{{0, 2116}, {0, 1155}}}, {{{2, 3}}}));
+	REQUIRE(test::makeSubpavingTester(subpaving).checkRatios(
+		{{{2, 3}, {2, 5}, {23, 7}, {23, 11}}}));
+
+	// Based on xolotl cases
+	Subpaving<TestType, 4> sp;
+	REQUIRE_NOTHROW(
+		sp = Subpaving<TestType, 4>({{{0, 256}, {0, 256}, {0, 128}, {0, 128}}},
+			{{{4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2},
+				{1, 1, 2, 2}, {1, 1, 2, 2}, {1, 1, 1, 2}}}));
+	REQUIRE(test::makeSubpavingTester(sp).checkRatios(
+		{{{4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {1, 1, 2, 2},
+			{1, 1, 2, 2}, {1, 1, 1, 2}, {1, 1, 2, 1}}}));
+
+	REQUIRE_NOTHROW(
+		sp = Subpaving<TestType, 4>({{{0, 256}, {0, 256}, {0, 128}, {0, 128}}},
+			{{{1, 1, 2, 1}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2},
+				{4, 4, 2, 2}, {1, 1, 2, 2}, {1, 1, 2, 2}, {1, 1, 1, 2}}}));
+	REQUIRE(test::makeSubpavingTester(sp).checkRatios(
+		{{{1, 1, 2, 1}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2},
+			{1, 1, 2, 2}, {1, 1, 2, 2}, {1, 1, 1, 2}}}));
+
+	REQUIRE_NOTHROW(
+		sp = Subpaving<TestType, 4>({{{0, 256}, {0, 256}, {0, 64}, {0, 128}}},
+			{{{4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2},
+				{1, 1, 2, 2}, {1, 1, 2, 2}, {1, 1, 1, 2}}}));
+	REQUIRE(test::makeSubpavingTester(sp).checkRatios(
+		{{{4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {4, 4, 2, 2}, {1, 1, 2, 2},
+			{1, 1, 2, 2}, {1, 1, 1, 2}}}));
 }
 
 TEMPLATE_LIST_TEST_CASE(
