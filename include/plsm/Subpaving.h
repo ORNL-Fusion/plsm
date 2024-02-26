@@ -41,7 +41,7 @@ template <typename TScalar, DimType Dim, typename TEnumIndex = void,
 class Subpaving
 {
 	template <typename>
-	friend class ::plsm::test::SubpavingTester;
+	friend struct ::plsm::test::SubpavingTester;
 
 	template <typename TSubpaving, typename TSelector>
 	friend class detail::Refiner;

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <fstream>
 #include <numeric>
 #include <stdexcept>
@@ -84,7 +85,9 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 	auto getNextFactor = [nonSelfFactors](auto toSub, auto refFactor) {
 		using T = std::remove_reference_t<decltype(refFactor)>;
 		if (toSub % refFactor == 0) {
-			return refFactor;
+			if (refFactor != 1) {
+				return refFactor;
+			}
 		}
 		auto opt = nonSelfFactors(static_cast<T>(toSub));
 		if (opt.empty()) {
@@ -103,9 +106,13 @@ Subpaving<TScalar, Dim, TEnum, TItemData, TMemSpace>::processSubdivisionRatios(
 		return ret;
 	};
 
+	// Limit loop to a reasonable iteration count
+	auto maxIter = std::log2(*std::max_element(begin(extents), end(extents)));
+
 	// Create additional ratio(s) until space is fully subdivided
-	for (;;) {
-		bool needAnotherLevel = false;
+	bool needAnotherLevel = false;
+	for (int n = 0; n < maxIter; ++n) {
+		needAnotherLevel = false;
 		auto nextRatio = SubdivisionRatio<Dim>::filled(1);
 		for (auto i : makeIntervalRange(Dim)) {
 			if (ratioProduct[i] < extents[i]) {
