@@ -12,10 +12,10 @@ namespace Kokkos
  * @brief Provide begin/end pairs so that Kokkos::Array can be used in a
  * range-based for loop
  */
-template <typename T, std::size_t N, typename P>
+template <typename T, std::size_t N>
 KOKKOS_INLINE_FUNCTION
 auto
-begin(Array<T, N, P>& a) noexcept
+begin(Array<T, N>& a) noexcept
 {
 	return a.data();
 }
@@ -24,10 +24,10 @@ begin(Array<T, N, P>& a) noexcept
  * @brief Provide begin/end pairs so that Kokkos::Array can be used in a
  * range-based for loop
  */
-template <typename T, std::size_t N, typename P>
+template <typename T, std::size_t N>
 KOKKOS_INLINE_FUNCTION
 auto
-end(Array<T, N, P>& a) noexcept
+end(Array<T, N>& a) noexcept
 {
 	return a.data() + static_cast<std::ptrdiff_t>(N);
 }
@@ -36,10 +36,10 @@ end(Array<T, N, P>& a) noexcept
  * @brief Provide begin/end pairs so that Kokkos::Array can be used in a
  * range-based for loop
  */
-template <typename T, std::size_t N, typename P>
+template <typename T, std::size_t N>
 KOKKOS_INLINE_FUNCTION
 auto
-begin(const Array<T, N, P>& a) noexcept
+begin(const Array<T, N>& a) noexcept
 {
 	return a.data();
 }
@@ -48,10 +48,10 @@ begin(const Array<T, N, P>& a) noexcept
  * @brief Provide begin/end pairs so that Kokkos::Array can be used in a
  * range-based for loop
  */
-template <typename T, std::size_t N, typename P>
+template <typename T, std::size_t N>
 KOKKOS_INLINE_FUNCTION
 auto
-end(const Array<T, N, P>& a) noexcept
+end(const Array<T, N>& a) noexcept
 {
 	return a.data() + static_cast<std::ptrdiff_t>(N);
 }
