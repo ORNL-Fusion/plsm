@@ -8,7 +8,7 @@ lattice.
 
 #### C++17
 
-#### Kokkos
+#### Kokkos (>=4.5)
 At this point, Kokkos must be built separately. It should be installed (with
 `make install`) so that CMake settings can be gathered from plsm.
 

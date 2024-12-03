@@ -15,7 +15,6 @@ find_package(Kokkos 3 REQUIRED)
 set(PLSM_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
 set(PLSM_HEADER_DIR "${PLSM_INCLUDE_DIR}/plsm")
 set(PLSM_HEADERS
-    ${PLSM_HEADER_DIR}/detail/KokkosExtension.h
     ${PLSM_HEADER_DIR}/detail/Refiner.h
     ${PLSM_HEADER_DIR}/detail/Refiner.inl
     ${PLSM_HEADER_DIR}/detail/SpaceVectorBase.h

@@ -8,7 +8,6 @@
 #include <Kokkos_Array.hpp>
 
 #include <plsm/Utility.h>
-#include <plsm/detail/KokkosExtension.h>
 
 namespace plsm
 {

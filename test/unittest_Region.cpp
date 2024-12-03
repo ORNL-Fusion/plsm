@@ -1,5 +1,7 @@
 #include <catch.hpp>
 
+#include <numeric>
+
 #include <plsm/Region.h>
 #include <plsm/TestingCommon.h>
 using namespace plsm;
@@ -42,6 +44,17 @@ TEMPLATE_LIST_TEST_CASE(
 	REQUIRE(r4[1] == Ival{4, 5});
 	REQUIRE(r4[2] == Ival{5, 6});
 	REQUIRE(r4.getOrigin() == SpaceVector<TestType, 3>{3, 4, 5});
+}
+
+TEMPLATE_LIST_TEST_CASE("Region Range", "[Region][template]", test::IntTypes)
+{
+	using Ival = Interval<TestType>;
+	using SizeType = typename Ival::SizeType;
+	Region<TestType, 3> r({Ival{0, 1}, Ival{2, 3}, Ival{4, 5}});
+	REQUIRE((*begin(r)) == Ival{0, 1});
+	auto lsum = std::accumulate(begin(r), end(r), SizeType(0),
+		[](SizeType& a, auto&& b) { return a + b.length(); });
+	REQUIRE(lsum == 3);
 }
 
 TEMPLATE_LIST_TEST_CASE(

@@ -234,6 +234,9 @@ public:
 	intersectsFace(DimType flatCoord, const Segment<FlatType>& segment) const;
 };
 
+using Kokkos::begin;
+using Kokkos::end;
+
 /*!
  * @relates Region
  * @brief Insert a Region to an output stream
