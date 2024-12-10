@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cassert>
 #include <limits>
 
 #include <plsm/SpaceVector.h>
@@ -180,7 +179,7 @@ KOKKOS_INLINE_FUNCTION
 CompactFlat<T, N>
 operator-(const CompactFlat<T, N>& b, const CompactFlat<T, N>& a)
 {
-	assert(a.size() == b.size());
+	KOKKOS_ASSERT(a.size() == b.size());
 	CompactFlat<T, N> ret{b};
 	for (DimType i = 0; i < a.size(); ++i) {
 		ret[i] -= a[i];

@@ -55,7 +55,7 @@ public:
 	KOKKOS_INLINE_FUNCTION
 	Region(std::initializer_list<IntervalType> ilist) noexcept
 	{
-		assert(ilist.size() == Dim);
+		KOKKOS_ASSERT(ilist.size() == Dim);
 		for (DimType i = 0; i < Dim; ++i) {
 			(*this)[i] = ilist.begin()[i];
 		}

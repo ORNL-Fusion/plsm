@@ -36,7 +36,7 @@ public:
 	KOKKOS_INLINE_FUNCTION
 	SpaceVectorBase(std::initializer_list<ScalarType> ilist)
 	{
-		assert(ilist.size() == Dim);
+		KOKKOS_ASSERT(ilist.size() == Dim);
 		for (DimType i = 0; i < Dim; ++i) {
 			(*this)[i] = ilist.begin()[i];
 		}
@@ -61,7 +61,7 @@ public:
 	SpaceVectorBase&
 	operator=(std::initializer_list<ScalarType> ilist)
 	{
-		assert(ilist.size() == Dim);
+		KOKKOS_ASSERT(ilist.size() == Dim);
 		for (DimType i = 0; i < Dim; ++i) {
 			(*this)[i] = ilist.begin()[i];
 		}

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <limits>
 #include <type_traits>
 
@@ -82,7 +81,7 @@ KOKKOS_INLINE_FUNCTION
 constexpr void
 assertNonNegative(T value)
 {
-	assert(value >= T{});
+	KOKKOS_ASSERT(value >= T{});
 }
 
 /*!

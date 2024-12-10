@@ -70,7 +70,7 @@ public:
 	constexpr Interval(LimitType begin, LimitType end) noexcept :
 		_begin{begin}, _end{end}
 	{
-		assert(begin <= end);
+		KOKKOS_ASSERT(begin <= end);
 	}
 
 	/*!
@@ -131,7 +131,7 @@ public:
 	double
 	midpoint() const noexcept
 	{
-		assert(!empty());
+		KOKKOS_ASSERT(!empty());
 		auto a = static_cast<double>(begin());
 		auto b = static_cast<double>(end() - 1);
 		return 0.5 * (a + b);
