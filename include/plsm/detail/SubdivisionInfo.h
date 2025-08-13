@@ -25,7 +25,10 @@ template <DimType Dim>
 class SubdivisionInfo
 {
 public:
-	SubdivisionInfo() noexcept = default;
+	KOKKOS_INLINE_FUNCTION
+	SubdivisionInfo()
+	{
+	}
 
 	/*!
 	 * @brief Construct from subdivision ratio
