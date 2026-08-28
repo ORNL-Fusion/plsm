@@ -6,9 +6,9 @@ lattice.
 
 ### Dependencies
 
-#### C++17
+#### C++20
 
-#### Kokkos (>=4.5)
+#### Kokkos (>=5)
 At this point, Kokkos must be built separately. It should be installed (with
 `make install`) so that CMake settings can be gathered from plsm.
 
@@ -16,8 +16,8 @@ Perhaps this should be done as part of the build project so that configuration
 options would be controlled through CMake for plsm.
 
 #### Catch2
-Catch2 is used as the testing framework. It is included automatically since it
-is header-only, and therefore nothing needs to be done by the user.
+Catch2 is used as the testing framework. It is included automatically, and
+therefore nothing needs to be done by the user.
 
 ### CMake Instructions
 ```

@@ -23,8 +23,8 @@ struct ItemTotals
 	volatile ItemTotals&
 	operator+=(const volatile ItemTotals& other) volatile
 	{
-		zones += other.zones;
-		tiles += other.tiles;
+		zones = zones + other.zones;
+		tiles = tiles + other.tiles;
 		return *this;
 	}
 };
@@ -113,7 +113,7 @@ protected:
 
 protected:
 	SubpavingType& _subpaving;
-	typename Kokkos::View<SubdivisionInfoType*>::HostMirror _subdivInfoMirror;
+	typename Kokkos::View<SubdivisionInfoType*>::host_mirror_type _subdivInfoMirror;
 
 	RefinerData<TSubpaving, TDetector> _data;
 };

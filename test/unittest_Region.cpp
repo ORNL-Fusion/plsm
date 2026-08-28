@@ -53,7 +53,7 @@ TEMPLATE_LIST_TEST_CASE("Region Range", "[Region][template]", test::IntTypes)
 	Region<TestType, 3> r({Ival{0, 1}, Ival{2, 3}, Ival{4, 5}});
 	REQUIRE((*begin(r)) == Ival{0, 1});
 	auto lsum = std::accumulate(begin(r), end(r), SizeType(0),
-		[](SizeType& a, auto&& b) { return a + b.length(); });
+		[](SizeType a, auto&& b) { return a + b.length(); });
 	REQUIRE(lsum == 3);
 }
 

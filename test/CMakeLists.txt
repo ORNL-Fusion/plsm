@@ -24,11 +24,16 @@ endif()
 set(TESTING_BIN_DIR ${CMAKE_CURRENT_BINARY_DIR})
 set(TESTING_SRC_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-# Get Catch2 single-header
-file(DOWNLOAD
-    https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp
-    "${TESTING_BIN_DIR}/catch.hpp"
+# Get Catch2
+Include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.8.1 # or a later release
 )
+
+FetchContent_MakeAvailable(Catch2)
 
 macro(add_unittest_source _source_list _name)
     list(APPEND ${_source_list} unittest_${_name}.cpp)
@@ -40,7 +45,7 @@ endmacro(add_benchmark_source)
 
 function(create_test _name _sources_list)
     add_executable(${_name} ${${_sources_list}} test_main.cpp)
-    target_link_libraries(${_name} PUBLIC plsm)
+    target_link_libraries(${_name} PUBLIC plsm Catch2::Catch2)
     target_include_directories(${_name} PUBLIC
         "${TESTING_SRC_DIR}/include"
         "${TESTING_BIN_DIR}"

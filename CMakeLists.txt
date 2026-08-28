@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(plsm
-    VERSION 2.1.3
+    VERSION 2.2.0
     LANGUAGES CXX
 )
 
 list(APPEND CMAKE_PREFIX_PATH ${Kokkos_DIR})
-find_package(Kokkos 3 REQUIRED)
+find_package(Kokkos 5 REQUIRED)
 
 set(PLSM_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
 set(PLSM_HEADER_DIR "${PLSM_INCLUDE_DIR}/plsm")
